@@ -273,12 +273,12 @@
   </div>
 
   <!-- Header (Balanced Single-Row Top Navbar on Desktop + Clean 2-Row on Mobile) -->
-  <header class="sticky top-0 z-40 safe-top-pad border-b px-3 sm:px-6 py-2.5 backdrop-blur-2xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
+  <header class="sticky top-0 z-40 safe-top-pad border-b px-2.5 sm:px-6 py-2 sm:py-2.5 backdrop-blur-2xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
     <div class="max-w-7xl mx-auto space-y-2 lg:space-y-0">
       <div class="flex items-center justify-between gap-2 lg:gap-4">
         <!-- Brand (Right/Start) -->
         <div class="flex items-center gap-2.5 shrink-0">
-          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
+          <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h3.5l2.2-5.5 3.3 11 2.4-6.5L16 12h5" />
               <circle cx="19.5" cy="6.5" r="1.5" fill="#30d158" stroke="none" />
@@ -306,34 +306,34 @@
             <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span id="live-studying-count" class="font-mono-num font-extrabold">56</span>
-              <span>نشط الآن</span>
+              <span>نشط</span>
             </span>
           </div>
 
           <span id="admin-active-badge" class="hidden"></span>
 
-          <button id="btn-notifications-bell" type="button" class="tap-btn relative p-2 rounded-full apple-subcard cursor-pointer" title="إشعارات الدفعة">
+          <button id="btn-notifications-bell" type="button" class="tap-btn relative p-1.5 sm:p-2 rounded-full apple-subcard cursor-pointer" title="إشعارات الدفعة">
             <svg id="bell-icon-svg" class="w-4 h-4 text-[#38bdf8] bell-anim-svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
             </svg>
             <span id="notif-unread-badge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-extrabold font-mono-num flex items-center justify-center">0</span>
           </button>
 
-          <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1.5 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
+          <button id="btn-student-auth" type="button" class="tap-btn px-2 sm:px-3 py-1 sm:py-1.5 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
             <span id="header-student-avatar" class="inline-flex items-center justify-center shrink-0" title="إعدادات حسابي"><i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i></span>
-            <span id="student-header-label" class="max-w-[64px] sm:max-w-[120px] truncate">دخول</span>
+            <span id="student-header-label" class="max-w-[68px] sm:max-w-[120px] truncate">دخول</span>
           </button>
 
-          <button id="btn-admin-lock" type="button" class="tap-btn p-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
+          <button id="btn-admin-lock" type="button" class="tap-btn p-1.5 sm:p-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
             <i data-lucide="lock" class="w-3.5 h-3.5"></i>
             <span id="admin-lock-label" class="hidden sm:inline text-amber-400 font-bold"></span>
           </button>
 
-          <button id="btn-perf-quick-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="وضع الأداء السريع (تشغيل/إيقاف الأنيميشنز)">
+          <button id="btn-perf-quick-toggle" type="button" class="tap-btn p-1.5 sm:p-2 rounded-full apple-subcard cursor-pointer" title="وضع الأداء السريع (تشغيل/إيقاف الأنيميشنز)">
             <i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>
           </button>
 
-          <button id="btn-theme-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
+          <button id="btn-theme-toggle" type="button" class="tap-btn p-1.5 sm:p-2 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
             <i data-lucide="sun-moon" class="w-4 h-4 text-[#0a84ff]"></i>
           </button>
         </div>
@@ -365,7 +365,7 @@
           <span class="inline-flex items-center gap-1 text-emerald-400 font-bold text-[10px]">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             <span id="live-studying-count-mob" class="font-mono-num font-extrabold">56</span>
-            <span>نشط الآن</span>
+            <span>نشط</span>
           </span>
         </div>
       </div>
