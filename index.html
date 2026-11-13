@@ -292,29 +292,25 @@
 
         <!-- Centered Glass Nav Capsule (Desktop lg+) -->
         <nav class="hidden lg:inline-flex seg-control items-center gap-1 shrink-0">
-          <button data-tab="home" class="nav-pill tap-btn active px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap">الرئيسية والامتحانات</button>
-          <button data-tab="planner" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">المخطط والدراسة</button>
-          <button data-tab="syllabus" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">المنهج والتشيك ليست</button>
-          <button data-tab="chat" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5 whitespace-nowrap" style="color: var(--text-muted);"><span>المذاكرة الجماعية</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span></button>
-          <button id="nav-admin-tab" data-tab="admin" class="hidden nav-pill tap-btn px-3.5 py-1.5 text-xs font-bold cursor-pointer text-amber-400 whitespace-nowrap">إدارة الأدمن</button>
+          <button data-tab="home" class="nav-pill tap-btn active px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap">الرئيسية</button>
+          <button data-tab="planner" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">المخطط</button>
+          <button data-tab="syllabus" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">المنهج</button>
+          <button data-tab="chat" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5 whitespace-nowrap" style="color: var(--text-muted);"><span>الشات</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span></button>
+          <button id="nav-admin-tab" data-tab="admin" class="hidden nav-pill tap-btn px-3.5 py-1.5 text-xs font-bold cursor-pointer text-amber-400 whitespace-nowrap">الأدمن</button>
         </nav>
 
         <!-- Actions & Compact Live Pill (Left/End) -->
         <div class="flex items-center gap-1.5 shrink-0">
-          <div class="hidden lg:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full apple-subcard text-[11px] whitespace-nowrap">
-            <span id="cloud-sync-badge" class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-              <span>محلي</span>
-            </span>
-            <span class="opacity-40">•</span>
-            <span class="inline-flex items-center gap-1 text-emerald-400 font-bold text-[10px]">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="live-studying-count" class="font-mono-num font-extrabold">41</span>
-              <span>يذاكرون الآن</span>
+          <div class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full apple-subcard text-[11px] whitespace-nowrap">
+            <span id="cloud-sync-badge" class="hidden"></span>
+            <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="live-studying-count" class="font-mono-num font-extrabold">56</span>
+              <span>نشط الآن</span>
             </span>
           </div>
 
-          <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">Admin</span>
+          <span id="admin-active-badge" class="hidden"></span>
 
           <button id="btn-notifications-bell" type="button" class="tap-btn relative p-2 rounded-full apple-subcard cursor-pointer" title="إشعارات الدفعة">
             <svg id="bell-icon-svg" class="w-4 h-4 text-[#38bdf8] bell-anim-svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
@@ -324,15 +320,13 @@
           </button>
 
           <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1.5 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
-            <span id="header-student-avatar" class="inline-flex items-center justify-center shrink-0" title="تغيير الأفاتار"><i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i></span>
+            <span id="header-student-avatar" class="inline-flex items-center justify-center shrink-0" title="إعدادات حسابي"><i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i></span>
             <span id="student-header-label" class="max-w-[74px] sm:max-w-[120px] truncate">دخول</span>
           </button>
 
-          <button id="btn-student-logout" type="button" class="hidden tap-btn px-2 py-1.5 rounded-full apple-subcard text-[10px] font-bold text-rose-400 cursor-pointer" title="تسجيل خروج / تبديل الحساب">خروج</button>
-
-          <button id="btn-admin-lock" type="button" class="tap-btn px-2 sm:px-2.5 py-1.5 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
+          <button id="btn-admin-lock" type="button" class="tap-btn p-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
             <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-            <span id="admin-lock-label" class="hidden xl:inline">Admin</span>
+            <span id="admin-lock-label" class="hidden text-amber-400 font-bold"></span>
           </button>
 
           <button id="btn-perf-quick-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="وضع الأداء السريع (تشغيل/إيقاف الأنيميشنز)">
@@ -349,7 +343,7 @@
       <div class="hidden sm:flex lg:hidden items-center justify-center pt-1">
         <nav class="seg-control inline-flex items-center gap-1">
           <button data-tab="home" class="nav-pill tap-btn active px-3.5 py-1.5 text-xs font-semibold cursor-pointer">الرئيسية</button>
-          <button data-tab="planner" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المخطط والدراسة</button>
+          <button data-tab="planner" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المخطط</button>
           <button data-tab="syllabus" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المنهج</button>
           <button data-tab="chat" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">الشات</button>
         </nav>
@@ -369,9 +363,9 @@
           <span id="header-hours-badge" class="text-emerald-400 font-bold font-mono-num">0.0h مذاكرة</span>
           <span class="opacity-40">•</span>
           <span class="inline-flex items-center gap-1 text-emerald-400 font-bold text-[10px]">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>يذاكرون الآن:</span>
-            <span id="live-studying-count-mob" class="font-mono-num font-extrabold">41</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="live-studying-count-mob" class="font-mono-num font-extrabold">56</span>
+            <span>نشط الآن</span>
           </span>
         </div>
       </div>
@@ -1488,7 +1482,7 @@
     function updateStudentHeaderUI() {
       const label = document.getElementById('student-header-label');
       const avSlot = document.getElementById('header-student-avatar');
-      const logoutBtn = document.getElementById('btn-student-logout');
+      const perfBtn = document.getElementById('btn-perf-quick-toggle');
       const hint = document.getElementById('kpi-sync-hint');
       if (state.studentProfile && state.studentProfile.studentId) {
         label.textContent = `أهلاً، ${state.studentProfile.name.split(' ')[0]}`;
@@ -1497,12 +1491,12 @@
             ? getStudentAvatarHtml(state.studentProfile.avatarType, 22)
             : '<i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>';
         }
-        logoutBtn.classList.remove('hidden');
+        if (perfBtn) perfBtn.classList.add('hidden');
         if (hint) hint.textContent = `متزامن (${state.studentProfile.studentId})`;
       } else {
         label.textContent = 'دخول';
         if (avSlot) avSlot.innerHTML = '<i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>';
-        logoutBtn.classList.add('hidden');
+        if (perfBtn) perfBtn.classList.remove('hidden');
         if (hint) hint.textContent = 'محفوظ على جهازك';
       }
       refreshLucideIcons();
@@ -2323,7 +2317,8 @@
       document.getElementById('nav-admin-tab').classList.toggle('hidden', !adm);
       document.getElementById('mob-admin-btn').classList.toggle('hidden', !adm);
       document.getElementById('add-topic-form').classList.toggle('hidden', !adm);
-      document.getElementById('admin-lock-label').textContent = adm ? 'Admin ✓' : 'Admin';
+      const admLbl = document.getElementById('admin-lock-label');
+      if (admLbl) { admLbl.textContent = adm ? 'Admin' : ''; admLbl.classList.toggle('hidden', !adm); }
       renderExamsTimeline();
       renderSubjects();
       updateChatAuthUI();
@@ -2827,7 +2822,7 @@
       };
       document.getElementById('acc-logout-btn').onclick = () => {
         document.getElementById('account-settings-modal').classList.add('hidden');
-        document.getElementById('btn-student-logout').click();
+        logoutStudentAccount();
       };
       document.getElementById('account-settings-form').onsubmit = async (e) => {
         e.preventDefault();
@@ -2876,14 +2871,14 @@
       document.getElementById('tab-stu-login').onclick = () => openStudentAuthModal('login');
       document.getElementById('tab-stu-signup').onclick = () => openStudentAuthModal('signup');
 
-      document.getElementById('btn-student-logout').onclick = () => {
+      function logoutStudentAccount() {
         state.studentProfile = null;
         state.guestDismissed = false;
         updateStudentHeaderUI();
         saveLocalStudentState();
         showToast('تم تسجيل خروج الطالب');
         openStudentAuthModal('login');
-      };
+      }
 
       document.getElementById('student-auth-form').onsubmit = async (e) => {
         e.preventDefault();
