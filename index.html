@@ -221,7 +221,7 @@
   <div id="broadcast-toast" class="hidden fixed top-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-50 safe-top-pad">
     <div id="broadcast-toast-card" class="apple-card modal-pop p-3.5 sm:p-4 border border-[#0a84ff]/50 shadow-2xl flex items-start justify-between gap-3">
       <div class="flex items-start gap-2.5 min-w-0">
-        <span class="text-lg shrink-0">🔔</span>
+        <span id="broadcast-toast-avatar" class="text-lg shrink-0">🔔</span>
         <div class="min-w-0">
           <div class="flex items-center gap-2 flex-wrap">
             <span id="broadcast-toast-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0a84ff]/20 text-[#0a84ff]">إشعار جديد</span>
@@ -598,6 +598,22 @@
 
     <!-- TAB 4: ADMIN TAB & STUDENT STATS -->
     <section id="tab-admin" class="tab-panel hidden space-y-6 fade-in">
+      <!-- Admin Exclusive Avatar (shared/admin_profile) -->
+      <div class="apple-card p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4 border-r-4 border-r-amber-400">
+        <div class="flex items-center gap-3.5 min-w-0">
+          <div id="admin-avatar-preview-wrap" class="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center text-amber-400 text-lg font-extrabold overflow-hidden shrink-0">A</div>
+          <div class="min-w-0">
+            <h2 class="text-base font-bold">صورة الأدمن الشخصية (حصرية للأدمن)</h2>
+            <p class="text-xs" style="color: var(--text-muted);">تظهر بجانب رسائلك في الشات وبجانب إشعارات الدفعة لجميع الطلبة.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <input id="admin-avatar-input" type="file" accept="image/*" class="hidden" />
+          <button type="button" id="admin-avatar-upload-btn" class="tap-btn px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer">رفع / تغيير الصورة</button>
+          <button type="button" id="admin-avatar-remove-btn" class="hidden tap-btn px-3 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">حذف</button>
+        </div>
+      </div>
+
       <!-- Admin Student Stats -->
       <div class="apple-card p-5 sm:p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
@@ -628,9 +644,12 @@
 
       <!-- Admin Broadcast Notifications (shared/notifications) -->
       <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-500">
-        <div>
-          <h2 class="text-base font-bold">إرسال إشعار للدفعة (Notifications Live)</h2>
-          <p class="text-xs" style="color: var(--text-muted);">يصل فوراً للطلبة كإشعار منبثق أعلى الشاشة ويُحفظ في أيقونة الجرس.</p>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base font-bold">إرسال إشعار للدفعة (Notifications Live)</h2>
+            <p class="text-xs" style="color: var(--text-muted);">يصل فوراً للطلبة كإشعار منبثق أعلى الشاشة ويُحفظ في أيقونة الجرس.</p>
+          </div>
+          <button type="button" id="admin-clear-all-notifs" class="tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">حذف جميع الإشعارات</button>
         </div>
         <form id="admin-broadcast-form" class="space-y-3">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -645,6 +664,7 @@
             <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إرسال الإشعار الآن</button>
           </div>
         </form>
+        <div id="admin-notifications-list" class="space-y-2 max-h-60 overflow-y-auto custom-scroll"></div>
       </div>
 
       <!-- Smart Moderation Bot Settings (shared/moderation) -->
@@ -818,9 +838,12 @@
   <!-- Notifications History Modal -->
   <div id="notifications-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
     <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 max-h-[85dvh] flex flex-col">
-      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
+      <div class="flex items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
         <h3 class="text-base font-bold">إشعارات الدفعة</h3>
-        <button type="button" id="notifications-modal-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
+        <div class="flex items-center gap-2">
+          <button type="button" id="modal-clear-all-notifs" class="hidden tap-btn px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-400 text-[11px] font-bold cursor-pointer">حذف جميع الإشعارات</button>
+          <button type="button" id="notifications-modal-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
+        </div>
       </div>
       <div id="notifications-history-list" class="flex-1 overflow-y-auto custom-scroll space-y-2.5"></div>
     </div>
@@ -991,7 +1014,8 @@
       chatPendingImage: null,
       pinnedChat: null,
       customBannedWords: [],
-      notifications: []
+      notifications: [],
+      adminAvatar: ''
     };
 
     let studentsUnsub = null;
@@ -1357,9 +1381,12 @@
           : isMine
             ? 'border-[#0a84ff]/45 bg-[#0a84ff]/15 rounded-tl-sm'
             : 'rounded-tr-sm';
+        const avatarHtml = (m.isAdmin && shared.adminAvatar)
+          ? `<img src="${shared.adminAvatar}" alt="Admin" class="w-8 h-8 rounded-full object-cover ring-2 ring-amber-400/70 shrink-0 shadow-md" />`
+          : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 shadow-md" style="background:${avColor};">${escapeHtml(initial)}</div>`;
         return `
           <div class="stagger-item flex items-end gap-2 ${isMine ? 'flex-row' : 'flex-row-reverse'}" style="--i:${Math.min(idx, 10)}">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 shadow-md" style="background:${avColor};">${escapeHtml(initial)}</div>
+            ${avatarHtml}
             <div class="max-w-[82%] sm:max-w-[70%] apple-subcard p-3 sm:p-3.5 space-y-1.5 ${bubbleStyle}">
               <div class="flex items-center justify-between gap-2 flex-wrap text-[11px]">
                 <div class="flex items-center gap-1.5 flex-wrap">
@@ -1476,34 +1503,55 @@
     // =========================================================================
     let notifBooted = false;
     let broadcastToastTimer = null;
+    function renderNotificationCard(n) {
+      const tStr = n.createdAt ? new Date(n.createdAt).toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      const isUrg = n.priority === 'urgent';
+      const admImg = shared.adminAvatar ? `<img src="${shared.adminAvatar}" alt="Admin" class="w-6 h-6 rounded-full object-cover ring-1 ring-amber-400/70 shrink-0" />` : '';
+      return `
+        <div class="apple-subcard p-3.5 space-y-1.5 ${isUrg ? 'border-rose-500/45 bg-rose-500/10' : ''}">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              ${admImg}
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isUrg ? 'bg-rose-500/20 text-rose-400' : 'bg-[#0a84ff]/20 text-[#0a84ff]'}">${isUrg ? 'هام جداً' : 'عادي'}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
+              ${shared.isAdmin ? `<button type="button" data-del-notif="${escapeHtml(n.id)}" class="del-notif-btn tap-btn text-xs px-1.5 py-0.5 rounded-lg hover:bg-rose-500/20 cursor-pointer" title="حذف الإشعار">🗑️</button>` : ''}
+            </div>
+          </div>
+          <div class="text-xs sm:text-sm font-bold">${escapeHtml(n.title)}</div>
+          <div class="text-xs leading-relaxed" style="color: var(--text-muted);">${escapeHtml(n.body)}</div>
+        </div>`;
+    }
     function updateNotifBadgeAndList() {
       const badge = document.getElementById('notif-unread-badge');
       const listEl = document.getElementById('notifications-history-list');
+      const adminListEl = document.getElementById('admin-notifications-list');
+      const modalClearBtn = document.getElementById('modal-clear-all-notifs');
+      const adminClearBtn = document.getElementById('admin-clear-all-notifs');
       const items = [...(shared.notifications || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       const unread = items.filter(n => (n.createdAt || 0) > (state.lastNotifReadAt || 0)).length;
       if (badge) {
         badge.textContent = unread > 9 ? '9+' : String(unread);
         badge.classList.toggle('hidden', unread === 0);
       }
-      if (listEl) {
-        if (!items.length) {
-          listEl.innerHTML = `<div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">لا توجد إشعارات من الإدارة حالياً.</div>`;
-        } else {
-          listEl.innerHTML = items.map(n => {
-            const tStr = n.createdAt ? new Date(n.createdAt).toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
-            const isUrg = n.priority === 'urgent';
-            return `
-              <div class="apple-subcard p-3.5 space-y-1 ${isUrg ? 'border-rose-500/45 bg-rose-500/10' : ''}">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isUrg ? 'bg-rose-500/20 text-rose-400' : 'bg-[#0a84ff]/20 text-[#0a84ff]'}">${isUrg ? 'هام جداً' : 'عادي'}</span>
-                  <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
-                </div>
-                <div class="text-xs sm:text-sm font-bold">${escapeHtml(n.title)}</div>
-                <div class="text-xs leading-relaxed" style="color: var(--text-muted);">${escapeHtml(n.body)}</div>
-              </div>`;
-          }).join('');
-        }
-      }
+      if (modalClearBtn) modalClearBtn.classList.toggle('hidden', !(shared.isAdmin && items.length));
+      if (adminClearBtn) adminClearBtn.classList.toggle('hidden', !items.length);
+      const emptyHtml = `<div class="apple-subcard p-4 text-center text-xs" style="color: var(--text-muted);">لا توجد إشعارات مرسلة حالياً.</div>`;
+      const cardsHtml = items.length ? items.map(renderNotificationCard).join('') : emptyHtml;
+      if (listEl) listEl.innerHTML = cardsHtml;
+      if (adminListEl) adminListEl.innerHTML = cardsHtml;
+    }
+    async function deleteNotificationById(notifId) {
+      if (!shared.isAdmin || !fbDb) return;
+      const nextItems = (shared.notifications || []).filter(n => n.id !== notifId);
+      await saveSharedToFirestore('notifications', { items: nextItems });
+      showToast('تم حذف الإشعار');
+    }
+    async function clearAllNotifications() {
+      if (!shared.isAdmin || !fbDb) return;
+      await saveSharedToFirestore('notifications', { items: [] });
+      showToast('تم حذف جميع الإشعارات');
     }
     function showBroadcastTopToast(n) {
       const wrap = document.getElementById('broadcast-toast');
@@ -1514,6 +1562,7 @@
       badge.textContent = isUrg ? 'إشعار هام جداً' : 'إشعار للدفعة';
       badge.className = `px-2 py-0.5 rounded text-[10px] font-bold ${isUrg ? 'bg-rose-500/20 text-rose-400' : 'bg-[#0a84ff]/20 text-[#0a84ff]'}`;
       card.className = `apple-card modal-pop p-3.5 sm:p-4 shadow-2xl flex items-start justify-between gap-3 border ${isUrg ? 'border-rose-500/60' : 'border-[#0a84ff]/50'}`;
+      document.getElementById('broadcast-toast-avatar').innerHTML = shared.adminAvatar ? `<img src="${shared.adminAvatar}" alt="Admin" class="w-8 h-8 rounded-full object-cover ring-2 ring-amber-400/70" />` : '🔔';
       document.getElementById('broadcast-toast-title').textContent = n.title || '';
       document.getElementById('broadcast-toast-body').textContent = n.body || '';
       wrap.classList.remove('hidden');
@@ -1522,6 +1571,42 @@
       broadcastToastTimer = setTimeout(() => wrap.classList.add('hidden'), 6500);
     }
 
+    function renderAdminAvatarPreview() {
+      const wrap = document.getElementById('admin-avatar-preview-wrap');
+      const remBtn = document.getElementById('admin-avatar-remove-btn');
+      if (!wrap) return;
+      if (shared.adminAvatar) {
+        wrap.innerHTML = `<img src="${shared.adminAvatar}" alt="Admin Avatar" class="w-full h-full object-cover" />`;
+        if (remBtn) remBtn.classList.remove('hidden');
+      } else {
+        wrap.textContent = 'A';
+        if (remBtn) remBtn.classList.add('hidden');
+      }
+    }
+    function compressSquareAvatar160(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('تعذر قراءة الصورة'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('ملف صورة غير صالح'));
+          img.onload = () => {
+            const size = 160;
+            const minSide = Math.min(img.width, img.height);
+            const sx = Math.floor((img.width - minSide) / 2);
+            const sy = Math.floor((img.height - minSide) / 2);
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            canvas.getContext('2d').drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+            let dataUrl = canvas.toDataURL('image/webp', 0.75);
+            if (!dataUrl.startsWith('data:image/webp')) dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+            resolve(dataUrl);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
     function initFirebaseSync() {
       const badge = document.getElementById('cloud-sync-badge');
       if (!isFirebaseReady()) {
@@ -1564,6 +1649,12 @@
             if (latest && (latest.createdAt || 0) > (state.lastNotifReadAt || 0)) showBroadcastTopToast(latest);
           }
           notifBooted = true;
+        }, () => {});
+        fbDb.collection('shared').doc('admin_profile').onSnapshot(doc => {
+          shared.adminAvatar = (doc.exists && doc.data().avatarUrl) ? doc.data().avatarUrl : '';
+          renderAdminAvatarPreview();
+          renderChatMessages();
+          updateNotifBadgeAndList();
         }, () => {});
         loadStudentFromFirestoreOnBoot();
         initChatListener();
@@ -1677,6 +1768,7 @@
       updateChatAuthUI();
       renderChatMessages();
       renderPinnedBar();
+      updateNotifBadgeAndList();
     }
 
     function renderNoticeBar() {
@@ -2282,6 +2374,16 @@
         document.getElementById('notifications-modal').classList.remove('hidden');
       };
       document.getElementById('notifications-modal-close').onclick = () => document.getElementById('notifications-modal').classList.add('hidden');
+      document.getElementById('admin-clear-all-notifs').onclick = clearAllNotifications;
+      document.getElementById('modal-clear-all-notifs').onclick = clearAllNotifications;
+      document.getElementById('admin-notifications-list').onclick = (e) => {
+        const btn = e.target.closest('.del-notif-btn');
+        if (btn) deleteNotificationById(btn.dataset.delNotif);
+      };
+      document.getElementById('notifications-history-list').onclick = (e) => {
+        const btn = e.target.closest('.del-notif-btn');
+        if (btn) deleteNotificationById(btn.dataset.delNotif);
+      };
       document.getElementById('admin-broadcast-form').onsubmit = async (e) => {
         e.preventDefault();
         if (!shared.isAdmin || !fbDb) return;
@@ -2344,6 +2446,30 @@
         switchTab('home'); showToast('تم تسجيل خروج الأدمن');
       };
       document.getElementById('admin-student-search').oninput = renderAdminStudentsStats;
+
+      // Admin Exclusive Avatar Upload / Remove
+      renderAdminAvatarPreview();
+      document.getElementById('admin-avatar-upload-btn').onclick = () => {
+        if (!shared.isAdmin) return;
+        document.getElementById('admin-avatar-input').click();
+      };
+      document.getElementById('admin-avatar-input').onchange = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file || !shared.isAdmin || !fbDb) return;
+        try {
+          const avatarUrl = await compressSquareAvatar160(file);
+          await saveSharedToFirestore('admin_profile', { avatarUrl });
+          showToast('تم تحديث صورة الأدمن الشخصية بنجاح!');
+        } catch (err) {
+          showToast(err.message || 'تعذر رفع الصورة');
+        }
+        e.target.value = '';
+      };
+      document.getElementById('admin-avatar-remove-btn').onclick = async () => {
+        if (!shared.isAdmin || !fbDb) return;
+        await saveSharedToFirestore('admin_profile', { avatarUrl: '' });
+        showToast('تم حذف صورة الأدمن الشخصية');
+      };
 
       // Seed Default Data to Firestore
       document.getElementById('btn-seed-firestore').onclick = async () => {
