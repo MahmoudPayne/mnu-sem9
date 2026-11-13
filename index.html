@@ -329,10 +329,6 @@
             <span id="admin-lock-label" class="hidden sm:inline text-amber-400 font-bold"></span>
           </button>
 
-          <button id="btn-perf-quick-toggle" type="button" class="tap-btn p-1.5 sm:p-2 rounded-full apple-subcard cursor-pointer" title="وضع الأداء السريع (تشغيل/إيقاف الأنيميشنز)">
-            <i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>
-          </button>
-
           <button id="btn-theme-toggle" type="button" class="tap-btn p-1.5 sm:p-2 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
             <i data-lucide="sun-moon" class="w-4 h-4 text-[#0a84ff]"></i>
           </button>
@@ -1128,47 +1124,84 @@
     </div>
   </div>
 
-  <!-- Account Settings Modal ("إعدادات حسابي") -->
+  <!-- Unified Settings & Account Modal ("الإعدادات والحساب") -->
   <div id="account-settings-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
-    <form id="account-settings-form" class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 max-h-[90dvh] overflow-y-auto custom-scroll">
+    <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 max-h-[90dvh] overflow-y-auto custom-scroll">
       <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
         <div>
-          <h3 class="text-base font-bold">إعدادات حسابي</h3>
-          <p id="acc-id-subtitle" class="text-[11px] font-mono-num" style="color: var(--text-muted);">ID: --</p>
+          <h3 class="text-base font-bold">الإعدادات والحساب</h3>
+          <p id="acc-id-subtitle" class="text-[11px] font-mono-num" style="color: var(--text-muted);">--</p>
         </div>
         <button type="button" id="acc-settings-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
       </div>
 
-      <div class="space-y-1 text-xs">
-        <label class="block font-semibold" style="color: var(--text-muted);">تغيير الاسم</label>
-        <input id="acc-name-input" type="text" placeholder="أدخل الاسم بالكامل" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" required />
-      </div>
-
-      <div class="space-y-1.5 text-xs">
-        <label class="block font-semibold" style="color: var(--text-muted);">تغيير الأفاتار</label>
-        <div class="grid grid-cols-2 gap-2.5">
-          <button type="button" data-acc-avatar="man" class="acc-avatar-btn tap-btn apple-subcard p-3 flex items-center justify-center gap-2 cursor-pointer border-2 border-transparent">
-            <span class="w-10 h-10 rounded-full bg-white/95 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
-              <lottie-player src="https://mnu-sem9.vercel.app/man.json" background="transparent" speed="1" loop autoplay style="width:36px;height:36px;pointer-events:none;"></lottie-player>
-            </span>
-            <span class="font-bold">ولد</span>
-          </button>
-          <button type="button" data-acc-avatar="women" class="acc-avatar-btn tap-btn apple-subcard p-3 flex items-center justify-center gap-2 cursor-pointer border-2 border-transparent">
-            <span class="w-10 h-10 rounded-full bg-white/95 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
-              <lottie-player src="https://mnu-sem9.vercel.app/women.json" background="transparent" speed="1" loop autoplay style="width:36px;height:36px;pointer-events:none;"></lottie-player>
-            </span>
-            <span class="font-bold">بنت</span>
-          </button>
+      <!-- Student Profile Section -->
+      <form id="account-settings-form" class="hidden space-y-3.5">
+        <div class="space-y-1 text-xs">
+          <label class="block font-semibold" style="color: var(--text-muted);">تعديل الاسم</label>
+          <input id="acc-name-input" type="text" placeholder="أدخل الاسم بالكامل" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" required />
         </div>
+        <div class="space-y-1.5 text-xs">
+          <label class="block font-semibold" style="color: var(--text-muted);">تغيير الأفاتار</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" data-acc-avatar="man" class="acc-avatar-btn tap-btn apple-subcard p-2.5 flex items-center justify-center gap-2 cursor-pointer border-2 border-transparent">
+              <span class="w-9 h-9 rounded-full bg-white/95 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+                <lottie-player src="https://mnu-sem9.vercel.app/man.json" background="transparent" speed="1" loop autoplay style="width:32px;height:32px;pointer-events:none;"></lottie-player>
+              </span>
+              <span class="font-bold">ولد</span>
+            </button>
+            <button type="button" data-acc-avatar="women" class="acc-avatar-btn tap-btn apple-subcard p-2.5 flex items-center justify-center gap-2 cursor-pointer border-2 border-transparent">
+              <span class="w-9 h-9 rounded-full bg-white/95 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+                <lottie-player src="https://mnu-sem9.vercel.app/women.json" background="transparent" speed="1" loop autoplay style="width:32px;height:32px;pointer-events:none;"></lottie-player>
+              </span>
+              <span class="font-bold">بنت</span>
+            </button>
+          </div>
+        </div>
+        <div id="acc-settings-error" class="hidden text-xs font-semibold text-rose-400 text-center"></div>
+        <button type="submit" id="acc-save-btn" class="tap-btn btn-grad-primary w-full py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer">حفظ بيانات الطالب</button>
+      </form>
+
+      <!-- Admin Profile Section -->
+      <div id="acc-admin-section" class="hidden apple-subcard p-3.5 space-y-3 border border-amber-400/30">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div id="acc-admin-avatar-wrap" class="w-11 h-11 rounded-full bg-amber-500/20 border border-amber-400/60 flex items-center justify-center text-amber-400 font-extrabold overflow-hidden shrink-0">A</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-amber-400">حساب الأدمن</div>
+              <div class="text-[11px] truncate" style="color: var(--text-muted);">صورة الأدمن الشخصية</div>
+            </div>
+          </div>
+          <button type="button" id="acc-admin-avatar-btn" class="tap-btn px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-[11px] font-extrabold cursor-pointer shrink-0">تغيير الصورة</button>
+        </div>
+        <button type="button" id="acc-open-admin-tab" class="tap-btn w-full py-2 rounded-xl apple-card text-xs font-bold text-amber-400 cursor-pointer">فتح لوحة تحكم الأدمن</button>
       </div>
 
-      <div id="acc-settings-error" class="hidden text-xs font-semibold text-rose-400 text-center"></div>
-
-      <div class="flex flex-col sm:flex-row gap-2 pt-1">
-        <button type="submit" id="acc-save-btn" class="tap-btn btn-grad-primary flex-1 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer">حفظ التعديلات</button>
-        <button type="button" id="acc-logout-btn" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تسجيل الخروج</button>
+      <!-- Shared Preferences Section (Student, Admin & Guest) -->
+      <div class="space-y-2.5 pt-2 border-t" style="border-color: var(--border-hairline);">
+        <div class="text-[11px] font-bold" style="color: var(--text-muted);">التفضيلات العامة</div>
+        <label class="apple-subcard p-3 flex items-center justify-between gap-3 cursor-pointer">
+          <div>
+            <div class="text-xs font-bold">تشغيل الأنيميشنز والتأثيرات</div>
+            <div class="text-[11px]" style="color: var(--text-muted);">أوقفها للحصول على وضع سريع وخفيف</div>
+          </div>
+          <input id="acc-anim-toggle-unified" type="checkbox" class="w-5 h-5 accent-[#0a84ff] cursor-pointer" checked />
+        </label>
+        <label class="apple-subcard p-3 flex items-center justify-between gap-3 cursor-pointer">
+          <div>
+            <div class="text-xs font-bold">الوضع الليلي (Dark Mode)</div>
+            <div class="text-[11px]" style="color: var(--text-muted);">تبديل بين المظهر الداكن والفاتح</div>
+          </div>
+          <input id="acc-dark-toggle-unified" type="checkbox" class="w-5 h-5 accent-[#0a84ff] cursor-pointer" checked />
+        </label>
       </div>
-    </form>
+
+      <!-- Logout Actions at Bottom Only -->
+      <div class="flex flex-col gap-2 pt-1">
+        <button type="button" id="acc-logout-btn" class="hidden tap-btn w-full py-2.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تسجيل خروج الطالب</button>
+        <button type="button" id="acc-admin-logout-btn" class="hidden tap-btn w-full py-2.5 rounded-xl bg-amber-500/15 text-amber-400 text-xs font-bold cursor-pointer">تسجيل خروج الأدمن</button>
+      </div>
+    </div>
   </div>
 
   <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
@@ -1321,6 +1354,7 @@
     };
 
     const STORAGE_KEY = 'mnu_sem9_student_local_v6';
+    const ANIM_PREF_KEY = 'animationsPref_v2';
     function getTodayDateStr() {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1395,8 +1429,15 @@
           if (typeof state.dailyGoalHours !== 'number' || isNaN(state.dailyGoalHours)) state.dailyGoalHours = 4;
           if (typeof state.todayHoursLogged !== 'number' || isNaN(state.todayHoursLogged)) state.todayHoursLogged = 0;
           if (typeof state.bellEnabled !== 'boolean') state.bellEnabled = true;
-          if (typeof state.animationsEnabled !== 'boolean') state.animationsEnabled = true;
-          if (typeof state.animationsPreferenceSet !== 'boolean') state.animationsPreferenceSet = false;
+          let prefV2 = null;
+          try { prefV2 = localStorage.getItem(ANIM_PREF_KEY); } catch (e) {}
+          if (prefV2 === 'on' || prefV2 === 'off') {
+            state.animationsEnabled = prefV2 === 'on';
+            state.animationsPreferenceSet = true;
+          } else {
+            state.animationsEnabled = true;
+            state.animationsPreferenceSet = false;
+          }
         }
       } catch (e) {}
       ensureTodayReset();
@@ -1469,21 +1510,28 @@
     function updateStudentHeaderUI() {
       const label = document.getElementById('student-header-label');
       const avSlot = document.getElementById('header-student-avatar');
-      const perfBtn = document.getElementById('btn-perf-quick-toggle');
       const hint = document.getElementById('kpi-sync-hint');
       if (state.studentProfile && state.studentProfile.studentId) {
         label.textContent = `أهلاً، ${state.studentProfile.name.split(' ')[0]}`;
         if (avSlot) {
-          avSlot.innerHTML = state.studentProfile.avatarType
-            ? getStudentAvatarHtml(state.studentProfile.avatarType, 22)
-            : '<i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>';
+          avSlot.innerHTML = (shared.isAdmin && shared.adminAvatar)
+            ? `<img src="${shared.adminAvatar}" alt="Admin" class="w-5 h-5 rounded-full object-cover ring-1 ring-amber-400" />`
+            : state.studentProfile.avatarType
+              ? getStudentAvatarHtml(state.studentProfile.avatarType, 22)
+              : '<i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>';
         }
-        if (perfBtn) perfBtn.classList.add('hidden');
         if (hint) hint.textContent = `متزامن (${state.studentProfile.studentId})`;
+      } else if (shared.isAdmin) {
+        label.textContent = 'Admin';
+        if (avSlot) {
+          avSlot.innerHTML = shared.adminAvatar
+            ? `<img src="${shared.adminAvatar}" alt="Admin" class="w-5 h-5 rounded-full object-cover ring-1 ring-amber-400" />`
+            : '<i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>';
+        }
+        if (hint) hint.textContent = 'محفوظ على جهازك';
       } else {
         label.textContent = 'دخول';
         if (avSlot) avSlot.innerHTML = '<i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>';
-        if (perfBtn) perfBtn.classList.remove('hidden');
         if (hint) hint.textContent = 'محفوظ على جهازك';
       }
       refreshLucideIcons();
@@ -1944,11 +1992,14 @@
       const wrap = document.getElementById('admin-avatar-preview-wrap');
       const remBtn = document.getElementById('admin-avatar-remove-btn');
       if (!wrap) return;
+      const accWrap = document.getElementById('acc-admin-avatar-wrap');
       if (shared.adminAvatar) {
         wrap.innerHTML = `<img src="${shared.adminAvatar}" alt="Admin Avatar" class="w-full h-full object-cover" />`;
+        if (accWrap) accWrap.innerHTML = `<img src="${shared.adminAvatar}" alt="Admin" class="w-full h-full object-cover" />`;
         if (remBtn) remBtn.classList.remove('hidden');
       } else {
         wrap.textContent = 'A';
+        if (accWrap) accWrap.textContent = 'A';
         if (remBtn) remBtn.classList.add('hidden');
       }
     }
@@ -2122,11 +2173,10 @@
     function applyAnimationsPreference() {
       const enabled = state.animationsEnabled !== false;
       document.body.classList.toggle('no-animations', !enabled);
-      const qBtn = document.getElementById('btn-perf-quick-toggle');
-      if (qBtn) {
-        qBtn.style.opacity = enabled ? '1' : '0.65';
-        qBtn.title = enabled ? 'الأنيميشنز مفعّلة (اضغط للإيقاف)' : 'الوضع السريع مفعّل (اضغط لتشغيل الأنيميشنز)';
-      }
+      const uChk = document.getElementById('acc-anim-toggle-unified');
+      if (uChk) uChk.checked = enabled;
+      const dChk = document.getElementById('acc-dark-toggle-unified');
+      if (dChk) dChk.checked = !!state.darkMode;
       if (!enabled && timerPulseTween) {
         timerPulseTween.kill();
         timerPulseTween = null;
@@ -2310,6 +2360,7 @@
       renderChatMessages();
       renderPinnedBar();
       updateNotifBadgeAndList();
+      updateStudentHeaderUI();
     }
 
     function renderNoticeBar() {
@@ -2744,12 +2795,16 @@
       };
 
       // Student Auth Modal Handlers
-      // Performance Prompt & Quick Toggle
-      function choosePerfMode(enabled) {
+      // Performance Prompt (animationsPref_v2)
+      function saveAnimPrefV2(enabled) {
         state.animationsEnabled = enabled;
         state.animationsPreferenceSet = true;
+        try { localStorage.setItem(ANIM_PREF_KEY, enabled ? 'on' : 'off'); } catch (e) {}
         saveLocalStudentState();
         applyAnimationsPreference();
+      }
+      function choosePerfMode(enabled) {
+        saveAnimPrefV2(enabled);
         document.getElementById('perf-prompt-modal').classList.add('hidden');
         showToast(enabled ? 'تم تفعيل الأنيميشنز والشكل الكامل' : 'تم تفعيل وضع الأداء السريع والخفيف');
         if (!state.studentProfile && !state.guestDismissed) {
@@ -2758,15 +2813,8 @@
       }
       document.getElementById('btn-perf-enable').onclick = () => choosePerfMode(true);
       document.getElementById('btn-perf-disable').onclick = () => choosePerfMode(false);
-      document.getElementById('btn-perf-quick-toggle').onclick = () => {
-        state.animationsEnabled = !state.animationsEnabled;
-        state.animationsPreferenceSet = true;
-        saveLocalStudentState();
-        applyAnimationsPreference();
-        showToast(state.animationsEnabled ? 'تم تشغيل الأنيميشنز' : 'تم تفعيل وضع الأداء السريع');
-      };
 
-      // Account Settings Modal ("إعدادات حسابي")
+      // Unified Settings & Account Modal ("الإعدادات والحساب")
       let accSelectedAvatar = 'man';
       function syncAccAvatarButtons() {
         document.querySelectorAll('.acc-avatar-btn').forEach(b => {
@@ -2777,20 +2825,57 @@
         });
       }
       function openAccountSettingsModal() {
-        if (!state.studentProfile || !state.studentProfile.studentId) { openStudentAuthModal('login'); return; }
-        document.getElementById('acc-id-subtitle').textContent = `ID: ${state.studentProfile.studentId}`;
-        document.getElementById('acc-name-input').value = state.studentProfile.name || '';
-        document.getElementById('acc-settings-error').classList.add('hidden');
-        accSelectedAvatar = state.studentProfile.avatarType || 'man';
-        syncAccAvatarButtons();
+        const hasStu = !!(state.studentProfile && state.studentProfile.studentId);
+        const isAdm = !!shared.isAdmin;
+        document.getElementById('account-settings-form').classList.toggle('hidden', !hasStu);
+        document.getElementById('acc-admin-section').classList.toggle('hidden', !isAdm);
+        document.getElementById('acc-logout-btn').classList.toggle('hidden', !hasStu);
+        document.getElementById('acc-admin-logout-btn').classList.toggle('hidden', !isAdm);
+
+        if (hasStu) {
+          document.getElementById('acc-id-subtitle').textContent = `ID: ${state.studentProfile.studentId}`;
+          document.getElementById('acc-name-input').value = state.studentProfile.name || '';
+          document.getElementById('acc-settings-error').classList.add('hidden');
+          accSelectedAvatar = state.studentProfile.avatarType || 'man';
+          syncAccAvatarButtons();
+        } else if (isAdm) {
+          document.getElementById('acc-id-subtitle').textContent = `Admin: ${shared.adminEmail || ''}`;
+        } else {
+          document.getElementById('acc-id-subtitle').textContent = 'تفضيلات العرض والأداء';
+        }
+        document.getElementById('acc-anim-toggle-unified').checked = state.animationsEnabled !== false;
+        document.getElementById('acc-dark-toggle-unified').checked = !!state.darkMode;
         gsapModalOpen('account-settings-modal');
       }
       document.getElementById('btn-student-auth').onclick = () => {
-        if (state.studentProfile && state.studentProfile.studentId) {
+        if ((state.studentProfile && state.studentProfile.studentId) || shared.isAdmin) {
           openAccountSettingsModal();
           return;
         }
         openStudentAuthModal('login');
+      };
+      document.getElementById('acc-anim-toggle-unified').onchange = (e) => {
+        saveAnimPrefV2(e.target.checked);
+        showToast(e.target.checked ? 'تم تشغيل الأنيميشنز' : 'تم تفعيل الوضع السريع والخفيف');
+      };
+      document.getElementById('acc-dark-toggle-unified').onchange = (e) => {
+        state.darkMode = e.target.checked;
+        document.body.classList.toggle('dark-mode', state.darkMode);
+        saveLocalStudentState();
+        renderStaticModuleIcons(); renderExamsTimeline(); renderSubjects(); renderTimeline(); syncTimerDisplay(); renderChatMessages(); updateKPIs();
+      };
+      document.getElementById('acc-admin-avatar-btn').onclick = () => {
+        if (!shared.isAdmin) return;
+        document.getElementById('admin-avatar-input').click();
+      };
+      document.getElementById('acc-open-admin-tab').onclick = () => {
+        document.getElementById('account-settings-modal').classList.add('hidden');
+        switchTab('admin');
+      };
+      document.getElementById('acc-admin-logout-btn').onclick = async () => {
+        document.getElementById('account-settings-modal').classList.add('hidden');
+        if (fbAuth) await fbAuth.signOut();
+        switchTab('home'); showToast('تم تسجيل خروج الأدمن');
       };
       document.getElementById('acc-settings-close').onclick = () => document.getElementById('account-settings-modal').classList.add('hidden');
       document.querySelectorAll('.acc-avatar-btn').forEach(b => b.onclick = () => {
