@@ -278,14 +278,14 @@
       <div class="flex items-center justify-between gap-2 lg:gap-4">
         <!-- Brand (Right/Start) -->
         <div class="flex items-center gap-2.5 shrink-0">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
-            <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h3.5l2.2-5.5 3.3 11 2.4-6.5L16 12h5" />
               <circle cx="19.5" cy="6.5" r="1.5" fill="#30d158" stroke="none" />
             </svg>
           </div>
           <div>
-            <h1 class="text-sm sm:text-base font-extrabold tracking-tight whitespace-nowrap font-en" dir="ltr">MNU Med • Sem 9</h1>
+            <h1 class="text-xs sm:text-base font-extrabold tracking-tight whitespace-nowrap font-en" dir="ltr">MNU Med • Sem 9</h1>
             <div class="hidden xl:block text-[10px] font-semibold font-en" dir="ltr" style="color: var(--text-muted);">Mansoura National University</div>
           </div>
         </div>
@@ -300,7 +300,7 @@
         </nav>
 
         <!-- Actions & Compact Live Pill (Left/End) -->
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <div class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full apple-subcard text-[11px] whitespace-nowrap">
             <span id="cloud-sync-badge" class="hidden"></span>
             <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
@@ -321,12 +321,12 @@
 
           <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1.5 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
             <span id="header-student-avatar" class="inline-flex items-center justify-center shrink-0" title="إعدادات حسابي"><i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i></span>
-            <span id="student-header-label" class="max-w-[74px] sm:max-w-[120px] truncate">دخول</span>
+            <span id="student-header-label" class="max-w-[64px] sm:max-w-[120px] truncate">دخول</span>
           </button>
 
           <button id="btn-admin-lock" type="button" class="tap-btn p-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
             <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-            <span id="admin-lock-label" class="hidden text-amber-400 font-bold"></span>
+            <span id="admin-lock-label" class="hidden sm:inline text-amber-400 font-bold"></span>
           </button>
 
           <button id="btn-perf-quick-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="وضع الأداء السريع (تشغيل/إيقاف الأنيميشنز)">
@@ -1161,19 +1161,6 @@
           </button>
         </div>
       </div>
-
-      <div class="space-y-1 text-xs">
-        <label class="block font-semibold" style="color: var(--text-muted);">تغيير كلمة السر (اختياري)</label>
-        <input id="acc-pass-input" type="password" placeholder="اتركه فارغاً للإبقاء على كلمة السر الحالية" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-[#0a84ff]" />
-      </div>
-
-      <label class="apple-subcard p-3.5 flex items-center justify-between gap-3 cursor-pointer">
-        <div>
-          <div class="text-xs font-bold">تشغيل الأنيميشنز والتأثيرات</div>
-          <div class="text-[11px]" style="color: var(--text-muted);">أوقفها للحصول على أداء أسرع وأخف</div>
-        </div>
-        <input id="acc-anim-toggle" type="checkbox" class="w-5 h-5 accent-[#0a84ff] cursor-pointer" checked />
-      </label>
 
       <div id="acc-settings-error" class="hidden text-xs font-semibold text-rose-400 text-center"></div>
 
@@ -2135,8 +2122,6 @@
     function applyAnimationsPreference() {
       const enabled = state.animationsEnabled !== false;
       document.body.classList.toggle('no-animations', !enabled);
-      const accChk = document.getElementById('acc-anim-toggle');
-      if (accChk) accChk.checked = enabled;
       const qBtn = document.getElementById('btn-perf-quick-toggle');
       if (qBtn) {
         qBtn.style.opacity = enabled ? '1' : '0.65';
@@ -2318,7 +2303,7 @@
       document.getElementById('mob-admin-btn').classList.toggle('hidden', !adm);
       document.getElementById('add-topic-form').classList.toggle('hidden', !adm);
       const admLbl = document.getElementById('admin-lock-label');
-      if (admLbl) { admLbl.textContent = adm ? 'Admin' : ''; admLbl.classList.toggle('hidden', !adm); }
+      if (admLbl) { admLbl.textContent = adm ? 'Admin' : ''; admLbl.className = adm ? 'hidden sm:inline text-amber-400 font-bold' : 'hidden'; }
       renderExamsTimeline();
       renderSubjects();
       updateChatAuthUI();
@@ -2795,9 +2780,7 @@
         if (!state.studentProfile || !state.studentProfile.studentId) { openStudentAuthModal('login'); return; }
         document.getElementById('acc-id-subtitle').textContent = `ID: ${state.studentProfile.studentId}`;
         document.getElementById('acc-name-input').value = state.studentProfile.name || '';
-        document.getElementById('acc-pass-input').value = '';
         document.getElementById('acc-settings-error').classList.add('hidden');
-        document.getElementById('acc-anim-toggle').checked = state.animationsEnabled !== false;
         accSelectedAvatar = state.studentProfile.avatarType || 'man';
         syncAccAvatarButtons();
         gsapModalOpen('account-settings-modal');
@@ -2814,12 +2797,6 @@
         accSelectedAvatar = b.dataset.accAvatar;
         syncAccAvatarButtons();
       });
-      document.getElementById('acc-anim-toggle').onchange = (e) => {
-        state.animationsEnabled = e.target.checked;
-        state.animationsPreferenceSet = true;
-        saveLocalStudentState();
-        applyAnimationsPreference();
-      };
       document.getElementById('acc-logout-btn').onclick = () => {
         document.getElementById('account-settings-modal').classList.add('hidden');
         logoutStudentAccount();
@@ -2830,9 +2807,7 @@
         const errEl = document.getElementById('acc-settings-error');
         errEl.classList.add('hidden');
         const newName = document.getElementById('acc-name-input').value.trim();
-        const newPass = document.getElementById('acc-pass-input').value;
         if (!newName) { errEl.textContent = 'يرجى كتابة الاسم بالكامل.'; errEl.classList.remove('hidden'); return; }
-        if (newPass && newPass.length < 4) { errEl.textContent = 'كلمة السر الجديدة يجب أن لا تقل عن 4 أحرف/أرقام.'; errEl.classList.remove('hidden'); return; }
 
         state.studentProfile.name = newName;
         state.studentProfile.avatarType = accSelectedAvatar;
@@ -2841,9 +2816,6 @@
           avatarType: accSelectedAvatar,
           lastActive: new Date().toISOString()
         };
-        if (newPass) {
-          updatePayload.passwordHash = await hashPassword(newPass);
-        }
         try {
           if (fbDb) await fbDb.collection('students').doc(state.studentProfile.studentId).set(updatePayload, { merge: true });
           saveLocalStudentState(false);
