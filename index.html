@@ -297,6 +297,7 @@
           <button data-tab="syllabus" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">المنهج</button>
           <button data-tab="chat" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5 whitespace-nowrap" style="color: var(--text-muted);"><span>الشات</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span></button>
           <button data-tab="together" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5 whitespace-nowrap" style="color: var(--text-muted);"><span>الدراسة سوا</span></button>
+          <button data-tab="stream" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5 whitespace-nowrap" style="color: var(--text-muted);"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>استراحة البث</span></button>
           <button id="nav-admin-tab" data-tab="admin" class="hidden nav-pill tap-btn px-3.5 py-1.5 text-xs font-bold cursor-pointer text-amber-400 whitespace-nowrap">الأدمن</button>
         </nav>
 
@@ -344,6 +345,7 @@
           <button data-tab="syllabus" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المنهج</button>
           <button data-tab="chat" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">الشات</button>
           <button data-tab="together" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">الدراسة سوا</button>
+          <button data-tab="stream" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">استراحة البث</button>
         </nav>
       </div>
 
@@ -494,21 +496,6 @@
             <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div id="kpi-today-bar" class="bg-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
           </div>
         </div>
-      </div>
-
-      <!-- Study Together Quick Peer Search Card -->
-      <div class="apple-card p-4 sm:p-5 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 class="text-sm sm:text-base font-bold flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-emerald-400"></i><span>ادعُ زميلك للدراسة سوا</span></h3>
-            <p class="text-xs" style="color: var(--text-muted);">ابحث بالكود الجامعي (ID) لدعوة زميلك لغرفة مذاكرة خاصة ومتزامنة.</p>
-          </div>
-          <form id="home-peer-search-form" class="flex items-center gap-2 w-full sm:w-auto">
-            <input id="home-peer-search-input" type="text" inputmode="numeric" placeholder="أدخل الكود الجامعي..." class="flex-1 sm:w-44 px-3 py-2 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-[#0a84ff]" />
-            <button type="submit" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer shrink-0">بحث</button>
-          </form>
-        </div>
-        <div id="home-peer-search-result" class="hidden"></div>
       </div>
 
       <div class="apple-card p-4 sm:p-6 space-y-4">
@@ -954,8 +941,102 @@
       </div>
     </section>
 
+    <!-- TAB: LIVE STREAM BREAK (MEMBERS ONLY) -->
+    <section id="tab-stream" class="tab-panel hidden space-y-5 fade-in">
+      <div id="live-stream-card" class="apple-card p-4 sm:p-6 space-y-4 border border-rose-500/30 shadow-[0_12px_36px_-12px_rgba(244,63,94,0.28)]">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 text-[10px] font-extrabold">
+              <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+              <span>LIVE • بث مباشر</span>
+            </span>
+            <h2 class="text-base sm:text-lg font-bold">استراحة البث المباشر ⚽🔴</h2>
+          </div>
+          <div id="stream-player-controls" class="flex items-center gap-1.5 shrink-0">
+            <button type="button" id="btn-stream-fullscreen" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1">
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[#38bdf8]"></i>
+              <span>ملء الشاشة</span>
+            </button>
+            <button type="button" id="btn-stream-toggle" class="tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">
+              إخفاء المشغّل
+            </button>
+          </div>
+        </div>
+
+        <!-- Guest Lock Screen (Shown when not logged in as Student or Admin) -->
+        <div id="stream-guest-lock" class="hidden apple-subcard p-8 sm:p-10 text-center space-y-4 border border-rose-500/25">
+          <div class="w-14 h-14 rounded-2xl bg-rose-500/15 text-rose-400 flex items-center justify-center mx-auto">
+            <i data-lucide="lock" class="w-7 h-7"></i>
+          </div>
+          <div class="text-sm sm:text-base font-bold">🔒 استراحة البث المباشر متاحة فقط لأعضاء المنصة المسجلين</div>
+          <p class="text-xs" style="color: var(--text-muted);">سجّل دخولك بحسابك الجامعي لفتح المشغّل ومشاهدة البث المباشر.</p>
+          <button type="button" id="btn-stream-login" class="tap-btn btn-grad-primary px-6 py-2.5 rounded-full text-white text-xs font-bold cursor-pointer">
+            تسجيل الدخول للمشاهدة
+          </button>
+        </div>
+
+        <!-- 16:9 Responsive Player Container (Loaded ONLY for logged-in members) -->
+        <div id="live-stream-container" class="hidden aspect-video w-full rounded-2xl overflow-hidden bg-black/85 border border-white/10">
+          <iframe id="live-stream-iframe" src="about:blank" class="w-full h-full border-0" allowfullscreen scrolling="no"></iframe>
+        </div>
+
+        <!-- Match Details Bar (Optional fields from Admin) -->
+        <div id="stream-match-details" class="hidden apple-subcard p-3.5 space-y-2 border border-rose-500/20">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div id="stream-match-title-out" class="text-sm font-extrabold text-white"></div>
+            <div id="stream-match-note-out" class="text-[11px] font-semibold text-amber-300"></div>
+          </div>
+          <div id="stream-match-meta-out" class="flex flex-wrap items-center gap-3 text-[11px]" style="color: var(--text-muted);"></div>
+        </div>
+
+        <!-- Admin-Only Live Viewers Bar inside Stream Tab -->
+        <div id="stream-admin-viewers-bar" class="hidden apple-subcard p-3 space-y-1.5 border border-rose-500/35 bg-rose-500/10">
+          <div class="text-xs font-extrabold text-rose-400" id="stream-admin-viewers-count">🔴 يشاهدون البث الآن: 0 طالب</div>
+          <div id="stream-admin-viewers-names" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <div id="stream-admin-hidden-msg" class="hidden apple-subcard p-8 text-center text-xs sm:text-sm font-bold" style="color: var(--text-muted);">
+          لا توجد مباريات مباشرة حالياً
+        </div>
+      </div>
+    </section>
+
     <!-- TAB 4: ADMIN TAB & STUDENT STATS -->
     <section id="tab-admin" class="tab-panel hidden space-y-6 fade-in">
+      <!-- Admin Live Stream Management & Real Viewers Counter (shared/live_stream) -->
+      <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-rose-500">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base font-bold">إدارة استراحة البث المباشر (Firestore Live)</h2>
+            <p class="text-xs" style="color: var(--text-muted);">تعديل رابط المشغّل أو كود iframe وتفاصيل المباراة والتحكم في إظهار البث.</p>
+          </div>
+          <label class="apple-subcard px-3 py-1.5 flex items-center gap-2 text-xs font-bold cursor-pointer">
+            <input id="admin-stream-visible-chk" type="checkbox" class="w-4 h-4 accent-rose-500" checked />
+            <span>إظهار البث للطلبة</span>
+          </label>
+        </div>
+
+        <!-- Real-Time Stream Viewers (Exclusive to Admin) -->
+        <div class="apple-subcard p-3.5 space-y-2 border border-rose-500/35 bg-rose-500/10">
+          <div id="admin-tab-viewers-count" class="text-xs sm:text-sm font-extrabold text-rose-400">🔴 يشاهدون البث الآن: 0 طالب</div>
+          <div id="admin-tab-viewers-names" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <form id="admin-stream-form" class="space-y-3 text-xs">
+          <input id="admin-stream-url-input" type="text" placeholder="رابط البث المباشر أو كود <iframe> كاملاً..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" dir="ltr" required />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <input id="admin-stream-title" type="text" placeholder="عنوان المباراة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+            <input id="admin-stream-note" type="text" placeholder="نبذة مميزة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <input id="admin-stream-referee" type="text" placeholder="الحكم (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+            <input id="admin-stream-stadium" type="text" placeholder="الملعب (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+            <input id="admin-stream-channel" type="text" placeholder="القناة الناقلة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+          </div>
+          <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">حفظ وتحديث للجميع</button>
+        </form>
+      </div>
+
       <!-- Admin Study Rooms Monitor -->
       <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
         <div>
@@ -1133,6 +1214,10 @@
     <button data-tab="together" class="mob-nav tap-btn flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">
       <i data-lucide="users" class="w-4 h-4"></i>
       <span class="text-[10px] font-bold whitespace-nowrap">سوا</span>
+    </button>
+    <button data-tab="stream" class="mob-nav tap-btn flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">
+      <i data-lucide="tv" class="w-4 h-4 text-rose-400"></i>
+      <span class="text-[10px] font-bold whitespace-nowrap">البث</span>
     </button>
     <button id="mob-admin-btn" data-tab="admin" class="hidden mob-nav tap-btn flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-2xl cursor-pointer text-amber-400 whitespace-nowrap">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
@@ -1675,7 +1760,8 @@
       roomPeerProfiles: {},
       roomPendingImage: null,
       roomPendingFile: null,
-      adminRoomsList: []
+      adminRoomsList: [],
+      liveStream: { url: 'https://912acsss8af382.sirtv.top/playerv5.php?match=4716606&key=9f39972b67d6ce22189507d008acwc26', visible: true, matchTitle: '', matchNote: '', referee: '', stadium: '', channel: '' }
     };
 
     let studentsUnsub = null;
@@ -1811,6 +1897,7 @@
       }
       refreshLucideIcons();
       updateChatAuthUI();
+      if (typeof applyLiveStreamUI === 'function') applyLiveStreamUI();
     }
 
     async function saveSharedToFirestore(docName, payload) {
@@ -1886,6 +1973,7 @@
       if (realActEl) realActEl.textContent = realActiveCount;
       document.getElementById('admin-stat-hours').textContent = totalHours.toFixed(1) + 'h';
       document.getElementById('admin-stat-sessions').textContent = totalSess;
+      renderAdminStreamViewers();
 
       const filtered = sorted.filter(s => {
         if (shared.adminActiveOnly && !isStudentActiveNow(s.lastActive)) return false;
@@ -2991,6 +3079,108 @@
       }).join('');
     }
 
+    function extractIframeSrc(raw) {
+      const s = String(raw || '').trim();
+      const m = s.match(/src=["']([^"']+)["']/i);
+      return m ? m[1].trim() : s;
+    }
+
+    async function sendWatchingStreamHeartbeat(ts) {
+      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      try {
+        await fbDb.collection('students').doc(state.studentProfile.studentId).set({
+          watchingStreamAt: ts
+        }, { merge: true });
+      } catch (e) {}
+    }
+
+    function renderAdminStreamViewers() {
+      const bar = document.getElementById('stream-admin-viewers-bar');
+      const sCount = document.getElementById('stream-admin-viewers-count');
+      const sNames = document.getElementById('stream-admin-viewers-names');
+      const aCount = document.getElementById('admin-tab-viewers-count');
+      const aNames = document.getElementById('admin-tab-viewers-names');
+      if (!shared.isAdmin) {
+        if (bar) bar.classList.add('hidden');
+        return;
+      }
+      if (bar) bar.classList.remove('hidden');
+      const now = Date.now();
+      const viewers = (shared.studentsList || []).filter(s => typeof s.watchingStreamAt === 'number' && s.watchingStreamAt > 0 && (now - s.watchingStreamAt) < 90000);
+      const countText = `🔴 يشاهدون البث الآن: ${viewers.length} طالب`;
+      const pillsHtml = viewers.length
+        ? viewers.map(v => `<span class="px-2 py-0.5 rounded-full apple-card text-[11px] font-bold text-white">${escapeHtml(v.name || v.studentId)}</span>`).join('')
+        : `<span class="text-[11px]" style="color: var(--text-muted);">لا يوجد مشاهدون حالياً</span>`;
+      if (sCount) sCount.textContent = countText;
+      if (sNames) sNames.innerHTML = pillsHtml;
+      if (aCount) aCount.textContent = countText;
+      if (aNames) aNames.innerHTML = pillsHtml;
+    }
+
+    function applyLiveStreamUI() {
+      const cont = document.getElementById('live-stream-container');
+      const ifr = document.getElementById('live-stream-iframe');
+      const guestLock = document.getElementById('stream-guest-lock');
+      const ctrls = document.getElementById('stream-player-controls');
+      const admHiddenMsg = document.getElementById('stream-admin-hidden-msg');
+      const detailsBox = document.getElementById('stream-match-details');
+      const admUrl = document.getElementById('admin-stream-url-input');
+      const admChk = document.getElementById('admin-stream-visible-chk');
+
+      const ls = shared.liveStream || {};
+      const isVisible = ls.visible !== false;
+      const isLogged = canUserChat();
+
+      if (admUrl && document.activeElement !== admUrl) admUrl.value = ls.url || '';
+      if (admChk) admChk.checked = isVisible;
+      const fMap = [['admin-stream-title', 'matchTitle'], ['admin-stream-note', 'matchNote'], ['admin-stream-referee', 'referee'], ['admin-stream-stadium', 'stadium'], ['admin-stream-channel', 'channel']];
+      fMap.forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el && document.activeElement !== el) el.value = ls[key] || '';
+      });
+
+      // Match details display
+      const hasDetails = !!(ls.matchTitle || ls.matchNote || ls.referee || ls.stadium || ls.channel);
+      if (detailsBox) {
+        detailsBox.classList.toggle('hidden', !hasDetails || (!isVisible && !shared.isAdmin));
+        if (hasDetails) {
+          document.getElementById('stream-match-title-out').textContent = ls.matchTitle || '';
+          document.getElementById('stream-match-note-out').textContent = ls.matchNote || '';
+          const metaParts = [];
+          if (ls.referee) metaParts.push(`<span>الحكم: <strong>${escapeHtml(ls.referee)}</strong></span>`);
+          if (ls.stadium) metaParts.push(`<span>الملعب: <strong>${escapeHtml(ls.stadium)}</strong></span>`);
+          if (ls.channel) metaParts.push(`<span>القناة: <strong>${escapeHtml(ls.channel)}</strong></span>`);
+          document.getElementById('stream-match-meta-out').innerHTML = metaParts.join('<span class="opacity-40">•</span>');
+        }
+      }
+
+      renderAdminStreamViewers();
+
+      if (!isVisible && !shared.isAdmin) {
+        if (cont) cont.classList.add('hidden');
+        if (guestLock) guestLock.classList.add('hidden');
+        if (ctrls) ctrls.classList.add('hidden');
+        if (admHiddenMsg) admHiddenMsg.classList.remove('hidden');
+        if (ifr && ifr.src !== 'about:blank') ifr.src = 'about:blank';
+        return;
+      }
+      if (admHiddenMsg) admHiddenMsg.classList.add('hidden');
+
+      if (!isLogged) {
+        if (cont) cont.classList.add('hidden');
+        if (ctrls) ctrls.classList.add('hidden');
+        if (guestLock) guestLock.classList.remove('hidden');
+        if (ifr && ifr.src !== 'about:blank') ifr.src = 'about:blank';
+      } else {
+        if (guestLock) guestLock.classList.add('hidden');
+        if (ctrls) ctrls.classList.remove('hidden');
+        if (cont) cont.classList.remove('hidden');
+        if (ifr && ls.url && ifr.src !== ls.url) {
+          ifr.src = ls.url;
+        }
+      }
+    }
+
     function initFirebaseSync() {
       const badge = document.getElementById('cloud-sync-badge');
       if (!isFirebaseReady()) {
@@ -3044,6 +3234,21 @@
         fbDb.collection('shared').doc('exam_schedule_image').onSnapshot(doc => {
           shared.examScheduleImage = (doc.exists && doc.data().imageUrl) ? doc.data().imageUrl : '';
           renderExamScheduleImage();
+        }, () => {});
+        fbDb.collection('shared').doc('live_stream').onSnapshot(doc => {
+          if (doc.exists) {
+            const d = doc.data();
+            shared.liveStream = {
+              url: d.url || shared.liveStream.url,
+              visible: d.visible !== false,
+              matchTitle: d.matchTitle || '',
+              matchNote: d.matchNote || '',
+              referee: d.referee || '',
+              stadium: d.stadium || '',
+              channel: d.channel || ''
+            };
+            applyLiveStreamUI();
+          }
         }, () => {});
         loadStudentFromFirestoreOnBoot();
         initStudyRoomsListener();
@@ -3289,6 +3494,7 @@
       renderPinnedBar();
       updateNotifBadgeAndList();
       updateStudentHeaderUI();
+      if (typeof applyLiveStreamUI === 'function') applyLiveStreamUI();
     }
 
     function renderNoticeBar() {
@@ -3648,6 +3854,7 @@
       document.querySelectorAll('.nav-pill').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('active', on); b.style.color = on ? '#fff' : (b.id === 'nav-admin-tab' ? '#fbbf24' : 'var(--text-muted)'); });
       document.querySelectorAll('.mob-nav').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('bg-[#0a84ff]/15', on); b.style.color = on ? '#38bdf8' : (b.id === 'mob-admin-btn' ? '#fbbf24' : 'var(--text-muted)'); });
       if (id === 'chat') { const w = document.getElementById('chat-messages-list'); if (w) w.scrollTop = w.scrollHeight; }
+      if (id === 'stream' && document.visibilityState === 'visible') { sendWatchingStreamHeartbeat(Date.now()); } else { sendWatchingStreamHeartbeat(0); }
       saveLocalStudentState();
     }
 
@@ -3682,7 +3889,7 @@
       startLiveStudyingCounter();
       setInterval(updateCountdowns, 1000);
       switchTab(state.activeTab || 'home');
-      window.addEventListener('beforeunload', () => saveLocalStudentState(true));
+      window.addEventListener('beforeunload', () => { saveLocalStudentState(true); sendWatchingStreamHeartbeat(0); });
 
       applyAnimationsPreference();
       if (!state.animationsPreferenceSet) {
@@ -4100,6 +4307,38 @@
         showToast('تم إرسال الإشعار لجميع الطلبة فوراً!');
       };
 
+      // Live Stream Break Controls & Admin Stream Form
+      applyLiveStreamUI();
+      document.getElementById('btn-stream-login').onclick = () => openStudentAuthModal('login');
+      document.getElementById('btn-stream-toggle').onclick = () => {
+        const cont = document.getElementById('live-stream-container');
+        const btn = document.getElementById('btn-stream-toggle');
+        const hidden = cont.classList.toggle('hidden');
+        btn.textContent = hidden ? 'إظهار المشغّل' : 'إخفاء المشغّل';
+      };
+      document.getElementById('btn-stream-fullscreen').onclick = () => {
+        const el = document.getElementById('live-stream-iframe') || document.getElementById('live-stream-container');
+        if (!el) return;
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else showToast('اضغط على زر التكبير داخل المشغّل');
+      };
+      document.getElementById('admin-stream-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!shared.isAdmin || !fbDb) return;
+        const rawInput = document.getElementById('admin-stream-url-input').value.trim();
+        const url = extractIframeSrc(rawInput);
+        const visible = document.getElementById('admin-stream-visible-chk').checked;
+        const matchTitle = document.getElementById('admin-stream-title').value.trim();
+        const matchNote = document.getElementById('admin-stream-note').value.trim();
+        const referee = document.getElementById('admin-stream-referee').value.trim();
+        const stadium = document.getElementById('admin-stream-stadium').value.trim();
+        const channel = document.getElementById('admin-stream-channel').value.trim();
+        if (!url) return;
+        await saveSharedToFirestore('live_stream', { url, visible, matchTitle, matchNote, referee, stadium, channel });
+        showToast('تم حفظ وتحديث البث وتفاصيل المباراة للجميع!');
+      };
+
       // Admin Lock / Unlock Group Chat
       document.getElementById('btn-admin-toggle-chat-lock').onclick = async () => {
         if (!shared.isAdmin || !fbDb) return;
@@ -4111,10 +4350,6 @@
       document.getElementById('chat-go-together-btn').onclick = () => switchTab('together');
 
       // Study Together Peer Search, Multi-User Invites, Archive & Hide Handlers
-      document.getElementById('home-peer-search-form').onsubmit = (e) => {
-        e.preventDefault();
-        searchPeerById(document.getElementById('home-peer-search-input'), document.getElementById('home-peer-search-result'));
-      };
       document.getElementById('together-peer-search-form').onsubmit = (e) => {
         e.preventDefault();
         searchPeerById(document.getElementById('together-peer-search-input'), document.getElementById('together-peer-search-result'));
@@ -4517,8 +4752,16 @@
       setInterval(() => {
         if (shared.isAdmin && state.activeTab === 'admin') renderAdminStudentsStats();
       }, 30000);
+      setInterval(() => {
+        if (state.activeTab === 'stream' && document.visibilityState === 'visible') sendWatchingStreamHeartbeat(Date.now());
+      }, 45000);
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') sendStudentHeartbeat();
+        if (document.visibilityState === 'visible') {
+          sendStudentHeartbeat();
+          if (state.activeTab === 'stream') sendWatchingStreamHeartbeat(Date.now());
+        } else {
+          sendWatchingStreamHeartbeat(0);
+        }
       });
 
       // Official Exam Schedule Image + Zoomable Lightbox
