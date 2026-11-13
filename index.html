@@ -980,7 +980,7 @@
 
         <!-- 16:9 Responsive Player Container (Loaded ONLY for logged-in members) -->
         <div id="live-stream-container" class="hidden min-h-[300px] sm:min-h-[420px] aspect-video w-full rounded-2xl overflow-hidden bg-black/85 border border-white/10">
-          <iframe id="live-stream-iframe" src="about:blank" class="w-full h-full border-0" allowfullscreen scrolling="no"></iframe>
+          <iframe id="live-stream-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms" class="w-full h-full border-0" allowfullscreen scrolling="no"></iframe>
         </div>
 
         <!-- Match Details Bar (Optional fields from Admin) -->
@@ -1736,7 +1736,7 @@
       lastNotifReadAt: 0,
       animationsEnabled: true,
       animationsPreferenceSet: false,
-      streamSafeMode: false
+      streamSafeMode: true
     };
 
     let shared = {
@@ -1794,6 +1794,7 @@
           if (typeof state.dailyGoalHours !== 'number' || isNaN(state.dailyGoalHours)) state.dailyGoalHours = 4;
           if (typeof state.todayHoursLogged !== 'number' || isNaN(state.todayHoursLogged)) state.todayHoursLogged = 0;
           if (typeof state.bellEnabled !== 'boolean') state.bellEnabled = true;
+          if (typeof state.streamSafeMode !== 'boolean') state.streamSafeMode = true;
           let prefV2 = null;
           try { prefV2 = localStorage.getItem(ANIM_PREF_KEY); } catch (e) {}
           if (prefV2 === 'on' || prefV2 === 'off') {
