@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>MNU Med • Sem 9 — Mansoura National University</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <!-- Lucide Icons, GSAP & Canvas Confetti CDNs -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.453.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
   <!-- Firebase Web SDK v10.14.1 (Compat CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -29,7 +35,7 @@
       --bg-canvas: #060913;
       --bg-surface: rgba(17, 24, 39, 0.72);
       --bg-elevated: rgba(22, 32, 51, 0.84);
-      --border-hairline: rgba(255, 255, 255, 0.11);
+      --border-hairline: rgba(255, 255, 255, 0.08);
       --text-main: #f5f5f7;
       --text-muted: #94a3b8;
       --apple-blue: #0a84ff;
@@ -97,16 +103,16 @@
       animation: orbFloat1 16s ease-in-out infinite alternate;
     }
     .orb-2 {
-      width: 380px; height: 380px;
+      width: 400px; height: 400px;
       bottom: 8%; left: -90px;
-      background: radial-gradient(circle, #bf5af2, transparent 70%);
-      animation: orbFloat2 20s ease-in-out infinite alternate;
+      background: radial-gradient(circle, #10b981, transparent 70%);
+      animation: orbFloat2 22s ease-in-out infinite alternate;
     }
     .orb-3 {
-      width: 280px; height: 280px;
+      width: 300px; height: 300px;
       top: 42%; right: 22%;
-      background: radial-gradient(circle, #30d158, transparent 70%);
-      animation: orbPulse 12s ease-in-out infinite;
+      background: radial-gradient(circle, #38bdf8, transparent 70%);
+      animation: orbPulse 14s ease-in-out infinite;
     }
     @keyframes orbFloat1 {
       0% { transform: translate3d(0, 0, 0) scale(1); }
@@ -124,12 +130,12 @@
     /* Glassmorphism Cards & Micro-interactions */
     .apple-card {
       background-color: var(--bg-surface);
-      backdrop-filter: blur(22px) saturate(150%);
-      -webkit-backdrop-filter: blur(22px) saturate(150%);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
       border: 1px solid var(--border-hairline);
-      border-radius: 20px;
-      box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.24s ease, box-shadow 0.24s ease;
     }
     .apple-subcard {
       background-color: var(--bg-elevated);
@@ -148,7 +154,8 @@
       transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease, box-shadow 0.2s ease;
     }
     .tap-btn:hover { box-shadow: 0 4px 14px rgba(10, 132, 255, 0.18); }
-    .tap-btn:active { transform: scale(0.95); }
+    .tap-btn:active { transform: scale(0.97); }
+    .btn-grad-primary { background: linear-gradient(135deg, #0ea5e9 0%, #0a84ff 55%, #0284c7 100%); box-shadow: 0 8px 22px -6px rgba(10, 132, 255, 0.48); }
     .ripple-wave {
       position: absolute;
       border-radius: 9999px;
@@ -221,7 +228,7 @@
   <div id="broadcast-toast" class="hidden fixed top-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-50 safe-top-pad">
     <div id="broadcast-toast-card" class="apple-card modal-pop p-3.5 sm:p-4 border border-[#0a84ff]/50 shadow-2xl flex items-start justify-between gap-3">
       <div class="flex items-start gap-2.5 min-w-0">
-        <span id="broadcast-toast-avatar" class="text-lg shrink-0">🔔</span>
+        <span id="broadcast-toast-avatar" class="shrink-0"><i data-lucide="bell-ring" class="w-5 h-5 text-[#38bdf8]"></i></span>
         <div class="min-w-0">
           <div class="flex items-center gap-2 flex-wrap">
             <span id="broadcast-toast-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0a84ff]/20 text-[#0a84ff]">إشعار جديد</span>
@@ -234,107 +241,148 @@
     </div>
   </div>
 
-  <!-- Header (2-Row Responsive Mobile Layout) -->
-  <header class="sticky top-0 z-40 safe-top-pad border-b px-3 sm:px-6 py-2.5 sm:py-3 backdrop-blur-2xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
-    <div class="max-w-7xl mx-auto space-y-2">
-      <!-- Row 1: Brand + Compact Action Buttons -->
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+  <!-- Header (Balanced Single-Row Top Navbar on Desktop + Clean 2-Row on Mobile) -->
+  <header class="sticky top-0 z-40 safe-top-pad border-b px-3 sm:px-6 py-2.5 backdrop-blur-2xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
+    <div class="max-w-7xl mx-auto space-y-2 lg:space-y-0">
+      <div class="flex items-center justify-between gap-2 lg:gap-4">
+        <!-- Brand (Right/Start) -->
+        <div class="flex items-center gap-2.5 shrink-0">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
+            <svg class="w-5 h-5 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h3.5l2.2-5.5 3.3 11 2.4-6.5L16 12h5" />
               <circle cx="19.5" cy="6.5" r="1.5" fill="#30d158" stroke="none" />
             </svg>
           </div>
           <div>
-            <h1 class="text-sm sm:text-lg font-extrabold tracking-tight whitespace-nowrap font-en" dir="ltr">MNU Med • Sem 9</h1>
-            <div class="hidden sm:block text-[11px] font-semibold font-en" dir="ltr" style="color: var(--text-muted);">Mansoura National University — Faculty of Medicine</div>
+            <h1 class="text-sm sm:text-base font-extrabold tracking-tight whitespace-nowrap font-en" dir="ltr">MNU Med • Sem 9</h1>
+            <div class="hidden xl:block text-[10px] font-semibold font-en" dir="ltr" style="color: var(--text-muted);">Mansoura National University</div>
           </div>
         </div>
 
-        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
-          <!-- Notifications Bell -->
+        <!-- Centered Glass Nav Capsule (Desktop lg+) -->
+        <nav class="hidden lg:inline-flex seg-control items-center gap-1 shrink-0">
+          <button data-tab="home" class="nav-pill tap-btn active px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap">الرئيسية والامتحانات</button>
+          <button data-tab="planner" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">المخطط والدراسة</button>
+          <button data-tab="syllabus" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">المنهج والتشيك ليست</button>
+          <button data-tab="chat" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5 whitespace-nowrap" style="color: var(--text-muted);"><span>المذاكرة الجماعية</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span></button>
+          <button id="nav-admin-tab" data-tab="admin" class="hidden nav-pill tap-btn px-3.5 py-1.5 text-xs font-bold cursor-pointer text-amber-400 whitespace-nowrap">إدارة الأدمن</button>
+        </nav>
+
+        <!-- Actions & Compact Live Pill (Left/End) -->
+        <div class="flex items-center gap-1.5 shrink-0">
+          <div class="hidden lg:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full apple-subcard text-[11px] whitespace-nowrap">
+            <span id="cloud-sync-badge" class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span>محلي</span>
+            </span>
+            <span class="opacity-40">•</span>
+            <span class="inline-flex items-center gap-1 text-emerald-400 font-bold text-[10px]">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="live-studying-count" class="font-mono-num font-extrabold">41</span>
+              <span>يذاكرون الآن</span>
+            </span>
+          </div>
+
+          <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">Admin</span>
+
           <button id="btn-notifications-bell" type="button" class="tap-btn relative p-2 rounded-full apple-subcard cursor-pointer" title="إشعارات الدفعة">
-            <svg class="w-4 h-4 text-[#0a84ff]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+            <i data-lucide="bell" class="w-4 h-4 text-[#0a84ff]"></i>
             <span id="notif-unread-badge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-extrabold font-mono-num flex items-center justify-center">0</span>
           </button>
 
-          <!-- Student Auth / Greeting Button -->
-          <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-            <span id="student-header-label" class="max-w-[78px] sm:max-w-[150px] truncate">دخول</span>
+          <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
+            <i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>
+            <span id="student-header-label" class="max-w-[74px] sm:max-w-[120px] truncate">دخول</span>
           </button>
 
           <button id="btn-student-logout" type="button" class="hidden tap-btn px-2 py-1.5 rounded-full apple-subcard text-[10px] font-bold text-rose-400 cursor-pointer" title="تسجيل خروج / تبديل الحساب">خروج</button>
 
-          <button id="btn-admin-lock" type="button" class="tap-btn px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-            <span id="admin-lock-label" class="hidden sm:inline">Admin</span>
+          <button id="btn-admin-lock" type="button" class="tap-btn px-2 sm:px-2.5 py-1.5 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
+            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+            <span id="admin-lock-label" class="hidden xl:inline">Admin</span>
           </button>
 
           <button id="btn-theme-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
-            <svg class="w-4 h-4 text-[#0a84ff]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+            <i data-lucide="sun-moon" class="w-4 h-4 text-[#0a84ff]"></i>
           </button>
         </div>
       </div>
 
-      <!-- Row 2: Clean Single-Line Status Bar -->
-      <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar whitespace-nowrap py-1 px-2.5 rounded-xl apple-subcard text-[11px]" style="color: var(--text-muted);">
-        <div class="flex items-center gap-2 shrink-0">
-          <span id="cloud-sync-badge" class="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-            <span>محلي</span>
-          </span>
-          <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">Admin</span>
-          <span class="hidden sm:inline">•</span>
-          <span id="live-clock-str" class="hidden sm:inline font-mono-num font-semibold">--:--</span>
-        </div>
+      <!-- Tablet (sm..md) Secondary Nav Row -->
+      <div class="hidden sm:flex lg:hidden items-center justify-center pt-1">
+        <nav class="seg-control inline-flex items-center gap-1">
+          <button data-tab="home" class="nav-pill tap-btn active px-3.5 py-1.5 text-xs font-semibold cursor-pointer">الرئيسية</button>
+          <button data-tab="planner" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المخطط والدراسة</button>
+          <button data-tab="syllabus" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المنهج</button>
+          <button data-tab="chat" class="nav-pill tap-btn px-3.5 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">الشات</button>
+        </nav>
+      </div>
 
-        <div class="flex items-center gap-2.5 shrink-0">
+      <!-- Mobile (< sm) Compact Single-Line Status Bar -->
+      <div class="flex lg:hidden items-center justify-between gap-2 overflow-x-auto no-scrollbar whitespace-nowrap py-1 px-2.5 rounded-xl apple-subcard text-[11px]" style="color: var(--text-muted);">
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="cloud-sync-badge-mob" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Live</span>
+          </span>
+          <span class="opacity-40">•</span>
+          <span id="live-clock-str" class="font-mono-num font-semibold">--:--</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
           <span id="header-hours-badge" class="text-emerald-400 font-bold font-mono-num">0.0h مذاكرة</span>
-          <span>•</span>
-          <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
+          <span class="opacity-40">•</span>
+          <span class="inline-flex items-center gap-1 text-emerald-400 font-bold text-[10px]">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
             <span>يذاكرون الآن:</span>
-            <span id="live-studying-count" class="font-mono-num font-extrabold">41</span>
+            <span id="live-studying-count-mob" class="font-mono-num font-extrabold">41</span>
           </span>
         </div>
       </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto mt-3 hidden sm:block">
-      <nav class="seg-control inline-flex items-center gap-1">
-        <button data-tab="home" class="nav-pill tap-btn active px-4 py-1.5 text-xs font-semibold cursor-pointer">الرئيسية والامتحانات</button>
-        <button data-tab="planner" class="nav-pill tap-btn px-4 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المخطط والدراسة</button>
-        <button data-tab="syllabus" class="nav-pill tap-btn px-4 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المنهج والتشيك ليست</button>
-        <button data-tab="chat" class="nav-pill tap-btn px-4 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5" style="color: var(--text-muted);"><span>المذاكرة الجماعية</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span></button>
-        <button id="nav-admin-tab" data-tab="admin" class="hidden nav-pill tap-btn px-4 py-1.5 text-xs font-bold cursor-pointer text-amber-400">إدارة الأدمن</button>
-      </nav>
     </div>
   </header>
 
   <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto p-3.5 sm:p-6 space-y-5 sm:space-y-6">
 
-    <!-- TAB 1: HOME & EXAMS -->
-    <section id="tab-home" class="tab-panel space-y-5 sm:space-y-6 fade-in">
-      <div class="rounded-[22px] overflow-hidden relative shadow-xl bg-gradient-to-br from-slate-950 via-sky-950 to-indigo-950 text-white border border-sky-400/25">
-        <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-30" viewBox="0 0 800 220" preserveAspectRatio="none">
-          <path class="ecg-line" fill="none" stroke="#38bdf8" stroke-width="2.5" d="M0,130 L180,130 L205,130 L220,95 L235,155 L255,40 L275,180 L295,115 L315,130 L520,130 L545,130 L560,95 L575,155 L595,40 L615,180 L635,115 L655,130 L800,130" />
-        </svg>
+    <!-- TAB 1: HOME & EXAMS (BALANCED BENTO GRID) -->
+    <section id="tab-home" class="tab-panel space-y-4 sm:space-y-5 fade-in">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Hero Next-Exam Card (Clean, Balanced, Zero White Circle) -->
+        <div class="lg:col-span-8 rounded-2xl overflow-hidden relative shadow-xl bg-gradient-to-br from-[#071428] via-[#0b223f] to-[#062729] text-white border border-sky-400/20 flex flex-col justify-between">
+          <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-25" viewBox="0 0 800 220" preserveAspectRatio="none">
+            <path class="ecg-line" fill="none" stroke="#38bdf8" stroke-width="2.5" d="M0,130 L180,130 L205,130 L220,95 L235,155 L255,40 L275,180 L295,115 L315,130 L520,130 L545,130 L560,95 L575,155 L595,40 L615,180 L635,115 L655,130 L800,130" />
+          </svg>
 
-        <div class="relative z-10 p-5 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div class="space-y-2 min-w-0">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/35 text-sky-300 text-[11px] font-semibold">
-              <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
-              <span id="calm-alert-banner">أقرب امتحان قادم</span>
+          <div class="relative z-10 p-5 sm:p-6 flex flex-col justify-between gap-4 h-full">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1.5 min-w-0 flex-1">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/35 text-sky-300 text-[11px] font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span id="calm-alert-banner">أقرب امتحان قادم</span>
+                </div>
+                <h2 id="hero-exam-title" class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">Ophthalmology — Final</h2>
+                <p id="hero-exam-meta" class="text-xs sm:text-sm text-sky-100/80">--</p>
+              </div>
+              <div class="shrink-0 flex justify-center">
+                <lottie-player
+                  src="https://lottie.host/0074b5eb-a871-4de4-abee-f7ad55bc7948/feBAK42RyT.json"
+                  background="transparent"
+                  speed="1"
+                  loop
+                  autoplay
+                  class="w-[130px] h-[130px] sm:w-[170px] sm:h-[170px]"
+                ></lottie-player>
+              </div>
             </div>
-            <h2 id="hero-exam-title" class="text-xl sm:text-3xl font-bold tracking-tight">Ophthalmology — Final</h2>
-            <p id="hero-exam-meta" class="text-xs sm:text-sm text-sky-100/80">--</p>
-            <div class="pt-2 flex flex-wrap items-center gap-2.5">
-              <button type="button" id="hero-go-planner" class="tap-btn px-5 py-2.5 rounded-full bg-[#0a84ff] hover:opacity-90 text-white text-xs font-bold transition cursor-pointer shadow-md">
+
+            <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center" dir="ltr">
+              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-days" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">DAYS</div></div>
+              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-hours" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">HRS</div></div>
+              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-mins" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">MIN</div></div>
+              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-secs" class="font-mono-num text-2xl sm:text-3xl font-extrabold text-emerald-400">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">SEC</div></div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 pt-1">
+              <button type="button" id="hero-go-planner" class="tap-btn btn-grad-primary px-5 py-2.5 rounded-full text-white text-xs font-bold transition cursor-pointer">
                 بدء المذاكرة والـ Timer
               </button>
               <button type="button" id="hero-open-student-auth" class="tap-btn px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition cursor-pointer">
@@ -342,59 +390,79 @@
               </button>
             </div>
           </div>
-
-          <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center" dir="ltr">
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-days" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">DAYS</div></div>
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-hours" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">HRS</div></div>
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-mins" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">MIN</div></div>
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-secs" class="font-mono-num text-xl sm:text-4xl font-bold text-sky-400">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">SEC</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- KPIs + Daily Goal Ring -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="apple-card apple-card-hover stagger-item p-5" style="--i:0">
-          <div class="text-xs font-semibold" style="color: var(--text-muted);">نسبة إنجاز المنهج الكلي</div>
-          <div class="flex items-baseline justify-between mt-1"><div id="kpi-overall-pct" class="text-2xl font-bold font-mono-num text-[#0a84ff]">0%</div><div id="kpi-overall-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 / 0</div></div>
-          <div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-2.5 overflow-hidden"><div id="kpi-overall-bar" class="bg-[#0a84ff] h-full transition-all duration-700" style="width: 0%"></div></div>
         </div>
 
-        <div class="apple-card apple-card-hover stagger-item p-5" style="--i:1">
-          <div class="text-xs font-semibold" style="color: var(--text-muted);">إنجاز خطة اليوم</div>
-          <div class="flex items-baseline justify-between mt-1"><div id="kpi-today-pct" class="text-2xl font-bold font-mono-num text-emerald-400">0%</div><div id="kpi-today-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 / 0 مهام</div></div>
-          <div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-2.5 overflow-hidden"><div id="kpi-today-bar" class="bg-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
-        </div>
-
-        <div class="apple-card apple-card-hover stagger-item p-5" style="--i:2">
-          <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات التركيز</div>
-          <div class="flex items-baseline justify-between mt-1">
-            <div id="kpi-hours-logged" class="text-2xl font-bold font-mono-num">0.0h</div>
-            <div id="kpi-sessions-count" class="text-[11px] font-mono-num text-purple-400 font-bold">0 جلسات</div>
-          </div>
-          <div id="kpi-sync-hint" class="text-[11px] mt-2" style="color: var(--text-muted);">محفوظ على جهازك</div>
-        </div>
-
-        <!-- Daily Goal Ring -->
-        <div class="apple-card apple-card-hover stagger-item p-4 flex items-center gap-3.5" style="--i:3">
-          <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
-            <svg class="w-full h-full -rotate-90" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="6"></circle>
-              <circle id="daily-goal-ring" cx="40" cy="40" r="33" fill="none" stroke="#30d158" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3" class="transition-all duration-700"></circle>
-            </svg>
-            <span id="daily-goal-pct" class="absolute font-mono-num text-xs font-extrabold text-emerald-400">0%</span>
-          </div>
-          <div class="flex-1 min-w-0 space-y-1">
-            <div class="flex items-center justify-between gap-1">
-              <span class="text-xs font-bold truncate">الهدف اليومي</span>
-              <select id="daily-goal-select" class="apple-subcard px-1.5 py-0.5 text-[11px] font-mono-num font-bold focus:outline-none cursor-pointer">
-                <option value="2">2h</option>
-                <option value="4" selected>4h</option>
-                <option value="6">6h</option>
-                <option value="8">8h</option>
-              </select>
+        <!-- Right Bento Column: Compact Daily Goal + Syllabus Progress with 4 Mini Subject Bars -->
+        <div class="lg:col-span-4 flex flex-col gap-4">
+          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex items-center gap-4" style="--i:0">
+            <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+              <svg class="w-full h-full -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="6.5"></circle>
+                <circle id="daily-goal-ring" cx="40" cy="40" r="33" fill="none" stroke="#30d158" stroke-width="6.5" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3" class="transition-all duration-700"></circle>
+              </svg>
+              <span id="daily-goal-pct" class="absolute font-mono-num text-xs font-extrabold text-emerald-400">0%</span>
             </div>
-            <div id="daily-goal-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0.0 / 4.0h اليوم</div>
+            <div class="flex-1 min-w-0 space-y-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-sm font-bold truncate">الهدف اليومي</span>
+                <select id="daily-goal-select" class="apple-subcard px-2 py-0.5 text-xs font-mono-num font-bold focus:outline-none cursor-pointer">
+                  <option value="2">2h</option>
+                  <option value="4" selected>4h</option>
+                  <option value="6">6h</option>
+                  <option value="8">8h</option>
+                </select>
+              </div>
+              <div id="daily-goal-sub" class="text-xs font-mono-num" style="color: var(--text-muted);">0.0 / 4.0h اليوم</div>
+            </div>
+          </div>
+
+          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3" style="--i:1">
+            <div>
+              <div class="flex items-baseline justify-between">
+                <span class="text-xs font-semibold" style="color: var(--text-muted);">نسبة إنجاز المنهج الكلي</span>
+                <span id="kpi-overall-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 محاضرة</span>
+              </div>
+              <div class="flex items-center gap-3 mt-1">
+                <div id="kpi-overall-pct" class="text-2xl font-extrabold font-mono-num text-[#38bdf8]">0%</div>
+                <div class="flex-1 bg-slate-700/40 h-2 rounded-full overflow-hidden"><div id="kpi-overall-bar" class="bg-gradient-to-l from-[#38bdf8] to-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
+              </div>
+            </div>
+            <div id="home-subj-mini-bars" class="grid grid-cols-2 gap-x-3 gap-y-2 pt-2 border-t" style="border-color: var(--border-hairline);"></div>
+          </div>
+        </div>
+
+        <!-- Bottom 3 Equal-Height Stat Cards -->
+        <div class="lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex items-center justify-between gap-3" style="--i:2">
+            <div class="space-y-1 min-w-0">
+              <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات التركيز</div>
+              <div id="kpi-hours-logged" class="text-2xl font-extrabold font-mono-num">0.0h</div>
+              <div id="kpi-sync-hint" class="text-[11px]" style="color: var(--text-muted);">محفوظ على جهازك</div>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-[#38bdf8] flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-5 h-5"></i></div>
+          </div>
+
+          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex items-center justify-between gap-3" style="--i:3">
+            <div class="space-y-1 min-w-0">
+              <div class="text-xs font-semibold" style="color: var(--text-muted);">الجلسات المنجزة</div>
+              <div id="kpi-sessions-count" class="text-2xl font-extrabold font-mono-num text-purple-400">0 جلسات</div>
+              <div class="text-[11px]" style="color: var(--text-muted);">إجمالي الجلسات المكتملة</div>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+          </div>
+
+          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex flex-col justify-between gap-2" style="--i:4">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <div class="text-xs font-semibold" style="color: var(--text-muted);">إنجاز خطة اليوم</div>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <div id="kpi-today-pct" class="text-2xl font-extrabold font-mono-num text-emerald-400">0%</div>
+                  <div id="kpi-today-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 / 0 مهام</div>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0"><i data-lucide="list-checks" class="w-5 h-5"></i></div>
+            </div>
+            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div id="kpi-today-bar" class="bg-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
           </div>
         </div>
       </div>
@@ -419,14 +487,14 @@
             <p class="text-xs mt-0.5" style="color: var(--text-muted);">اضغط على الصورة أو زر التكبير لعرض الجدول بدقة عالية أو تحميله.</p>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <button type="button" id="btn-zoom-exam-schedule" class="tap-btn px-3.5 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تكبير الجدول 🔍</button>
-            <a id="btn-download-exam-schedule" href="#exam-schedule-img-wrap" download="exam-schedule.jpg" class="tap-btn px-3.5 py-2 rounded-xl apple-subcard text-xs font-bold cursor-pointer">تحميل الصورة ⬇️</a>
+            <button type="button" id="btn-zoom-exam-schedule" class="tap-btn px-3.5 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer"><i data-lucide="zoom-in" class="w-3.5 h-3.5 inline-block ml-1"></i><span>تكبير الجدول</span></button>
+            <a id="btn-download-exam-schedule" href="#exam-schedule-img-wrap" download="exam-schedule.jpg" class="tap-btn px-3.5 py-2 rounded-xl apple-subcard text-xs font-bold cursor-pointer"><i data-lucide="download" class="w-3.5 h-3.5 inline-block ml-1"></i><span>تحميل الصورة</span></a>
           </div>
         </div>
         <div class="relative rounded-2xl overflow-hidden border cursor-pointer group" style="border-color: var(--border-hairline);" id="exam-schedule-img-wrap">
           <img id="exam-schedule-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="صورة جدول الامتحانات الرسمي (Revised Schedule)" class="w-full h-auto max-h-[420px] object-contain mx-auto bg-slate-950/40 transition-transform duration-300 group-hover:scale-[1.01]" />
           <div id="exam-schedule-fallback" class="hidden p-8 text-center text-xs space-y-2" style="color: var(--text-muted);">
-            <div class="text-2xl">🗓️</div>
+            <div class="flex justify-center"><i data-lucide="calendar-days" class="w-8 h-8 text-[#38bdf8]"></i></div>
             <div>لم يتم العثور على ملف <span class="font-mono-num">./exam-schedule.jpg</span> محلياً، أو لم يرفع الأدمن صورة الجدول بعد.</div>
           </div>
         </div>
@@ -436,18 +504,45 @@
     <!-- TAB 2: STUDY PLANNER & UNIFIED TIMER -->
     <section id="tab-planner" class="tab-panel hidden space-y-5 sm:space-y-6 fade-in">
       <div class="apple-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-r-4 border-r-[#0a84ff]">
-        <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold">المخطط والدراسة (نظام التايمر الموحد)</h2>
-          <p class="text-xs mt-0.5" style="color: var(--text-muted);">أضف محاضراتك للجدول، واضغط "ابدأ" لتشغيل التايمر والترحيل التلقائي للتشيك ليست.</p>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
+          <div class="shrink-0 flex justify-center">
+            <lottie-player
+              src="https://lottie.host/be925b4b-6d63-41dc-a165-f9e71e9c10ad/rNlBMCpggP.json"
+              background="transparent"
+              speed="1"
+              loop
+              autoplay
+              class="w-[110px] h-[110px] sm:w-[150px] sm:h-[150px]"
+            ></lottie-player>
+          </div>
+          <div class="min-w-0">
+            <h2 class="text-base sm:text-lg font-bold">المخطط والدراسة (نظام التايمر الموحد)</h2>
+            <p class="text-xs mt-1 leading-relaxed" style="color: var(--text-muted);">أضف محاضراتك للجدول، واضغط "ابدأ" لتشغيل التايمر والترحيل التلقائي للتشيك ليست.</p>
+          </div>
         </div>
-        <button type="button" id="btn-open-study-wizard" class="tap-btn px-5 py-3 rounded-2xl bg-[#0a84ff] hover:opacity-90 text-white text-xs sm:text-sm font-bold shadow-lg shadow-[#0a84ff]/25 cursor-pointer transition shrink-0">
+        <button type="button" id="btn-open-study-wizard" class="tap-btn btn-grad-primary px-5 py-3 rounded-2xl text-white text-xs sm:text-sm font-bold cursor-pointer transition shrink-0">
           + هتذاكر إيه النهارده؟ (إضافة جلسة)
         </button>
       </div>
 
       <div class="apple-card p-4 sm:p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div><h3 class="text-base font-bold">التايمر الموحد للمحاضرة النشطة</h3><p class="text-xs" style="color: var(--text-muted);">يظهر العد التنازلي في تبويب المتصفح مع تنبيه صوتي اختياري عند الانتهاء.</p></div>
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div id="timer-pulse-lottie" class="hidden w-10 h-10 shrink-0">
+              <lottie-player
+                src="https://lottie.host/f4ca486a-d86d-40db-95f0-40dda6a2d988/0XYEbRGwFg.json"
+                background="transparent"
+                speed="1"
+                loop
+                autoplay
+                class="w-10 h-10"
+              ></lottie-player>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-base font-bold">التايمر الموحد للمحاضرة النشطة</h3>
+              <p class="text-xs" style="color: var(--text-muted);">يظهر العد التنازلي في تبويب المتصفح مع تنبيه صوتي اختياري عند الانتهاء.</p>
+            </div>
+          </div>
           <div class="flex items-center gap-2">
             <label class="tap-btn flex items-center gap-1.5 px-3 py-2 rounded-xl apple-subcard text-[11px] font-semibold cursor-pointer">
               <input id="bell-toggle-chk" type="checkbox" class="accent-[#0a84ff]" checked />
@@ -500,9 +595,22 @@
 
     <!-- TAB 3: SYLLABUS CHECKLIST -->
     <section id="tab-syllabus" class="tab-panel hidden space-y-5 fade-in">
-      <div class="apple-card p-5 space-y-2">
-        <div class="flex items-center justify-between text-xs sm:text-sm font-bold"><span>تقدمك الكلي في المنهج النظري</span><span id="syl-overall-label" class="font-mono-num text-[#0a84ff]">0%</span></div>
-        <div class="w-full bg-slate-700/40 h-2.5 rounded-full overflow-hidden"><div id="syl-overall-bar" class="bg-gradient-to-l from-[#0a84ff] to-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
+      <div class="apple-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="shrink-0 flex justify-center">
+          <lottie-player
+            src="https://lottie.host/dabb0413-de28-479b-b7e6-acf2b9333bc9/z6P9VxcGKt.json"
+            background="transparent"
+            speed="1"
+            loop
+            autoplay
+            class="w-[100px] h-[100px] sm:w-[135px] sm:h-[135px]"
+          ></lottie-player>
+        </div>
+        <div class="flex-1 min-w-0 space-y-2.5">
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold"><span>تقدمك الكلي في المنهج النظري</span><span id="syl-overall-label" class="font-mono-num text-[#0a84ff]">0%</span></div>
+          <div class="w-full bg-slate-700/40 h-2.5 rounded-full overflow-hidden"><div id="syl-overall-bar" class="bg-gradient-to-l from-[#0a84ff] to-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
+          <p class="text-[11px]" style="color: var(--text-muted);">حدّد مراحل كل محاضرة لحساب تقدمك الفعلي ومزامنته مع حسابك.</p>
+        </div>
       </div>
 
       <div id="subjects-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
@@ -533,12 +641,22 @@
     <!-- TAB: LIVE GROUP STUDY CHAT -->
     <section id="tab-chat" class="tab-panel hidden space-y-4 fade-in">
       <div class="apple-card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-base sm:text-lg font-bold">غرفة المذاكرة الجماعية</h2>
-            <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold">Firestore Live</span>
+        <div class="flex items-center gap-3 min-w-0">
+          <dotlottie-player
+            src="https://lottie.host/d47ef3dd-6431-4f24-8f96-af6a748558f0/ZLl8dic0bP.lottie"
+            background="transparent"
+            speed="1"
+            loop
+            autoplay
+            class="w-[70px] h-[70px] sm:w-[88px] sm:h-[88px] shrink-0"
+          ></dotlottie-player>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-base sm:text-lg font-bold">غرفة المذاكرة الجماعية</h2>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold">Firestore Live</span>
+            </div>
+            <p class="text-xs mt-0.5" style="color: var(--text-muted);">اسأل زمايلك في أي مادة، رد على الرسائل، وتفاعل بالـ Reactions لحظياً.</p>
           </div>
-          <p class="text-xs mt-0.5" style="color: var(--text-muted);">اسأل زمايلك في أي مادة، رد على الرسائل، وتفاعل بالـ Reactions لحظياً.</p>
         </div>
         <div class="seg-control inline-flex flex-wrap gap-1 text-[11px] font-semibold">
           <button type="button" data-chat-filter="ALL" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
@@ -554,7 +672,7 @@
         <!-- Pinned Message Bar -->
         <div id="chat-pinned-bar" class="hidden px-3.5 py-2.5 border-b bg-amber-500/10 flex items-center justify-between gap-2" style="border-color: var(--border-hairline);">
           <div class="flex items-center gap-2 min-w-0 text-xs">
-            <span class="shrink-0">📌</span>
+            <i data-lucide="pin" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
             <div class="min-w-0 truncate">
               <span class="font-bold text-amber-400" id="chat-pinned-sender"></span>:
               <span id="chat-pinned-text" style="color: var(--text-main);"></span>
@@ -610,9 +728,9 @@
             <option value="FMIMC">Family Med</option>
           </select>
           <input id="chat-img-input" type="file" accept="image/*" class="hidden" />
-          <button type="button" id="chat-img-btn" class="tap-btn px-3 py-2.5 rounded-xl apple-subcard text-base leading-none cursor-pointer shrink-0" title="إرسال صورة">📷</button>
+          <button type="button" id="chat-img-btn" class="tap-btn px-3 py-2.5 rounded-xl apple-subcard text-base leading-none cursor-pointer shrink-0" title="إرسال صورة"><i data-lucide="image-plus" class="w-4 h-4 text-[#38bdf8]"></i></button>
           <input id="chat-message-input" type="text" placeholder="اكتب سؤالك أو مشاركتك هنا..." class="flex-1 min-w-[140px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" />
-          <button type="submit" id="chat-send-btn" class="tap-btn px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer shrink-0">إرسال</button>
+          <button type="submit" id="chat-send-btn" class="tap-btn btn-grad-primary px-5 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer shrink-0">إرسال</button>
         </form>
       </div>
     </section>
@@ -743,13 +861,28 @@
     </section>
   </main>
 
-  <!-- Mobile Bottom Navigation -->
-  <nav class="sm:hidden fixed bottom-0 inset-x-0 z-40 safe-bottom-nav border-t backdrop-blur-2xl flex justify-around pt-2.5 text-xs font-bold" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
-    <button data-tab="home" class="mob-nav tap-btn text-[#0a84ff] cursor-pointer px-3 py-1.5">الرئيسية</button>
-    <button data-tab="planner" class="mob-nav tap-btn cursor-pointer px-3 py-1.5" style="color: var(--text-muted);">الدراسة</button>
-    <button data-tab="syllabus" class="mob-nav tap-btn cursor-pointer px-2.5 py-1.5" style="color: var(--text-muted);">المنهج</button>
-    <button data-tab="chat" class="mob-nav tap-btn cursor-pointer px-2.5 py-1.5" style="color: var(--text-muted);">المذاكرة الجماعية</button>
-    <button id="mob-admin-btn" data-tab="admin" class="hidden mob-nav tap-btn cursor-pointer px-2.5 py-1.5 text-amber-400">الأدمن</button>
+  <!-- Mobile Floating Pill Dock -->
+  <nav class="sm:hidden fixed inset-x-3 z-40 rounded-[24px] border backdrop-blur-2xl flex items-center justify-around px-1.5 py-2 shadow-[0_14px_38px_-10px_rgba(0,0,0,0.65)]" style="bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); background-color: var(--header-bg); border-color: rgba(255,255,255,0.12);">
+    <button data-tab="home" class="mob-nav tap-btn flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-2xl bg-[#0a84ff]/15 text-[#38bdf8] cursor-pointer whitespace-nowrap">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
+      <span class="text-[10px] font-bold whitespace-nowrap">الرئيسية</span>
+    </button>
+    <button data-tab="planner" class="mob-nav tap-btn flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-2xl cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span class="text-[10px] font-bold whitespace-nowrap">الدراسة</span>
+    </button>
+    <button data-tab="syllabus" class="mob-nav tap-btn flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-2xl cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span class="text-[10px] font-bold whitespace-nowrap">المنهج</span>
+    </button>
+    <button data-tab="chat" class="mob-nav tap-btn flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-2xl cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/></svg>
+      <span class="text-[10px] font-bold whitespace-nowrap">الشات</span>
+    </button>
+    <button id="mob-admin-btn" data-tab="admin" class="hidden mob-nav tap-btn flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-2xl cursor-pointer text-amber-400 whitespace-nowrap">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+      <span class="text-[10px] font-bold whitespace-nowrap">الأدمن</span>
+    </button>
   </nav>
 
   <!-- Student Auth Modal (No Email — University ID + Password) -->
@@ -901,7 +1034,7 @@
         <span id="sched-zoom-label" class="font-mono-num text-xs text-sky-300 font-bold min-w-[44px] text-center">100%</span>
         <button type="button" id="sched-zoom-in" class="tap-btn px-3 py-1.5 rounded-lg bg-white/15 text-white text-xs font-bold cursor-pointer">تكبير +</button>
         <button type="button" id="sched-zoom-reset" class="tap-btn px-2.5 py-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold cursor-pointer">100%</button>
-        <a id="sched-lightbox-download" href="#exam-schedule-img-wrap" download="exam-schedule.jpg" class="tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تحميل ⬇️</a>
+        <a id="sched-lightbox-download" href="#exam-schedule-img-wrap" download="exam-schedule.jpg" class="tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white text-xs font-bold cursor-pointer"><i data-lucide="download" class="w-3.5 h-3.5 inline-block ml-1"></i><span>تحميل</span></a>
         <button type="button" id="sched-lightbox-close" class="tap-btn px-3 py-1.5 rounded-lg bg-rose-500/80 text-white text-xs font-bold cursor-pointer">✕</button>
       </div>
     </div>
@@ -1387,6 +1520,7 @@
       document.getElementById('chat-pinned-sender').textContent = shared.pinnedChat.senderName || 'Admin';
       document.getElementById('chat-pinned-text').textContent = shared.pinnedChat.text;
       if (unpinBtn) unpinBtn.classList.toggle('hidden', !shared.isAdmin);
+      refreshLucideIcons();
     }
     function renderAdminModWords() {
       const wrap = document.getElementById('admin-mod-words-list');
@@ -1479,13 +1613,14 @@
                 <div class="flex items-center gap-1">${reactHtml}</div>
                 <div class="flex items-center gap-1">
                   <button type="button" data-reply-id="${m.id}" class="chat-reply-btn tap-btn text-[11px] font-semibold px-2 py-0.5 rounded-lg hover:bg-white/10 cursor-pointer" style="color: var(--text-muted);">رد</button>
-                  ${shared.isAdmin ? `<button type="button" data-pin-id="${m.id}" class="chat-pin-btn tap-btn text-[11px] px-1.5 py-0.5 rounded-lg hover:bg-amber-500/20 cursor-pointer" title="تثبيت">📌</button><button type="button" data-del-chat="${m.id}" class="chat-del-btn tap-btn text-[11px] px-1.5 py-0.5 rounded-lg hover:bg-rose-500/20 cursor-pointer" title="حذف الرسالة">🗑️</button>` : ''}
+                  ${shared.isAdmin ? `<button type="button" data-pin-id="${m.id}" class="chat-pin-btn tap-btn text-[11px] px-1.5 py-0.5 rounded-lg hover:bg-amber-500/20 cursor-pointer" title="تثبيت"><i data-lucide="pin" class="w-3.5 h-3.5 text-amber-400"></i></button><button type="button" data-del-chat="${m.id}" class="chat-del-btn tap-btn text-[11px] px-1.5 py-0.5 rounded-lg hover:bg-rose-500/20 cursor-pointer" title="حذف الرسالة"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i></button>` : ''}
                 </div>
               </div>
             </div>
           </div>`;
       }).join('');
       wrap.scrollTop = wrap.scrollHeight;
+      refreshLucideIcons();
     }
     function compressImageToDataURL(file) {
       return new Promise((resolve, reject) => {
@@ -1592,7 +1727,7 @@
             </div>
             <div class="flex items-center gap-2">
               <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
-              ${shared.isAdmin ? `<button type="button" data-del-notif="${escapeHtml(n.id)}" class="del-notif-btn tap-btn text-xs px-1.5 py-0.5 rounded-lg hover:bg-rose-500/20 cursor-pointer" title="حذف الإشعار">🗑️</button>` : ''}
+              ${shared.isAdmin ? `<button type="button" data-del-notif="${escapeHtml(n.id)}" class="del-notif-btn tap-btn text-xs px-1.5 py-0.5 rounded-lg hover:bg-rose-500/20 cursor-pointer" title="حذف الإشعار"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i></button>` : ''}
             </div>
           </div>
           <div class="text-xs sm:text-sm font-bold">${escapeHtml(n.title)}</div>
@@ -1617,6 +1752,7 @@
       const cardsHtml = items.length ? items.map(renderNotificationCard).join('') : emptyHtml;
       if (listEl) listEl.innerHTML = cardsHtml;
       if (adminListEl) adminListEl.innerHTML = cardsHtml;
+      refreshLucideIcons();
     }
     async function deleteNotificationById(notifId) {
       if (!shared.isAdmin || !fbDb) return;
@@ -1716,7 +1852,7 @@
     function openScheduleLightbox() {
       setScheduleZoom(1);
       document.getElementById('sched-lightbox-img').src = getExamScheduleSrc();
-      document.getElementById('schedule-lightbox-modal').classList.remove('hidden');
+      gsapModalOpen('schedule-lightbox-modal');
     }
     function compressScheduleImage(file) {
       return new Promise((resolve, reject) => {
@@ -1759,6 +1895,7 @@
         fbAuth = firebase.auth();
         fbDb = firebase.firestore();
         badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>Live</span>';
+        const mobBadge = document.getElementById('cloud-sync-badge-mob'); if (mobBadge) mobBadge.innerHTML = badge.innerHTML;
         badge.className = 'inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-400';
 
         fbDb.collection('shared').doc('exams').onSnapshot(doc => {
@@ -1817,6 +1954,75 @@
       }
     }
 
+    // =========================================================================
+    // Lucide Icons & GSAP (GPU-accelerated 60fps transform/opacity)
+    // =========================================================================
+    function refreshLucideIcons() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+    function gsapStagger(selector, parent = document) {
+      if (!window.gsap) return;
+      const els = parent.querySelectorAll(selector);
+      if (!els.length) return;
+      window.gsap.killTweensOf(els);
+      window.gsap.fromTo(els,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.36, stagger: 0.04, ease: 'power2.out', clearProps: 'transform,opacity' }
+      );
+    }
+    function gsapModalOpen(modalId) {
+      const m = document.getElementById(modalId);
+      if (!m) return;
+      m.classList.remove('hidden');
+      if (window.gsap) {
+        const card = m.querySelector('.modal-pop');
+        if (card) {
+          window.gsap.fromTo(card,
+            { opacity: 0, scale: 0.92, y: 14 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: 'back.out(1.4)', clearProps: 'transform,opacity' }
+          );
+        }
+      }
+    }
+    const countUpCache = {};
+    function gsapCountUp(elId, target, suffix = '', decimals = 0) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const prev = countUpCache[elId] ?? 0;
+      if (prev === target) {
+        el.textContent = (decimals ? Number(target).toFixed(decimals) : Math.round(target)) + suffix;
+        return;
+      }
+      countUpCache[elId] = target;
+      if (!window.gsap) {
+        el.textContent = (decimals ? Number(target).toFixed(decimals) : Math.round(target)) + suffix;
+        return;
+      }
+      const obj = { val: prev };
+      window.gsap.to(obj, {
+        val: target,
+        duration: 0.65,
+        ease: 'power2.out',
+        onUpdate: () => {
+          el.textContent = (decimals ? obj.val.toFixed(decimals) : Math.round(obj.val)) + suffix;
+        }
+      });
+    }
+    let timerPulseTween = null;
+    function setTimerPulse(running) {
+      const wrap = document.getElementById('pomo-ring-wrap');
+      if (!wrap || !window.gsap) return;
+      if (running && !timerPulseTween) {
+        timerPulseTween = window.gsap.to(wrap, { scale: 1.035, duration: 1.15, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      } else if (!running && timerPulseTween) {
+        timerPulseTween.kill();
+        timerPulseTween = null;
+        window.gsap.to(wrap, { scale: 1, duration: 0.2, ease: 'power1.out' });
+      }
+    }
+
     function getTopicStage(id) {
       if (!state.stages[id]) state.stages[id] = { videos: false, studied: false, reviewed: false, solved: false };
       return state.stages[id];
@@ -1833,20 +2039,15 @@
     }
 
     function triggerConfetti() {
-      const colors = ['#0a84ff', '#30d158', '#ff9f0a', '#bf5af2', '#ff375f'];
-      for (let i = 0; i < 24; i++) {
-        const el = document.createElement('div');
-        el.className = 'confetti-dot';
-        el.style.backgroundColor = colors[i % colors.length];
-        el.style.left = (window.innerWidth / 2 + (Math.random() - 0.5) * 180) + 'px';
-        el.style.top = (window.innerHeight / 2 + (Math.random() - 0.5) * 60) + 'px';
-        document.body.appendChild(el);
-        const dx = (Math.random() - 0.5) * 320, dy = -120 - Math.random() * 160;
-        const rot = (Math.random() - 0.5) * 540;
-        el.animate([
-          { transform: 'translate3d(0,0,0) rotate(0deg) scale(1)', opacity: 1 },
-          { transform: `translate3d(${dx}px, ${dy + 280}px, 0) rotate(${rot}deg) scale(0.4)`, opacity: 0 }
-        ], { duration: 820, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => el.remove();
+      if (typeof window.confetti === 'function') {
+        window.confetti({
+          particleCount: 55,
+          spread: 70,
+          origin: { y: 0.65 },
+          colors: ['#0a84ff', '#30d158', '#38bdf8', '#fbbf24'],
+          disableForReducedMotion: true
+        });
+        return;
       }
     }
 
@@ -1890,11 +2091,13 @@
       const el = document.getElementById('live-studying-count');
       if (!el) return;
       el.textContent = liveStudyingVal;
+      const mobEl = document.getElementById('live-studying-count-mob'); if (mobEl) mobEl.textContent = liveStudyingVal;
       setInterval(() => {
         const delta = Math.random() < 0.5 ? -1 : 1;
         const step = Math.random() < 0.25 ? delta * 2 : delta;
         liveStudyingVal = Math.min(49, Math.max(34, liveStudyingVal + step));
         el.textContent = liveStudyingVal;
+        if (mobEl) mobEl.textContent = liveStudyingVal;
         el.classList.remove('live-pop');
         void el.offsetWidth;
         el.classList.add('live-pop');
@@ -1974,11 +2177,13 @@
           </div>`;
       }).join('');
       updateCountdowns();
+      refreshLucideIcons();
+      gsapStagger('#exams-timeline-list .stagger-item');
     }
 
     // Study Wizard Modal
     let wizStep = 1, wizData = { subj: 'ENT', topicId: '', title: '', hasVideo: true, speed: 1.5, pages: 15, mode: 'first' };
-    function openStudyWizard() { wizStep = 1; wizData.topicId = ''; wizData.title = ''; renderWizardStep(); document.getElementById('study-wizard-modal').classList.remove('hidden'); }
+    function openStudyWizard() { wizStep = 1; wizData.topicId = ''; wizData.title = ''; renderWizardStep(); gsapModalOpen('study-wizard-modal'); }
     function renderWizardStep() {
       document.getElementById('wiz-step-indicator').textContent = `الخطوة ${wizStep} من 5`;
       document.querySelectorAll('.wiz-step').forEach((el, idx) => el.classList.toggle('hidden', idx + 1 !== wizStep));
@@ -2033,6 +2238,9 @@
     function syncTimerDisplay() {
       const task = getActiveTask(), badgeEl = document.getElementById('pomo-active-mode-badge'), titleEl = document.getElementById('pomo-active-lecture');
       document.getElementById('pomo-ring-wrap').classList.toggle('timer-running-glow', pomoRunning);
+      setTimerPulse(pomoRunning);
+      const pulseLottie = document.getElementById('timer-pulse-lottie');
+      if (pulseLottie) pulseLottie.classList.toggle('hidden', !pomoRunning);
       if (!task) {
         pomoTotalSec = 0; pomoLeftSec = 0;
         document.getElementById('pomo-display').textContent = '00:00'; document.getElementById('pomo-ring').style.strokeDashoffset = 0;
@@ -2132,6 +2340,7 @@
           </div>`;
       }).join('');
       updateKPIs();
+      refreshLucideIcons();
     }
 
     // 4-Stage Syllabus Checklist
@@ -2183,6 +2392,8 @@
       }
       document.getElementById('topics-sections-container').innerHTML = html;
       updateKPIs();
+      refreshLucideIcons();
+      gsapStagger('#topics-sections-container .stagger-item');
     }
 
     function updateKPIs() {
@@ -2190,17 +2401,17 @@
       let sumPct = 0, tot = 0;
       Object.values(shared.topics).forEach(a => a.forEach(t => { tot++; sumPct += getTopicPct(t.id); }));
       const pct = tot ? Math.round(sumPct / tot) : 0;
-      document.getElementById('kpi-overall-pct').textContent = pct + '%';
+      gsapCountUp('kpi-overall-pct', pct, '%', 0);
       document.getElementById('kpi-overall-sub').textContent = `${tot} محاضرة`;
       document.getElementById('kpi-overall-bar').style.width = pct + '%';
 
       const qDn = state.todayQueue.filter(x => x.done).length, qTot = state.todayQueue.length, qPct = qTot ? Math.round((qDn / qTot) * 100) : 0;
-      document.getElementById('kpi-today-pct').textContent = qPct + '%';
+      gsapCountUp('kpi-today-pct', qPct, '%', 0);
       document.getElementById('kpi-today-sub').textContent = `${qDn} / ${qTot} مهام`;
       document.getElementById('kpi-today-bar').style.width = qPct + '%';
 
       const hrs = state.hoursLogged || 0;
-      document.getElementById('kpi-hours-logged').textContent = hrs.toFixed(1) + 'h';
+      gsapCountUp('kpi-hours-logged', hrs, 'h', 1);
       document.getElementById('kpi-sessions-count').textContent = `${state.completedSessions || 0} جلسات`;
       document.getElementById('header-hours-badge').textContent = `${hrs.toFixed(1)}h مذاكرة`;
 
@@ -2209,9 +2420,18 @@
       const tHrs = state.todayHoursLogged || 0;
       const gPct = Math.min(100, Math.round((tHrs / goal) * 100));
       document.getElementById('daily-goal-select').value = String(goal);
-      document.getElementById('daily-goal-pct').textContent = `${gPct}%`;
+      gsapCountUp('daily-goal-pct', gPct, '%', 0);
       document.getElementById('daily-goal-sub').textContent = `${tHrs.toFixed(1)} / ${goal}.0h اليوم`;
       document.getElementById('daily-goal-ring').style.strokeDashoffset = 207.3 * (1 - gPct / 100);
+      const miniWrap = document.getElementById('home-subj-mini-bars');
+      if (miniWrap) {
+        miniWrap.innerHTML = Object.keys(SUBJECTS_META).map(code => {
+          const items = shared.topics[code] || [];
+          const sp = items.length ? Math.round(items.reduce((a, t) => a + getTopicPct(t.id), 0) / items.length) : 0;
+          const col = SUBJECTS_META[code].color;
+          return `<div class="space-y-1"><div class="flex justify-between text-[10px] font-bold"><span>${code}</span><span class="font-mono-num" style="color:${col};">${sp}%</span></div><div class="w-full bg-slate-700/40 h-1 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-500" style="width:${sp}%; background:${col};"></div></div></div>`;
+        }).join('');
+      }
     }
 
     function switchTab(id) {
@@ -2223,8 +2443,9 @@
       panel.classList.remove('fade-in');
       void panel.offsetWidth;
       panel.classList.add('fade-in');
+      gsapStagger(`#tab-${id} .stagger-item`, panel);
       document.querySelectorAll('.nav-pill').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('active', on); b.style.color = on ? '#fff' : (b.id === 'nav-admin-tab' ? '#fbbf24' : 'var(--text-muted)'); });
-      document.querySelectorAll('.mob-nav').forEach(b => { const on = b.dataset.tab === id; b.style.color = on ? '#0a84ff' : (b.id === 'mob-admin-btn' ? '#fbbf24' : 'var(--text-muted)'); });
+      document.querySelectorAll('.mob-nav').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('bg-[#0a84ff]/15', on); b.style.color = on ? '#38bdf8' : (b.id === 'mob-admin-btn' ? '#fbbf24' : 'var(--text-muted)'); });
       if (id === 'chat') { const w = document.getElementById('chat-messages-list'); if (w) w.scrollTop = w.scrollHeight; }
       saveLocalStudentState();
     }
@@ -2245,11 +2466,12 @@
       document.getElementById('stu-id-input').value = '';
       document.getElementById('stu-pass-input').value = '';
       document.getElementById('stu-auth-error').classList.add('hidden');
-      document.getElementById('student-auth-modal').classList.remove('hidden');
+      gsapModalOpen('student-auth-modal');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       loadLocalStudentState();
+      refreshLucideIcons();
       document.body.classList.toggle('dark-mode', state.darkMode);
       document.getElementById('bell-toggle-chk').checked = state.bellEnabled;
       initFirebaseSync();
@@ -2516,7 +2738,7 @@
         state.lastNotifReadAt = Date.now();
         saveLocalStudentState();
         updateNotifBadgeAndList();
-        document.getElementById('notifications-modal').classList.remove('hidden');
+        gsapModalOpen('notifications-modal');
       };
       document.getElementById('notifications-modal-close').onclick = () => document.getElementById('notifications-modal').classList.add('hidden');
       document.getElementById('admin-clear-all-notifs').onclick = clearAllNotifications;
@@ -2567,7 +2789,7 @@
         document.getElementById('admin-email-input').value = '';
         document.getElementById('admin-pass-input').value = '';
         document.getElementById('admin-login-error').classList.add('hidden');
-        document.getElementById('admin-login-modal').classList.remove('hidden');
+        gsapModalOpen('admin-login-modal');
       };
       document.getElementById('admin-login-close').onclick = () => document.getElementById('admin-login-modal').classList.add('hidden');
       document.getElementById('admin-login-form').onsubmit = async (e) => {
@@ -2785,7 +3007,7 @@
 
       document.querySelectorAll('.ambient-btn').forEach(b => b.onclick = () => setAmbientSound(b.dataset.ambient));
       document.getElementById('ambient-volume').oninput = (e) => { if (ambientGain && audioCtx) ambientGain.gain.setValueAtTime((e.target.value / 100) * 0.22, audioCtx.currentTime); };
-      document.getElementById('btn-sos-burnout').onclick = () => document.getElementById('sos-modal').classList.remove('hidden');
+      document.getElementById('btn-sos-burnout').onclick = () => gsapModalOpen('sos-modal');
       document.getElementById('sos-close').onclick = () => document.getElementById('sos-modal').classList.add('hidden');
 
       // 4-Stage Syllabus Checklist
