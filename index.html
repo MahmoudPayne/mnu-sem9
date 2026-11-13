@@ -734,6 +734,7 @@
         <h3 class="text-base font-bold">إدارة بيانات Cloud Firestore</h3>
         <p class="text-xs" style="color: var(--text-muted);">مسجل الدخول: <span id="admin-email-display" class="font-mono-num text-[#0a84ff]">--</span></p>
         <div class="flex flex-wrap gap-2">
+          <button id="btn-sync-new-curriculum" class="tap-btn px-4 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">مزامنة المنهج الجديد على Firestore (دون مسح التقدم)</button>
           <button id="btn-seed-firestore" class="tap-btn px-4 py-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs font-bold cursor-pointer">رفع البيانات الافتراضية لـ Firestore</button>
           <button id="btn-reset-exams" class="tap-btn px-4 py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">استعادة جدول الامتحانات</button>
           <button id="btn-exit-admin" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تسجيل خروج الأدمن</button>
@@ -955,19 +956,25 @@
 
     const DEFAULT_TOPICS = {
       ENT: [
-        { id: 'ent-m1', title: 'Lecture 1 — Anatomy and Physiology of the Ear', kind: 'Midterm' },
-        { id: 'ent-m2', title: 'Lecture 2 — Congenital Anomalies & Diseases of the External Ear', kind: 'Midterm' },
-        { id: 'ent-m3', title: 'Lecture 3 — Congenital Anomalies & Traumatic Lesions of the Middle Ear', kind: 'Midterm' },
-        { id: 'ent-m4', title: 'Lecture 4 — Acute Otitis Media (AOM)', kind: 'Midterm' },
-        { id: 'ent-m5', title: 'Lecture 5 — Chronic Suppurative Otitis Media (CSOM)', kind: 'Midterm' },
-        { id: 'ent-m6', title: 'Lecture 6 — Facial Nerve and Facial Nerve Palsy', kind: 'Midterm' },
+        { id: 'ent-m1', title: 'Lecture 1: Anatomy & Physiology of Ear', kind: 'Midterm' },
+        { id: 'ent-m2', title: 'Lecture 2: Diseases of the External Ear', kind: 'Midterm' },
+        { id: 'ent-m3', title: 'Lecture 3: Congenital & Traumatic Diseases of the Middle Ear', kind: 'Midterm' },
+        { id: 'ent-m4', title: 'Lecture 4: Acute Otitis Media', kind: 'Midterm' },
+        { id: 'ent-m5', title: 'Lecture 5: CSOM', kind: 'Midterm' },
+        { id: 'ent-m6', title: 'Lecture 6: Facial Nerve Palsy', kind: 'Midterm' },
         { id: 'ent-m7', title: 'Seminar — Ear Symptoms', kind: 'Midterm' },
-        { id: 'ent-m8', title: 'Lecture 7 & 8 — Anatomy & Physiology of the Nose and PNS + Congenital & Traumatic Diseases of the Nose', kind: 'Midterm' },
-        { id: 'ent-p9', title: 'Lecture 9 — Epistaxis', kind: 'Post-Midterm' },
-        { id: 'ent-p10', title: 'Lecture 10 — Rhinosinusitis', kind: 'Post-Midterm' },
-        { id: 'ent-p11', title: 'Lecture 11 — Allergic Rhinitis', kind: 'Post-Midterm' },
-        { id: 'ent-p12', title: 'Lecture 12 & 13 — Nasal Tumour, Scleroderma & Nasal Septal Deviation (+ زيادات المحاضرة)', kind: 'Post-Midterm' },
-        { id: 'ent-p13', title: 'Lecture 14 & 15 — Anatomy of the Pharynx & Pharyngitis', kind: 'Post-Midterm' }
+        { id: 'ent-m8', title: 'Lecture 7 & 8: Anatomy of the Nose & Congenital Disease of the Nose', kind: 'Midterm' },
+        { id: 'ent-p9', title: 'Lecture 9: Epistaxis', kind: 'Post-Midterm' },
+        { id: 'ent-p10', title: 'Lecture 10: Rhinosinusitis', kind: 'Post-Midterm' },
+        { id: 'ent-p11', title: 'Lecture 11: Allergic Rhinitis (+ Atrophic Rhinitis & Rhinoscleroma)', kind: 'Post-Midterm' },
+        { id: 'ent-p12', title: 'Lecture 12: Nasal Tumour & Scleroderma', kind: 'Post-Midterm' },
+        { id: 'ent-p12b', title: 'Lecture 13: Nasal Septal Deviation', kind: 'Post-Midterm' },
+        { id: 'ent-p13', title: 'Lecture 14 & 15: Anatomy of the Pharynx & Pharyngitis (Dr. Asser)', kind: 'Post-Midterm' },
+        { id: 'ent-s1', title: 'Skill Lab 1: Ear Anatomy Revision & Ear Examination (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
+        { id: 'ent-s2', title: 'Seminar 2: Facial Nerve & Ear Symptoms / Otosclerosis (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
+        { id: 'ent-s3', title: 'Seminar 3: Anatomy & Examination of the Nose and PNS (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
+        { id: 'ent-s4', title: 'Seminar 4: Nose Symptoms (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
+        { id: 'ent-s5', title: 'Seminar 5: Pharynx & Larynx (Anatomy / Examination) + Tracheostomy (Dr. Ahmed Gad)', kind: 'Post-Midterm' }
       ],
       OPTH: [
         { id: 'op-m1', title: 'Lecture 1 — Anatomy of the Eye', kind: 'Midterm' },
@@ -980,9 +987,12 @@
         { id: 'op-m8', title: 'Lecture 8 — Cataract (+ Extra Dr. Eslam Mokhtar)', kind: 'Midterm' },
         { id: 'op-m9', title: 'Lecture 9 & 10 — Retina 1 & Retina 2 (Retinopathy & Retinal Detachment)', kind: 'Midterm' },
         { id: 'op-p10', title: 'Lecture 11 & 12 — Open Angle Glaucoma & Errors of Refraction', kind: 'Post-Midterm' },
-        { id: 'op-p11', title: 'Lecture 13 & 14 — Optic Nerve Diseases & Pupils', kind: 'Post-Midterm' },
-        { id: 'op-p12', title: 'Lecture 15 — Eyelids', kind: 'Post-Midterm' },
-        { id: 'op-p13', title: 'Lecture 16 — Orbit', kind: 'Post-Midterm' }
+        { id: 'op-p11', title: 'Optic Nerve Diseases', kind: 'Post-Midterm' },
+        { id: 'op-p11b', title: 'Pupil', kind: 'Post-Midterm' },
+        { id: 'op-p12', title: 'Lecture 15: Eyelids (Dr. Mona)', kind: 'Post-Midterm' },
+        { id: 'op-p12b', title: 'Lecture 16: Eyelids (Dr. Mona)', kind: 'Post-Midterm' },
+        { id: 'op-p13', title: 'Lecture 17: The Orbit (Dr. Mona)', kind: 'Post-Midterm' },
+        { id: 'op-p14', title: 'Clinical Section: Ophthalmology Tests (Hospital Skills)', kind: 'Post-Midterm' }
       ],
       EBMR: [
         { id: 'eb-m1', title: 'Lecture 1 — Revision of Research Methods', kind: 'Midterm' },
@@ -990,39 +1000,50 @@
         { id: 'eb-m3', title: 'Lecture 3 — Biomedical Statistical Analysis for Beginners', kind: 'Midterm' },
         { id: 'eb-m4', title: 'Lecture 4 — Sample Size Calculation', kind: 'Midterm' },
         { id: 'eb-m5', title: 'Lecture 5 — Plagiarism (Dr. Amira)', kind: 'Midterm' },
-        { id: 'eb-p6', title: 'Lecture 9 — How to Select a Journal (Dr. Osama Hussein)', kind: 'Post-Midterm' },
-        { id: 'eb-p7', title: 'Lecture 10 — Critical Thinking (Dr. Amira Taman)', kind: 'Post-Midterm' },
-        { id: 'eb-p8', title: 'Lecture 11 — How to Search the Literature Effectively (Dr. Osama Hussein)', kind: 'Post-Midterm' },
-        { id: 'eb-p9', title: 'Lecture 12 — How to Write a Scientific Paper (Dr. Asmaa)', kind: 'Post-Midterm' },
+        { id: 'eb-m6', title: 'Lecture 6 — Research Ethics & Study Design', kind: 'Midterm' },
+        { id: 'eb-m7', title: 'Lecture 7 — Epidemiological Measures & Screening', kind: 'Midterm' },
+        { id: 'eb-m8', title: 'Lecture 8 — Evidence-Based Practice & Critical Appraisal', kind: 'Midterm' },
+        { id: 'eb-p6', title: 'Lecture 9: How to Select a Journal (Dr. Osama Hussein)', kind: 'Post-Midterm' },
+        { id: 'eb-p7', title: 'Lecture 10: Critical Thinking (Dr. Amira Taman)', kind: 'Post-Midterm' },
+        { id: 'eb-p8', title: 'Lecture 11: How to Search the Literature Effectively (Dr. Osama Hussein)', kind: 'Post-Midterm' },
+        { id: 'eb-p9', title: 'Lecture 12: How to Write a Scientific Paper (Dr. Asmaa)', kind: 'Post-Midterm' },
         { id: 'eb-p10', title: 'Revision — Top 50 Important Exam Questions', kind: 'Post-Midterm' }
       ],
       FMIMC: [
-        { id: 'fm-m1', title: '[Community] Health Care System in Egypt, PHC and Health Insurance', kind: 'Midterm' },
-        { id: 'fm-m2', title: '[Community] Family Practice Approach and Family Influences on Health and Disease', kind: 'Midterm' },
-        { id: 'fm-m3', title: '[Community] Referral, Consultation, and Team Care', kind: 'Midterm' },
-        { id: 'fm-m4', title: '[Community] Screening for Common Diseases and Their Complications', kind: 'Midterm' },
-        { id: 'fm-m5', title: '[Geriatrics] Introduction to Geriatric Medicine', kind: 'Midterm' },
-        { id: 'fm-m6', title: '[Geriatrics] Atypical Presentation of Diseases in Elderly Patients (Dr. Heba El-Sobky)', kind: 'Midterm' },
-        { id: 'fm-m7', title: '[Geriatrics] Frailty', kind: 'Midterm' },
-        { id: 'fm-m8', title: '[Geriatrics] Urinary Incontinence and Dysuria', kind: 'Midterm' },
-        { id: 'fm-m9', title: '[Pediatrics] Routine and Catch-up Vaccination', kind: 'Midterm' },
-        { id: 'fm-m10', title: '[Pediatrics] Integrated Management of Childhood Illness (IMCI)', kind: 'Midterm' },
-        { id: 'fm-m11', title: '[Pediatrics] Enuresis', kind: 'Midterm' },
-        { id: 'fm-m12', title: '[OB/GYN] Female Genital Mutilation (FGM)', kind: 'Midterm' },
-        { id: 'fm-m13', title: '[OB/GYN] Postmenopausal Symptoms (Menopause)', kind: 'Midterm' },
-        { id: 'fm-m14', title: '[OB/GYN] Preconception and Routine Antenatal Care (Dr. Mohamed Galal)', kind: 'Midterm' },
-        { id: 'fm-m15', title: '[Forensic] Female Genital Mutilation: Medico-Legal Aspects (Dr. Amal)', kind: 'Midterm' },
-        { id: 'fm-m16', title: '[Tropical] Travel Medicine (Dr. Sahar Zakaria)', kind: 'Midterm' },
-        { id: 'fm-m17', title: '[Psychiatry] Abuse, Neglect, and Violence in Special Populations', kind: 'Midterm' },
-        { id: 'fm-p18', title: '[Community] Lecture 5 — Travellers Immunization (Dr. Asmaa)', kind: 'Post-Midterm' },
-        { id: 'fm-p19', title: '[Community] Lecture 6 — Quality in Healthcare (Dr. Asmaa)', kind: 'Post-Midterm' },
-        { id: 'fm-p20', title: '[Geriatrics] Lecture 5 — Delirium and Dementia', kind: 'Post-Midterm' },
-        { id: 'fm-p21', title: '[Pharmacology] Lecture 1 — Polypharmacy & Drug Reaction (Dr. Amany)', kind: 'Post-Midterm' },
-        { id: 'fm-p22', title: '[Forensic] Lecture 2 — Domestic Violence (Dr. Basma)', kind: 'Post-Midterm' },
-        { id: 'fm-p23', title: '[Tropical] Lecture 2 — Parasitic Infections (Dr. Sahar Zakaria)', kind: 'Post-Midterm' },
-        { id: 'fm-p24', title: '[Orthopedic] Lecture 1 — Limping Child (Dr. Bassem)', kind: 'Post-Midterm' },
-        { id: 'fm-p25', title: '[Pediatric Seminar 1] Fever with Rash (Dr. Hossam Eltahan)', kind: 'Post-Midterm' },
-        { id: 'fm-p26', title: '[Pediatric Seminar 2] Growth & Development Assessment (Dr. Hossam Eltahan)', kind: 'Post-Midterm' }
+        { id: 'fm-ch1', title: '[Chest & Cardio & Medicine] Chest L1: Pulmonary Function Tests (Dr. Magda)', kind: 'Post-Midterm' },
+        { id: 'fm-ch2', title: '[Chest & Cardio & Medicine] Chest L2: Sleep Related Breathing Disorders (Dr. Magda)', kind: 'Post-Midterm' },
+        { id: 'fm-ca1', title: '[Chest & Cardio & Medicine] Cardio Seminar 1: Approach to Chest Pain (Dr. Khaled Essam)', kind: 'Post-Midterm' },
+        { id: 'fm-md1', title: '[Chest & Cardio & Medicine] Medicine Seminar 1: Abdominal Pain, Weight Loss & Weight Gain', kind: 'Post-Midterm' },
+        { id: 'fm-m16', title: '[Tropical Medicine] Travel Medicine (Dr. Sahar Zakaria)', kind: 'Midterm' },
+        { id: 'fm-p23', title: '[Tropical Medicine] Tropical L2: Parasitic Infections (Dr. Sahar Zakaria)', kind: 'Post-Midterm' },
+        { id: 'fm-tr3', title: '[Tropical Medicine] Tropical L3: Heat-Related Disorders (Dr. Sahar Zakaria)', kind: 'Post-Midterm' },
+        { id: 'fm-tr4', title: '[Tropical Medicine] Tropical L4: Approach to a Patient with Fever (Dr. Sahar Zakaria)', kind: 'Post-Midterm' },
+        { id: 'fm-m9', title: '[Pediatrics & Orthopedic] Routine and Catch-up Vaccination', kind: 'Midterm' },
+        { id: 'fm-m10', title: '[Pediatrics & Orthopedic] Integrated Management of Childhood Illness (IMCI)', kind: 'Midterm' },
+        { id: 'fm-m11', title: '[Pediatrics & Orthopedic] Enuresis', kind: 'Midterm' },
+        { id: 'fm-p24', title: '[Pediatrics & Orthopedic] Orthopedic L1: Limping Child (Dr. Bassem)', kind: 'Post-Midterm' },
+        { id: 'fm-p25', title: '[Pediatrics & Orthopedic] Pediatric Seminar 1: Fever with Rash (Dr. Hossam Eltahan)', kind: 'Post-Midterm' },
+        { id: 'fm-p26', title: '[Pediatrics & Orthopedic] Pediatric Seminar 2: Growth & Development Assessment (Dr. Hossam Eltahan)', kind: 'Post-Midterm' },
+        { id: 'fm-m1', title: '[Family Medicine & Quality & Practical] Health Care System in Egypt, PHC and Health Insurance', kind: 'Midterm' },
+        { id: 'fm-m2', title: '[Family Medicine & Quality & Practical] Family Practice Approach and Family Influences', kind: 'Midterm' },
+        { id: 'fm-m3', title: '[Family Medicine & Quality & Practical] Referral, Consultation, and Team Care', kind: 'Midterm' },
+        { id: 'fm-m4', title: '[Family Medicine & Quality & Practical] Screening for Common Diseases', kind: 'Midterm' },
+        { id: 'fm-p18', title: '[Family Medicine & Quality & Practical] Lecture 5: Travellers Immunization (Dr. Asmaa)', kind: 'Post-Midterm' },
+        { id: 'fm-p19', title: '[Family Medicine & Quality & Practical] Lecture 6: Quality in Healthcare (Dr. Asmaa)', kind: 'Post-Midterm' },
+        { id: 'fm-pr2', title: '[Family Medicine & Quality & Practical] Practical 2: Screening Training (Dr. Fatma)', kind: 'Post-Midterm' },
+        { id: 'fm-pr3', title: '[Family Medicine & Quality & Practical] Practical 3: Quality Training (Dr. Fatma)', kind: 'Post-Midterm' },
+        { id: 'fm-m15', title: '[Forensic / Ethics] Lecture 1: MLA of FGM (Dr. Amal)', kind: 'Midterm' },
+        { id: 'fm-p22', title: '[Forensic / Ethics] Lecture 2: Domestic Violence (Dr. Basma)', kind: 'Post-Midterm' },
+        { id: 'fm-m5', title: '[Geriatric Medicine] Geriatric L1: Introduction to Geriatric Medicine', kind: 'Midterm' },
+        { id: 'fm-m6', title: '[Geriatric Medicine] Geriatric L2: Atypical Presentation of Illnesses in Elderly (Dr. Heba El-Sobky)', kind: 'Midterm' },
+        { id: 'fm-m7', title: '[Geriatric Medicine] Geriatric L3: Frailty', kind: 'Midterm' },
+        { id: 'fm-m8', title: '[Geriatric Medicine] Geriatric L4: Urinary Incontinence', kind: 'Midterm' },
+        { id: 'fm-p20', title: '[Geriatric Medicine] Geriatric L5: Delirium and Dementia', kind: 'Post-Midterm' },
+        { id: 'fm-p21', title: '[Geriatric Medicine] Geriatric: Polypharmacy & Drug Reaction (Dr. Amany)', kind: 'Post-Midterm' },
+        { id: 'fm-m12', title: '[Obstetrics & Gynecology] Obs/Gyn L1: Female Genital Mutilation (FGM)', kind: 'Midterm' },
+        { id: 'fm-m13', title: '[Obstetrics & Gynecology] Obs/Gyn L2: Menopause', kind: 'Midterm' },
+        { id: 'fm-m14', title: '[Obstetrics & Gynecology] Obs/Gyn L3: Preconceptional & Antenatal Care (Dr. Mohamed Galal)', kind: 'Midterm' },
+        { id: 'fm-m17', title: '[Psychiatry] Abuse, Neglect, and Violence in Special Populations', kind: 'Midterm' }
       ]
     };
 
@@ -2627,6 +2648,15 @@
         if (!shared.isAdmin || !fbDb) return;
         await saveSharedToFirestore('admin_profile', { avatarUrl: '' });
         showToast('تم حذف صورة الأدمن الشخصية');
+      };
+
+      // Sync Updated Curriculum to Firestore without wiping student progress
+      document.getElementById('btn-sync-new-curriculum').onclick = async () => {
+        if (!shared.isAdmin || !fbDb) return;
+        shared.topics = JSON.parse(JSON.stringify(DEFAULT_TOPICS));
+        await saveSharedToFirestore('topics', { data: shared.topics });
+        renderSubjects();
+        showToast('تم تحديث ومزامنة المنهج الجديد في Firestore دون مسح تقدم الطلبة!');
       };
 
       // Seed Default Data to Firestore
