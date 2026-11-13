@@ -952,7 +952,10 @@
             </span>
             <h2 class="text-base sm:text-lg font-bold">استراحة البث المباشر ⚽🔴</h2>
           </div>
-          <div id="stream-player-controls" class="flex items-center gap-1.5 shrink-0">
+          <div id="stream-player-controls" class="flex flex-wrap items-center gap-1.5 shrink-0">
+            <button type="button" id="btn-stream-safemode" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1" title="منع النوافذ المنبثقة الإعلانية">
+              <span>🛡️ منع النوافذ المنبقة (Safe Mode)</span>
+            </button>
             <button type="button" id="btn-stream-fullscreen" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[#38bdf8]"></i>
               <span>ملء الشاشة</span>
@@ -1732,7 +1735,8 @@
       modMutedUntil: 0,
       lastNotifReadAt: 0,
       animationsEnabled: true,
-      animationsPreferenceSet: false
+      animationsPreferenceSet: false,
+      streamSafeMode: false
     };
 
     let shared = {
@@ -3175,8 +3179,10 @@
         if (guestLock) guestLock.classList.add('hidden');
         if (ctrls) ctrls.classList.remove('hidden');
         if (cont) cont.classList.remove('hidden');
-        if (ifr && ls.url && ifr.src !== ls.url) {
-          ifr.src = ls.url;
+        if (ifr) {
+          if (state.streamSafeMode) ifr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-forms');
+          else ifr.removeAttribute('sandbox');
+          if (ls.url && ifr.src !== ls.url) ifr.src = ls.url;
         }
       }
     }
@@ -4310,6 +4316,31 @@
       // Live Stream Break Controls & Admin Stream Form
       applyLiveStreamUI();
       document.getElementById('btn-stream-login').onclick = () => openStudentAuthModal('login');
+      function syncSafeModeBtnUI() {
+        const b = document.getElementById('btn-stream-safemode');
+        if (!b) return;
+        const on = !!state.streamSafeMode;
+        b.className = on
+          ? 'tap-btn px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/45 text-emerald-400 text-xs font-bold cursor-pointer inline-flex items-center gap-1'
+          : 'tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1';
+        b.textContent = on ? '🛡️ Safe Mode: مفعّل ✓' : '🛡️ منع النوافذ المنبثقة (Safe Mode)';
+      }
+      syncSafeModeBtnUI();
+      document.getElementById('btn-stream-safemode').onclick = () => {
+        state.streamSafeMode = !state.streamSafeMode;
+        saveLocalStudentState();
+        syncSafeModeBtnUI();
+        const ifr = document.getElementById('live-stream-iframe');
+        if (ifr) {
+          if (state.streamSafeMode) ifr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-forms');
+          else ifr.removeAttribute('sandbox');
+          if (shared.liveStream.url) {
+            ifr.src = 'about:blank';
+            setTimeout(() => { ifr.src = shared.liveStream.url; }, 60);
+          }
+        }
+        showToast(state.streamSafeMode ? 'تم تفعيل Safe Mode لمنع النوافذ المنبثقة' : 'تم إيقاف Safe Mode وإعادة تحميل المشغّل');
+      };
       document.getElementById('btn-stream-toggle').onclick = () => {
         const cont = document.getElementById('live-stream-container');
         const btn = document.getElementById('btn-stream-toggle');
