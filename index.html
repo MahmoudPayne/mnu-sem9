@@ -789,16 +789,14 @@
       </div>
     </section>
 
-    <!-- TAB: STUDY TOGETHER (PRIVATE 2-STUDENT ROOMS) -->
+    <!-- TAB: STUDY TOGETHER (MULTI-PARTICIPANT ROOMS, ARCHIVE & VOICE/FILES) -->
     <section id="tab-together" class="tab-panel hidden space-y-5 fade-in">
-      <!-- Lobby View (Peer Search + Active Rooms List) -->
+      <!-- Lobby View (Peer Search + Active Rooms + Archived Rooms) -->
       <div id="together-lobby-view" class="space-y-5">
         <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-500">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 class="text-base sm:text-lg font-bold flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-emerald-400"></i><span>الدراسة سوا (غرف المذاكرة الخاصة)</span></h2>
-              <p class="text-xs mt-0.5" style="color: var(--text-muted);">ابحث عن زميلك بالكود الجامعي وأرسل له دعوة للمذاكرة بتايمر مشترك ودردشة وصوتيات.</p>
-            </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-emerald-400"></i><span>الدراسة سوا (غرف المذاكرة الخاصة)</span></h2>
+            <p class="text-xs mt-0.5" style="color: var(--text-muted);">ابحث عن زملائك بالكود الجامعي وأرسل دعوات لمذاكرة جماعية (2 إلى 5+ طلاب) بتايمر مشترك وملفات وصوتيات.</p>
           </div>
           <form id="together-peer-search-form" class="flex flex-wrap gap-2.5">
             <input id="together-peer-search-input" type="text" inputmode="numeric" placeholder="أدخل الكود الجامعي للزميل (ID)..." class="flex-1 min-w-[180px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-[#0a84ff]" required />
@@ -808,32 +806,66 @@
         </div>
 
         <div class="apple-card p-5 sm:p-6 space-y-4">
-          <h3 class="text-base font-bold">غرفك النشطة والمعلقة</h3>
+          <h3 class="text-base font-bold">الغرف النشطة والدعوات</h3>
           <div id="together-rooms-list" class="space-y-2.5"></div>
+        </div>
+
+        <div class="apple-card p-5 sm:p-6 space-y-4">
+          <h3 class="text-base font-bold flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4 text-sky-400"></i><span>الغرف السابقة / المحفوظة (الأرشيف)</span></h3>
+          <div id="together-archive-list" class="space-y-2.5"></div>
         </div>
       </div>
 
-      <!-- Inside Active Room View -->
+      <!-- Inside Active / Archived Room View -->
       <div id="together-active-room" class="hidden space-y-4">
         <div class="apple-card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
             <button type="button" id="room-back-lobby" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">← الغرف</button>
             <div>
-              <h3 class="text-sm sm:text-base font-bold">غرفة الدراسة سوا</h3>
-              <p class="text-[11px]" style="color: var(--text-muted);">البيانات والتايمر متزامنان لحظياً بينكما</p>
+              <h3 class="text-sm sm:text-base font-bold">غرفة الدراسة سوا <span id="room-archive-badge" class="hidden px-2 py-0.5 rounded bg-slate-500/20 text-slate-300 text-[10px]">مؤرشفة</span></h3>
+              <p class="text-[11px]" style="color: var(--text-muted);">البيانات والتايمر والصفحات متزامنة لحظياً للجميع</p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
+          <div id="room-active-actions" class="flex flex-wrap items-center gap-2">
+            <button type="button" id="room-invite-more-btn" class="tap-btn px-3 py-2 rounded-xl apple-subcard text-xs font-bold text-[#38bdf8] cursor-pointer">+ دعوة زميل للغرفة</button>
             <button type="button" id="room-finish-lecture-btn" class="tap-btn px-3.5 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إنهاء المحاضرة ✓</button>
-            <button type="button" id="room-close-btn" class="tap-btn px-3 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">إغلاق الغرفة</button>
+            <button type="button" id="room-close-btn" class="tap-btn px-3 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">أرشفة الغرفة</button>
           </div>
         </div>
 
-        <!-- Two Student Cards with Real Presence -->
-        <div id="room-participants-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+        <!-- Inline Invite More Friends Box -->
+        <div id="room-invite-peer-box" class="hidden apple-card p-4 space-y-3 border border-[#0a84ff]/35">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-[#38bdf8]">دعوة زميل إضافي للغرفة (3، 4، 5 أصدقاء...)</span>
+            <button type="button" id="room-invite-box-close" class="text-xs text-rose-400 font-bold cursor-pointer">✕</button>
+          </div>
+          <form id="room-invite-search-form" class="flex flex-wrap gap-2">
+            <input id="room-invite-search-input" type="text" inputmode="numeric" placeholder="أدخل الكود الجامعي (ID)..." class="flex-1 min-w-[160px] px-3 py-2 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" required />
+            <button type="submit" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">بحث</button>
+          </form>
+          <div id="room-invite-search-result" class="hidden"></div>
+        </div>
 
-        <!-- Shared Topic, Mode & Synchronized Timer -->
-        <div class="apple-card p-4 sm:p-5 space-y-4">
+        <!-- All Room Participants with Real Presence -->
+        <div id="room-participants-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+        <!-- Interactive Page Progress Tracker ("وصلنا لصفحة كام؟") -->
+        <div id="room-page-tracker" class="apple-card p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="text-xs sm:text-sm font-bold flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i><span>متتبع الصفحات التفاعلي (وصلنا لصفحة كام؟)</span></div>
+            <div class="flex items-center gap-1.5 text-xs">
+              <button type="button" id="room-page-minus" class="tap-btn px-2.5 py-1.5 rounded-lg apple-subcard font-mono-num font-bold cursor-pointer">-1</button>
+              <input id="room-my-page-input" type="number" min="0" value="1" class="w-16 px-2 py-1.5 apple-subcard text-center font-mono-num font-bold text-base sm:text-xs" />
+              <span style="color: var(--text-muted);">/</span>
+              <input id="room-my-total-pages-input" type="number" min="1" value="20" class="w-16 px-2 py-1.5 apple-subcard text-center font-mono-num font-bold text-base sm:text-xs" />
+              <button type="button" id="room-page-plus" class="tap-btn px-2.5 py-1.5 rounded-lg bg-[#0a84ff] text-white font-mono-num font-bold cursor-pointer">+1</button>
+            </div>
+          </div>
+          <div id="room-all-pages-progress" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+        </div>
+
+        <!-- Full Room Session Config (Videos + Pages + Mode) & Synchronized Timer -->
+        <div id="room-session-card" class="apple-card p-4 sm:p-5 space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
             <select id="room-subject-select" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-bold"></select>
             <select id="room-topic-select" class="sm:col-span-2 px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold"></select>
@@ -841,8 +873,30 @@
               <option value="first">مذاكرة أول مرة</option>
               <option value="review">مراجعة</option>
               <option value="solve">حل أسئلة</option>
-              <option value="video">فيديوهات</option>
+              <option value="video">فيديوهات فقط</option>
             </select>
+          </div>
+
+          <div class="apple-subcard p-3.5 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span class="font-bold">إعداد الفيديوهات والورق للجلسة:</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="room-vid-yes" class="tap-btn px-3 py-1 rounded-lg bg-[#0a84ff] text-white text-[11px] font-bold cursor-pointer">يوجد فيديوهات</button>
+                <button type="button" id="room-vid-no" class="tap-btn px-3 py-1 rounded-lg apple-card text-[11px] font-bold cursor-pointer">بدون فيديوهات</button>
+              </div>
+            </div>
+            <div id="room-vid-details" class="space-y-2">
+              <div class="grid grid-cols-3 gap-2 text-xs">
+                <div><label class="block text-[10px]" style="color: var(--text-muted);">عدد الفيديوهات</label><input id="room-vid-count" type="number" min="1" max="15" value="2" class="w-full px-2.5 py-1.5 apple-card text-base sm:text-xs font-mono-num" /></div>
+                <div><label class="block text-[10px]" style="color: var(--text-muted);">السرعة</label><select id="room-vid-speed" class="w-full px-2 py-1.5 apple-card text-base sm:text-xs font-mono-num"><option value="1">1.0x</option><option value="1.25">1.25x</option><option value="1.5" selected>1.5x</option><option value="1.75">1.75x</option><option value="2">2.0x</option></select></div>
+                <div><label class="block text-[10px]" style="color: var(--text-muted);">عدد الصفحات</label><input id="room-pages-input" type="number" min="0" max="250" value="15" class="w-full px-2.5 py-1.5 apple-card text-base sm:text-xs font-mono-num" /></div>
+              </div>
+              <div id="room-vid-durations" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <span id="room-calc-preview" class="text-xs font-mono-num text-[#38bdf8] font-bold">الوقت المحسوب: 45 دقيقة</span>
+              <button type="button" id="room-calc-apply-btn" class="tap-btn px-4 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">تطبيق على تايمر الغرفة</button>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
@@ -856,12 +910,6 @@
                   <button type="button" id="room-timer-toggle" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تشغيل</button>
                   <button type="button" id="room-timer-reset" class="tap-btn px-3 py-2 rounded-xl apple-card text-xs font-bold cursor-pointer">إعادة</button>
                 </div>
-                <select id="room-duration-select" class="px-2 py-1 apple-card text-base sm:text-[11px] font-mono-num font-bold">
-                  <option value="25">25 دقيقة</option>
-                  <option value="45" selected>45 دقيقة</option>
-                  <option value="60">60 دقيقة</option>
-                  <option value="90">90 دقيقة</option>
-                </select>
               </div>
             </div>
 
@@ -878,7 +926,7 @@
           </div>
         </div>
 
-        <!-- Private Room Chat (Text + Compressed Images + Voice Notes <= 30s) -->
+        <!-- Private Room Chat (Text + Compressed Images + Files <= 500KB + Voice Notes <= 30s) -->
         <div class="apple-card flex flex-col overflow-hidden">
           <div class="px-4 py-3 border-b flex items-center justify-between" style="border-color: var(--border-hairline);">
             <span class="text-xs sm:text-sm font-bold">دردشة الغرفة الخاصة</span>
@@ -889,12 +937,18 @@
             <div class="flex items-center gap-2"><img id="room-img-thumb" src="" alt="معاينة" class="w-10 h-10 rounded-lg object-cover" /><span id="room-img-size" class="text-[11px] font-mono-num"></span></div>
             <button type="button" id="room-img-cancel" class="tap-btn text-xs font-bold text-rose-400 cursor-pointer">✕</button>
           </div>
+          <div id="room-file-preview-bar" class="hidden px-4 py-2 border-t flex items-center justify-between gap-2 bg-emerald-500/10" style="border-color: var(--border-hairline);">
+            <div class="flex items-center gap-2 text-xs"><i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i><span id="room-file-name-lbl" class="font-bold"></span><span id="room-file-size-lbl" class="font-mono-num text-[11px]" style="color: var(--text-muted);"></span></div>
+            <button type="button" id="room-file-cancel" class="tap-btn text-xs font-bold text-rose-400 cursor-pointer">✕</button>
+          </div>
           <form id="room-chat-form" class="p-3 border-t flex items-center gap-1.5 sm:gap-2" style="border-color: var(--border-hairline);">
             <input id="room-img-input" type="file" accept="image/*" class="hidden" />
-            <button type="button" id="room-img-btn" class="tap-btn p-2.5 rounded-xl apple-subcard cursor-pointer shrink-0" title="إرسال صورة"><i data-lucide="image-plus" class="w-4 h-4 text-[#38bdf8]"></i></button>
-            <button type="button" id="room-voice-btn" class="tap-btn p-2.5 rounded-xl apple-subcard cursor-pointer shrink-0" title="تسجيل رسالة صوتية (بحد أقصى 30 ثانية)"><i data-lucide="mic" class="w-4 h-4 text-emerald-400"></i></button>
-            <input id="room-msg-input" type="text" placeholder="اكتب لزميلك..." class="flex-1 min-w-[100px] px-3 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" />
-            <button type="submit" class="tap-btn btn-grad-primary px-4 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer shrink-0">إرسال</button>
+            <input id="room-file-input" type="file" accept=".pdf,.doc,.docx,.txt,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="hidden" />
+            <button type="button" id="room-img-btn" class="tap-btn p-2 rounded-xl apple-subcard cursor-pointer shrink-0" title="إرسال صورة"><i data-lucide="image-plus" class="w-4 h-4 text-[#38bdf8]"></i></button>
+            <button type="button" id="room-file-btn" class="tap-btn p-2 rounded-xl apple-subcard cursor-pointer shrink-0" title="إرفاق ملف (PDF / DOCX / TXT بحد أقصى 500KB)"><i data-lucide="paperclip" class="w-4 h-4 text-amber-400"></i></button>
+            <button type="button" id="room-voice-btn" class="tap-btn p-2 rounded-xl apple-subcard cursor-pointer shrink-0" title="تسجيل رسالة صوتية (بحد أقصى 30 ثانية)"><i data-lucide="mic" class="w-4 h-4 text-emerald-400"></i></button>
+            <input id="room-msg-input" type="text" placeholder="اكتب لزميلك..." class="flex-1 min-w-[80px] px-3 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" />
+            <button type="submit" class="tap-btn btn-grad-primary px-3.5 sm:px-4 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer shrink-0">إرسال</button>
           </form>
         </div>
       </div>
@@ -902,6 +956,15 @@
 
     <!-- TAB 4: ADMIN TAB & STUDENT STATS -->
     <section id="tab-admin" class="tab-panel hidden space-y-6 fade-in">
+      <!-- Admin Study Rooms Monitor -->
+      <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
+        <div>
+          <h2 class="text-base font-bold">مراقبة غرف الدراسة سوا (Admin Monitor)</h2>
+          <p class="text-xs" style="color: var(--text-muted);">اعرض جميع الغرف النشطة والمؤرشفة ورسائلها وملفاتها، أو احذف أي غرفة نهائياً.</p>
+        </div>
+        <div id="admin-rooms-list" class="space-y-2.5 max-h-80 overflow-y-auto custom-scroll"></div>
+      </div>
+
       <!-- Admin Lock/Unlock Public Group Chat -->
       <div class="apple-card p-5 sm:p-6 space-y-3 border-r-4 border-r-rose-500">
         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -1380,6 +1443,32 @@
     </div>
   </div>
 
+  <!-- Admin Delete Student Confirmation Modal -->
+  <div id="admin-delete-student-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-sm w-full p-5 sm:p-6 space-y-4 text-center">
+      <h3 class="text-base font-bold text-rose-400">تأكيد حذف حساب الطالب</h3>
+      <p id="admin-del-stu-msg" class="text-xs leading-relaxed" style="color: var(--text-muted);">هل أنت متأكد من حذف حساب الطالب نهائياً؟</p>
+      <div class="flex gap-2.5 pt-1">
+        <button type="button" id="admin-del-stu-yes" class="tap-btn flex-1 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">نعم، حذف نهائي</button>
+        <button type="button" id="admin-del-stu-no" class="tap-btn flex-1 py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Room Viewer Modal -->
+  <div id="admin-room-viewer-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-2xl w-full p-5 sm:p-6 space-y-4 max-h-[88dvh] flex flex-col">
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
+        <div>
+          <h3 class="text-base font-bold">مراقبة محتوى الغرفة</h3>
+          <p id="admin-viewer-members" class="text-[11px]" style="color: var(--text-muted);">--</p>
+        </div>
+        <button type="button" id="admin-viewer-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
+      </div>
+      <div id="admin-viewer-msgs" class="flex-1 overflow-y-auto custom-scroll space-y-2.5"></div>
+    </div>
+  </div>
+
   <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
 
   <script>
@@ -1584,7 +1673,9 @@
       studyRooms: [],
       activeRoomId: null,
       roomPeerProfiles: {},
-      roomPendingImage: null
+      roomPendingImage: null,
+      roomPendingFile: null,
+      adminRoomsList: []
     };
 
     let studentsUnsub = null;
@@ -1848,6 +1939,7 @@
                 <div class="text-[10px]" style="color: var(--text-muted);">المنهج</div>
                 <div class="font-mono-num text-xs font-extrabold text-[#0a84ff]">${sylPct}%</div>
               </div>
+              <button type="button" data-del-student="${escapeHtml(s.studentId)}" data-del-student-name="${escapeHtml(s.name || s.studentId)}" class="admin-del-student-btn tap-btn p-2 rounded-xl apple-card hover:bg-rose-500/20 text-rose-400 cursor-pointer" title="حذف الطالب"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
           </div>`;
       }).join('');
@@ -2198,9 +2290,10 @@
       const modalClearBtn = document.getElementById('modal-clear-all-notifs');
       const adminClearBtn = document.getElementById('admin-clear-all-notifs');
       const myId = state.studentProfile ? state.studentProfile.studentId : '';
-      const pendingInvites = (shared.studyRooms || []).filter(r => r.status === 'pending' && r.receiverId === myId);
+      const pendingInvites = (shared.studyRooms || []).filter(r => (r.status === 'pending' && r.receiverId === myId) || (r.pendingInvites || []).includes(myId));
+      const rejectedInvites = (shared.studyRooms || []).filter(r => r.status === 'rejected' && r.senderId === myId && !r.rejectionAck);
       const items = [...(shared.notifications || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-      const unread = items.filter(n => (n.createdAt || 0) > (state.lastNotifReadAt || 0)).length + pendingInvites.length;
+      const unread = items.filter(n => (n.createdAt || 0) > (state.lastNotifReadAt || 0)).length + pendingInvites.length + rejectedInvites.length;
       if (badge) {
         badge.textContent = unread > 9 ? '9+' : String(unread);
         badge.classList.toggle('hidden', unread === 0);
@@ -2223,7 +2316,12 @@
       `).join('');
       const emptyHtml = `<div class="apple-subcard p-4 text-center text-xs" style="color: var(--text-muted);">لا توجد إشعارات مرسلة حالياً.</div>`;
       const cardsHtml = items.length ? items.map(renderNotificationCard).join('') : emptyHtml;
-      if (listEl) listEl.innerHTML = invitesHtml + (items.length ? items.map(renderNotificationCard).join('') : (!invitesHtml ? emptyHtml : ''));
+      const rejHtml = rejectedInvites.map(r => `
+        <div class="apple-subcard p-3.5 flex items-center justify-between gap-2 border border-rose-500/40 bg-rose-500/10">
+          <div class="text-xs font-bold text-rose-300">❌ رفض ${escapeHtml(r.rejectedByName || r.receiverName || r.receiverId)} دعوتك للدراسة سوا</div>
+          <button type="button" data-ack-rej="${r.id}" class="ack-rej-btn tap-btn px-2.5 py-1 rounded-lg apple-card text-[10px] font-bold cursor-pointer">تم</button>
+        </div>`).join('');
+      if (listEl) listEl.innerHTML = invitesHtml + rejHtml + (items.length ? items.map(renderNotificationCard).join('') : (!(invitesHtml || rejHtml) ? emptyHtml : ''));
       if (adminListEl) adminListEl.innerHTML = cardsHtml;
       refreshLucideIcons();
     }
@@ -2361,9 +2459,11 @@
     }
 
     // =========================================================================
-    // Study Together ("الدراسة سوا" — Private 2-Student Rooms + Voice Notes)
+    // Study Together ("الدراسة سوا" — Multi-User Rooms, Archive, Files & Voice)
     // =========================================================================
-    let roomsUnsub = null;
+    let roomsUnsub1 = null;
+    let roomsUnsub2 = null;
+    let adminRoomsUnsub = null;
     let roomMsgsUnsub = null;
     let roomPeerUnsubs = [];
     let roomTimerTick = null;
@@ -2372,13 +2472,31 @@
     let voiceChunks = [];
     let voiceTimer = null;
     let voiceSecs = 0;
+    let roomHasVideo = true;
+    let pendingDeleteStudentId = null;
 
     function maskPeerName(name) {
       const s = String(name || 'ط').trim();
       return s.charAt(0) + '*****';
     }
 
-    async function searchPeerById(inputEl, resultEl) {
+    function hasPendingOrActiveInviteFor(pid, existingRoomId = null) {
+      const myId = state.studentProfile ? state.studentProfile.studentId : '';
+      if (existingRoomId) {
+        const r = shared.studyRooms.find(x => x.id === existingRoomId);
+        if (r) {
+          if ((r.participants || []).includes(pid)) return 'موجود في الغرفة بالفعل';
+          if ((r.pendingInvites || []).includes(pid) || r.receiverId === pid && r.status === 'pending') return 'تم إرسال الدعوة بالفعل ⏳';
+        }
+      }
+      const dup = (shared.studyRooms || []).find(r =>
+        r.status === 'pending' && r.senderId === myId && r.receiverId === pid
+      );
+      if (dup) return 'تم إرسال الدعوة بالفعل ⏳';
+      return null;
+    }
+
+    async function searchPeerById(inputEl, resultEl, existingRoomId = null) {
       const pid = (inputEl.value || '').trim();
       if (!pid) return;
       if (!state.studentProfile || !state.studentProfile.studentId) {
@@ -2402,6 +2520,7 @@
         }
         const d = snap.data();
         const masked = maskPeerName(d.name);
+        const dupMsg = hasPendingOrActiveInviteFor(pid, existingRoomId);
         const avHtml = (d.avatarType && STUDENT_AVATAR_URLS[d.avatarType])
           ? getStudentAvatarHtml(d.avatarType, 34)
           : `<div class="w-9 h-9 rounded-full bg-[#0a84ff]/20 text-[#38bdf8] flex items-center justify-center text-xs font-extrabold">${escapeHtml(masked.charAt(0))}</div>`;
@@ -2414,19 +2533,33 @@
                 <div class="text-[11px] font-mono-num" style="color: var(--text-muted);">ID: ${escapeHtml(pid)}</div>
               </div>
             </div>
-            <button type="button" data-invite-id="${escapeHtml(pid)}" data-invite-name="${escapeHtml(d.name || pid)}" data-invite-av="${escapeHtml(d.avatarType || '')}" class="send-study-invite-btn tap-btn px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">دعوة للدراسة سوا</button>
+            ${dupMsg
+              ? `<button type="button" disabled class="px-4 py-2 rounded-xl apple-card text-amber-400 text-xs font-bold opacity-80 cursor-not-allowed">${dupMsg}</button>`
+              : `<button type="button" data-invite-id="${escapeHtml(pid)}" data-invite-name="${escapeHtml(d.name || pid)}" data-invite-av="${escapeHtml(d.avatarType || '')}" data-target-room="${escapeHtml(existingRoomId || '')}" class="send-study-invite-btn tap-btn px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">دعوة للدراسة سوا</button>`}
           </div>`;
       } catch (e) {
         resultEl.innerHTML = `<div class="apple-subcard p-3 text-xs text-rose-400">تعذر البحث حالياً.</div>`;
       }
     }
 
-    async function sendStudyInvite(receiverId, receiverName, receiverAvatar) {
+    async function sendStudyInvite(receiverId, receiverName, receiverAvatar, existingRoomId = '', btnEl = null) {
       if (!fbDb || !state.studentProfile) return;
+      const dupMsg = hasPendingOrActiveInviteFor(receiverId, existingRoomId || null);
+      if (dupMsg) { showToast(dupMsg); return; }
       const my = state.studentProfile;
-      const subj = 'ENT';
-      const firstTopic = (shared.topics[subj] && shared.topics[subj][0]) ? shared.topics[subj][0] : { id: '', title: 'جلسة مذاكرة' };
+      if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'تم إرسال الدعوة بالفعل ⏳'; }
       try {
+        if (existingRoomId) {
+          const room = shared.studyRooms.find(r => r.id === existingRoomId);
+          if (!room) return;
+          const nextPending = Array.from(new Set([...(room.pendingInvites || []), receiverId]));
+          const nextMeta = { ...(room.inviteMeta || {}), [receiverId]: { name: receiverName, avatar: receiverAvatar || '', byName: my.name, byId: my.studentId } };
+          await fbDb.collection('study_rooms').doc(existingRoomId).set({ pendingInvites: nextPending, inviteMeta: nextMeta }, { merge: true });
+          showToast('تمت دعوة زميلك للانضمام للغرفة!');
+          return;
+        }
+        const subj = 'ENT';
+        const firstTopic = (shared.topics[subj] && shared.topics[subj][0]) ? shared.topics[subj][0] : { id: '', title: 'جلسة مذاكرة' };
         await fbDb.collection('study_rooms').add({
           status: 'pending',
           senderId: my.studentId,
@@ -2436,12 +2569,19 @@
           receiverName,
           receiverAvatar: receiverAvatar || '',
           participants: [my.studentId, receiverId],
+          participantProfiles: {
+            [my.studentId]: { name: my.name, avatarType: my.avatarType || '' },
+            [receiverId]: { name: receiverName, avatarType: receiverAvatar || '' }
+          },
+          pendingInvites: [],
+          hiddenFor: [],
           subject: subj,
           topicId: firstTopic.id,
           topicTitle: firstTopic.title,
           mode: 'first',
           durationMins: 45,
           timer: { running: false, totalSec: 2700, remainingSec: 2700, updatedAt: Date.now(), pauseSec: 0, pauseCount: 0 },
+          pageProgress: {},
           createdAt: Date.now()
         });
         showToast('تم إرسال دعوة الدراسة سوا لزميلك!');
@@ -2450,8 +2590,39 @@
       }
     }
 
+    let roomsCache1 = {}, roomsCache2 = {};
+    function mergeAndApplyRooms() {
+      const mergedMap = { ...roomsCache1, ...roomsCache2 };
+      const rooms = Object.values(mergedMap).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      const myId = state.studentProfile ? state.studentProfile.studentId : '';
+      // Check newly rejected invites for sender toast
+      rooms.forEach(r => {
+        if (r.status === 'rejected' && r.senderId === myId && !r.rejectionNotifiedLocal) {
+          r.rejectionNotifiedLocal = true;
+          showToast(`❌ رفض ${r.rejectedByName || r.receiverName || r.receiverId} دعوتك للدراسة سوا`);
+        }
+      });
+      shared.studyRooms = rooms;
+      renderStudyRoomsList();
+      updateNotifBadgeAndList();
+      if (shared.activeRoomId) {
+        const cur = rooms.find(r => r.id === shared.activeRoomId);
+        if (!cur) {
+          exitActiveStudyRoom();
+        } else {
+          renderActiveStudyRoom(cur);
+          if (cur.finishedEvent && !roomFinishHandled[cur.finishedEvent.at]) {
+            roomFinishHandled[cur.finishedEvent.at] = true;
+            applySharedRoomCompletion(cur.finishedEvent);
+          }
+        }
+      }
+    }
+
     function initStudyRoomsListener() {
-      if (roomsUnsub) { roomsUnsub(); roomsUnsub = null; }
+      if (roomsUnsub1) { roomsUnsub1(); roomsUnsub1 = null; }
+      if (roomsUnsub2) { roomsUnsub2(); roomsUnsub2 = null; }
+      roomsCache1 = {}; roomsCache2 = {};
       if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) {
         shared.studyRooms = [];
         renderStudyRoomsList();
@@ -2459,70 +2630,98 @@
         return;
       }
       const myId = state.studentProfile.studentId;
-      roomsUnsub = fbDb.collection('study_rooms').where('participants', 'array-contains', myId).onSnapshot(snap => {
-        const rooms = [];
-        snap.forEach(doc => rooms.push({ id: doc.id, ...doc.data() }));
-        rooms.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        shared.studyRooms = rooms;
-        renderStudyRoomsList();
-        updateNotifBadgeAndList();
-        if (shared.activeRoomId) {
-          const cur = rooms.find(r => r.id === shared.activeRoomId);
-          if (!cur || cur.status === 'closed') {
-            exitActiveStudyRoom();
-          } else {
-            renderActiveStudyRoom(cur);
-            if (cur.finishedEvent && !roomFinishHandled[cur.finishedEvent.at]) {
-              roomFinishHandled[cur.finishedEvent.at] = true;
-              applySharedRoomCompletion(cur.finishedEvent);
-            }
-          }
-        }
+      roomsUnsub1 = fbDb.collection('study_rooms').where('participants', 'array-contains', myId).onSnapshot(snap => {
+        roomsCache1 = {};
+        snap.forEach(doc => roomsCache1[doc.id] = { id: doc.id, ...doc.data() });
+        mergeAndApplyRooms();
+      }, () => {});
+      roomsUnsub2 = fbDb.collection('study_rooms').where('pendingInvites', 'array-contains', myId).onSnapshot(snap => {
+        roomsCache2 = {};
+        snap.forEach(doc => roomsCache2[doc.id] = { id: doc.id, ...doc.data() });
+        mergeAndApplyRooms();
       }, () => {});
     }
 
     function renderStudyRoomsList() {
       const wrap = document.getElementById('together-rooms-list');
+      const archWrap = document.getElementById('together-archive-list');
       if (!wrap) return;
       if (!state.studentProfile || !state.studentProfile.studentId) {
         wrap.innerHTML = `<div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">سجّل دخولك بحساب الطالب أولاً لاستخدام غرف الدراسة سوا.</div>`;
+        if (archWrap) archWrap.innerHTML = '';
         return;
       }
       const myId = state.studentProfile.studentId;
-      const visible = shared.studyRooms.filter(r => r.status === 'active' || r.status === 'pending');
-      if (!visible.length) {
+      const notHidden = (shared.studyRooms || []).filter(r => !(r.hiddenFor || []).includes(myId));
+      const activeOrPending = notHidden.filter(r => r.status === 'active' || r.status === 'pending');
+      const archived = notHidden.filter(r => r.status === 'closed');
+
+      if (!activeOrPending.length) {
         wrap.innerHTML = `<div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">لا توجد غرف نشطة حالياً. ابحث عن زميلك بالكود الجامعي وأرسل له دعوة!</div>`;
-        return;
-      }
-      wrap.innerHTML = visible.map(r => {
-        const isSender = r.senderId === myId;
-        const peerName = isSender ? r.receiverName : r.senderName;
-        const isPending = r.status === 'pending';
-        return `
-          <div class="apple-subcard p-3.5 flex flex-wrap items-center justify-between gap-3 ${!isPending ? 'border-emerald-500/35' : ''}">
-            <div class="space-y-0.5 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs sm:text-sm font-bold">${isPending && isSender ? escapeHtml(maskPeerName(peerName)) : escapeHtml(peerName || 'زميل')}</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPending ? 'bg-amber-500/15 text-amber-400' : 'bg-emerald-500/15 text-emerald-400'}">${isPending ? (isSender ? 'بانتظار القبول' : 'دعوة واردة') : 'غرفة نشطة'}</span>
+      } else {
+        wrap.innerHTML = activeOrPending.map(r => {
+          const isPending = r.status === 'pending';
+          const isReceiver = isPending && r.receiverId === myId;
+          const isMultiInvite = (r.pendingInvites || []).includes(myId);
+          const count = (r.participants || []).length;
+          const title = isPending && r.senderId === myId ? maskPeerName(r.receiverName) : (count > 2 ? `غرفة جماعية (${count} طلاب)` : ((r.senderId === myId ? r.receiverName : r.senderName) || 'غرفة مذاكرة'));
+          return `
+            <div class="apple-subcard p-3.5 flex flex-wrap items-center justify-between gap-3 ${!isPending ? 'border-emerald-500/35' : ''}">
+              <div class="space-y-0.5 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs sm:text-sm font-bold">${escapeHtml(title)}</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPending || isMultiInvite ? 'bg-amber-500/15 text-amber-400' : 'bg-emerald-500/15 text-emerald-400'}">${isMultiInvite ? 'دعوة للانضمام' : isPending ? (isReceiver ? 'دعوة واردة' : 'بانتظار القبول') : 'غرفة نشطة'}</span>
+                </div>
+                <div class="text-[11px]" style="color: var(--text-muted);">${escapeHtml(r.subject || 'ENT')} • ${escapeHtml(r.topicTitle || '')}</div>
               </div>
-              <div class="text-[11px]" style="color: var(--text-muted);">${escapeHtml(r.subject || 'ENT')} • ${escapeHtml(r.topicTitle || '')}</div>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              ${isPending && !isSender ? `<button type="button" data-accept-room="${r.id}" class="accept-room-btn tap-btn px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">قبول</button><button type="button" data-reject-room="${r.id}" class="reject-room-btn tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">رفض</button>` : ''}
-              ${!isPending ? `<button type="button" data-enter-room="${r.id}" class="enter-room-btn tap-btn px-4 py-1.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">دخول الغرفة</button>` : ''}
-            </div>
-          </div>`;
-      }).join('');
+              <div class="flex items-center gap-2 shrink-0">
+                ${(isReceiver || isMultiInvite) ? `<button type="button" data-accept-room="${r.id}" class="accept-room-btn tap-btn px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">قبول</button><button type="button" data-reject-room="${r.id}" class="reject-room-btn tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">رفض</button>` : ''}
+                ${(!isPending && !isMultiInvite) ? `<button type="button" data-enter-room="${r.id}" class="enter-room-btn tap-btn px-4 py-1.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">دخول الغرفة</button>` : ''}
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      if (archWrap) {
+        if (!archived.length) {
+          archWrap.innerHTML = `<div class="apple-subcard p-4 text-center text-xs" style="color: var(--text-muted);">لا توجد غرف مؤرشفة بعد.</div>`;
+        } else {
+          archWrap.innerHTML = archived.map(r => {
+            const count = (r.participants || []).length;
+            return `
+              <div class="apple-subcard p-3.5 flex flex-wrap items-center justify-between gap-3 opacity-85">
+                <div class="space-y-0.5 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs sm:text-sm font-bold">${escapeHtml(r.subject || 'ENT')} — ${escapeHtml(r.topicTitle || 'جلسة مذاكرة')}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 text-[10px] font-bold">${count} أعضاء</span>
+                  </div>
+                  <div class="text-[11px] font-mono-num" style="color: var(--text-muted);">${r.createdAt ? new Date(r.createdAt).toLocaleDateString('ar-EG') : ''}</div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button type="button" data-enter-room="${r.id}" class="enter-room-btn tap-btn px-3 py-1.5 rounded-xl apple-card text-xs font-bold text-[#38bdf8] cursor-pointer">عرض الأرشيف</button>
+                  <button type="button" data-hide-room="${r.id}" class="hide-room-btn tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">حذف الغرفة من عندي</button>
+                </div>
+              </div>`;
+          }).join('');
+        }
+      }
+      refreshLucideIcons();
     }
 
     function enterStudyRoom(roomId) {
-      const room = shared.studyRooms.find(r => r.id === roomId && r.status === 'active');
+      const room = shared.studyRooms.find(r => r.id === roomId && (r.status === 'active' || r.status === 'closed'));
       if (!room || !fbDb) return;
       shared.activeRoomId = roomId;
       document.getElementById('together-lobby-view').classList.add('hidden');
       document.getElementById('together-active-room').classList.remove('hidden');
 
-      // Subscribe to both participants' real presence
+      const isArchived = room.status === 'closed';
+      document.getElementById('room-archive-badge').classList.toggle('hidden', !isArchived);
+      document.getElementById('room-active-actions').classList.toggle('hidden', isArchived);
+      document.getElementById('room-session-card').classList.toggle('hidden', isArchived);
+      document.getElementById('room-chat-form').classList.toggle('hidden', isArchived);
+      document.getElementById('room-invite-peer-box').classList.add('hidden');
+
       roomPeerUnsubs.forEach(u => u());
       roomPeerUnsubs = [];
       (room.participants || []).forEach(pid => {
@@ -2536,14 +2735,14 @@
         roomPeerUnsubs.push(u);
       });
 
-      // Subscribe to room chat subcollection
       if (roomMsgsUnsub) roomMsgsUnsub();
-      roomMsgsUnsub = fbDb.collection('study_rooms').doc(roomId).collection('messages').orderBy('createdAt', 'asc').limitToLast(80).onSnapshot(snap => {
+      roomMsgsUnsub = fbDb.collection('study_rooms').doc(roomId).collection('messages').orderBy('createdAt', 'asc').limitToLast(120).onSnapshot(snap => {
         const list = [];
         snap.forEach(d => list.push({ id: d.id, ...d.data() }));
         renderRoomMessages(list);
       }, () => {});
 
+      renderRoomVidDurations();
       renderActiveStudyRoom(room);
       if (roomTimerTick) clearInterval(roomTimerTick);
       roomTimerTick = setInterval(() => {
@@ -2566,29 +2765,89 @@
     function renderRoomParticipants(room) {
       const grid = document.getElementById('room-participants-grid');
       if (!grid) return;
-      const peers = [
-        { id: room.senderId, name: room.senderName, av: room.senderAvatar },
-        { id: room.receiverId, name: room.receiverName, av: room.receiverAvatar }
-      ];
-      grid.innerHTML = peers.map(p => {
-        const prof = shared.roomPeerProfiles[p.id] || {};
+      const pids = room.participants || [];
+      const profilesMap = room.participantProfiles || {};
+      grid.innerHTML = pids.map(pid => {
+        const prof = shared.roomPeerProfiles[pid] || {};
+        const fallback = profilesMap[pid] || {};
+        const name = prof.name || fallback.name || (pid === room.senderId ? room.senderName : pid === room.receiverId ? room.receiverName : pid);
+        const av = prof.avatarType || fallback.avatarType || (pid === room.senderId ? room.senderAvatar : pid === room.receiverId ? room.receiverAvatar : '');
         const activeNow = isStudentActiveNow(prof.lastActive);
         const rel = formatArabicRelativeTime(prof.lastActive);
-        const avHtml = (prof.avatarType || p.av)
-          ? getStudentAvatarHtml(prof.avatarType || p.av, 34)
-          : `<div class="w-9 h-9 rounded-full bg-[#0a84ff]/20 text-[#38bdf8] flex items-center justify-center text-xs font-extrabold">${escapeHtml((p.name || 'ط').charAt(0))}</div>`;
+        const avHtml = (av && STUDENT_AVATAR_URLS[av])
+          ? getStudentAvatarHtml(av, 32)
+          : `<div class="w-8 h-8 rounded-full bg-[#0a84ff]/20 text-[#38bdf8] flex items-center justify-center text-xs font-extrabold">${escapeHtml((name || 'ط').charAt(0))}</div>`;
         return `
-          <div class="apple-card p-3.5 flex items-center justify-between gap-3">
+          <div class="apple-card p-3.5 flex items-center justify-between gap-2.5">
             <div class="flex items-center gap-2.5 min-w-0">
               ${avHtml}
               <div class="min-w-0">
-                <div class="text-xs sm:text-sm font-bold truncate">${escapeHtml(prof.name || p.name || 'طالب')}</div>
-                <div class="text-[10px] font-mono-num" style="color: var(--text-muted);">ID: ${escapeHtml(p.id)}</div>
+                <div class="text-xs sm:text-sm font-bold truncate">${escapeHtml(name)}</div>
+                <div class="text-[10px] font-mono-num" style="color: var(--text-muted);">ID: ${escapeHtml(pid)}</div>
               </div>
             </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${activeNow ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-500/15 text-slate-400'}">${activeNow ? '● نشط الآن' : rel}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${activeNow ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-500/15 text-slate-400'}">${activeNow ? '● نشط' : rel}</span>
           </div>`;
       }).join('');
+    }
+
+    function renderRoomPageTracker(room) {
+      const wrap = document.getElementById('room-all-pages-progress');
+      if (!wrap) return;
+      const myId = state.studentProfile ? state.studentProfile.studentId : '';
+      const pp = room.pageProgress || {};
+      const myProg = pp[myId] || { current: 1, total: 20 };
+      const curInp = document.getElementById('room-my-page-input');
+      const totInp = document.getElementById('room-my-total-pages-input');
+      if (curInp && document.activeElement !== curInp) curInp.value = myProg.current || 0;
+      if (totInp && document.activeElement !== totInp) totInp.value = myProg.total || 20;
+
+      const profilesMap = room.participantProfiles || {};
+      wrap.innerHTML = (room.participants || []).map(pid => {
+        const prof = shared.roomPeerProfiles[pid] || profilesMap[pid] || {};
+        const name = prof.name || (pid === room.senderId ? room.senderName : pid === room.receiverId ? room.receiverName : pid);
+        const pg = pp[pid] || { current: 0, total: myProg.total || 20 };
+        const pct = pg.total > 0 ? Math.min(100, Math.round((pg.current / pg.total) * 100)) : 0;
+        return `
+          <div class="apple-subcard p-2.5 space-y-1">
+            <div class="flex justify-between text-[11px] font-bold">
+              <span class="truncate">${escapeHtml(name)}</span>
+              <span class="font-mono-num text-[#38bdf8]">صفحة ${pg.current} / ${pg.total} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="bg-emerald-400 h-full transition-all duration-300" style="width:${pct}%"></div></div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderRoomVidDurations() {
+      const cnt = Math.min(15, Math.max(1, parseInt(document.getElementById('room-vid-count')?.value, 10) || 1));
+      const wrap = document.getElementById('room-vid-durations');
+      if (!wrap) return;
+      let html = '';
+      for (let i = 0; i < cnt; i++) {
+        html += `<div class="flex items-center gap-1 apple-card px-2 py-1"><span class="text-[10px]">ف${i + 1}</span><input type="number" min="1" value="${i === 0 ? 35 : 45}" class="room-vdur w-full bg-transparent text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none" /><span class="text-[10px]">د</span></div>`;
+      }
+      wrap.innerHTML = html;
+      wrap.querySelectorAll('.room-vdur').forEach(i => i.oninput = calcRoomTotalMins);
+      calcRoomTotalMins();
+    }
+
+    function calcRoomTotalMins() {
+      let watch = 0;
+      if (roomHasVideo) {
+        const raw = Array.from(document.querySelectorAll('.room-vdur')).reduce((a, b) => a + (parseFloat(b.value) || 0), 0);
+        const speed = parseFloat(document.getElementById('room-vid-speed')?.value) || 1;
+        watch = Math.round(raw / speed);
+      }
+      const pages = parseFloat(document.getElementById('room-pages-input')?.value) || 0;
+      const mode = document.getElementById('room-mode-select')?.value || 'first';
+      const mult = mode === 'review' ? 2.5 : mode === 'solve' ? 2.0 : mode === 'video' ? 0 : 4.5;
+      const read = Math.round(pages * mult);
+      const brk = Math.floor((watch + read) / 50) * 10;
+      const total = Math.max(15, watch + read + brk);
+      const lbl = document.getElementById('room-calc-preview');
+      if (lbl) lbl.textContent = `الوقت المحسوب: ${total} دقيقة (مشاهدة ${watch}د • ورق ${read}د • راحة ${brk}د)`;
+      return total;
     }
 
     function updateRoomTimerDisplayOnly(room) {
@@ -2611,10 +2870,10 @@
 
     function renderActiveStudyRoom(room) {
       renderRoomParticipants(room);
+      renderRoomPageTracker(room);
       const subjSel = document.getElementById('room-subject-select');
       const topSel = document.getElementById('room-topic-select');
       const modeSel = document.getElementById('room-mode-select');
-      const durSel = document.getElementById('room-duration-select');
       if (subjSel && !subjSel.options.length) {
         subjSel.innerHTML = Object.keys(SUBJECTS_META).map(c => `<option value="${c}">${c}</option>`).join('');
       }
@@ -2625,8 +2884,36 @@
         if (room.topicId) topSel.value = room.topicId;
       }
       if (modeSel) modeSel.value = room.mode || 'first';
-      if (durSel) durSel.value = String(room.durationMins || 45);
       updateRoomTimerDisplayOnly(room);
+    }
+
+    function buildRoomMessageHtml(m, myId) {
+      const isMine = m.senderId === myId;
+      const tStr = m.createdAt ? new Date(m.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
+      const fileCard = m.fileData ? `
+        <div class="apple-card p-2.5 flex items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2 min-w-0">
+            <i data-lucide="file-text" class="w-4 h-4 text-amber-400 shrink-0"></i>
+            <div class="min-w-0">
+              <div class="font-bold truncate">${escapeHtml(m.fileName || 'ملف')}</div>
+              <div class="text-[10px] font-mono-num" style="color: var(--text-muted);">${m.fileSizeKB || '--'} KB</div>
+            </div>
+          </div>
+          <a href="${m.fileData}" download="${escapeHtml(m.fileName || 'file')}" class="tap-btn px-2.5 py-1 rounded-lg bg-[#0a84ff] text-white text-[10px] font-bold shrink-0">تحميل</a>
+        </div>` : '';
+      return `
+        <div class="flex flex-col ${isMine ? 'items-start' : 'items-end'}">
+          <div class="max-w-[85%] sm:max-w-[75%] apple-subcard p-3 space-y-1.5 ${isMine ? 'border-[#0a84ff]/45 bg-[#0a84ff]/15' : ''}">
+            <div class="flex items-center justify-between gap-2 text-[10px]">
+              <span class="font-bold text-[#38bdf8]">${escapeHtml(m.senderName || 'طالب')}</span>
+              <span class="font-mono-num" style="color: var(--text-muted);">${tStr}</span>
+            </div>
+            ${m.imageData ? `<img src="${m.imageData}" alt="صورة" class="chat-msg-img max-h-56 rounded-xl cursor-pointer object-cover" />` : ''}
+            ${fileCard}
+            ${m.voiceData ? `<audio controls src="${m.voiceData}" class="w-full max-w-[230px] h-9"></audio>` : ''}
+            ${m.text ? `<div class="text-xs sm:text-sm break-words">${escapeHtml(m.text)}</div>` : ''}
+          </div>
+        </div>`;
     }
 
     function renderRoomMessages(msgs) {
@@ -2634,26 +2921,12 @@
       if (!wrap) return;
       const myId = state.studentProfile ? state.studentProfile.studentId : '';
       if (!msgs.length) {
-        wrap.innerHTML = `<div class="apple-subcard p-4 text-center text-xs" style="color: var(--text-muted);">ابدأوا المذاكرة والدردشة هنا (نص، صور، أو رسائل صوتية).</div>`;
+        wrap.innerHTML = `<div class="apple-subcard p-4 text-center text-xs" style="color: var(--text-muted);">ابدأوا المذاكرة والدردشة هنا (نص، صور، ملفات، أو رسائل صوتية).</div>`;
         return;
       }
-      wrap.innerHTML = msgs.map(m => {
-        const isMine = m.senderId === myId;
-        const tStr = m.createdAt ? new Date(m.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
-        return `
-          <div class="flex flex-col ${isMine ? 'items-start' : 'items-end'}">
-            <div class="max-w-[85%] sm:max-w-[75%] apple-subcard p-3 space-y-1.5 ${isMine ? 'border-[#0a84ff]/45 bg-[#0a84ff]/15' : ''}">
-              <div class="flex items-center justify-between gap-2 text-[10px]">
-                <span class="font-bold text-[#38bdf8]">${escapeHtml(m.senderName || 'طالب')}</span>
-                <span class="font-mono-num" style="color: var(--text-muted);">${tStr}</span>
-              </div>
-              ${m.imageData ? `<img src="${m.imageData}" alt="صورة" class="chat-msg-img max-h-56 rounded-xl cursor-pointer object-cover" />` : ''}
-              ${m.voiceData ? `<audio controls src="${m.voiceData}" class="w-full max-w-[230px] h-9"></audio>` : ''}
-              ${m.text ? `<div class="text-xs sm:text-sm break-words">${escapeHtml(m.text)}</div>` : ''}
-            </div>
-          </div>`;
-      }).join('');
+      wrap.innerHTML = msgs.map(m => buildRoomMessageHtml(m, myId)).join('');
       wrap.scrollTop = wrap.scrollHeight;
+      refreshLucideIcons();
     }
 
     function applySharedRoomCompletion(ev) {
@@ -2665,17 +2938,57 @@
       state.completedSessions = (state.completedSessions || 0) + 1;
       if (ev.topicId) {
         const st = getTopicStage(ev.topicId);
-        if (ev.mode === 'video') st.videos = true;
-        else if (ev.mode === 'review') st.reviewed = true;
+        if (ev.hasVideo || ev.mode === 'video') st.videos = true;
+        if (ev.mode === 'review') st.reviewed = true;
         else if (ev.mode === 'solve') st.solved = true;
-        else st.studied = true;
+        else if (ev.mode === 'first') st.studied = true;
       }
       saveLocalStudentState(true);
       renderSubjects();
       updateKPIs();
       triggerConfetti();
       playSFX('bell');
-      showToast(`تم إنهاء "${ev.topicTitle || 'المحاضرة'}" وتحديث التشيك ليست لكما!`);
+      showToast(`تم إنهاء "${ev.topicTitle || 'المحاضرة'}" وتحديث التشيك ليست للجميع!`);
+    }
+
+    // Admin Study Rooms Monitor
+    function subscribeAdminStudyRooms() {
+      if (!fbDb || !shared.isAdmin) return;
+      if (adminRoomsUnsub) adminRoomsUnsub();
+      adminRoomsUnsub = fbDb.collection('study_rooms').onSnapshot(snap => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        shared.adminRoomsList = list;
+        renderAdminStudyRooms();
+      }, () => {});
+    }
+    function renderAdminStudyRooms() {
+      const wrap = document.getElementById('admin-rooms-list');
+      if (!wrap) return;
+      if (!shared.adminRoomsList.length) {
+        wrap.innerHTML = `<div class="apple-subcard p-4 text-center text-xs" style="color: var(--text-muted);">لا توجد غرف دراسة سوا مسجلة.</div>`;
+        return;
+      }
+      wrap.innerHTML = shared.adminRoomsList.map(r => {
+        const pMap = r.participantProfiles || {};
+        const names = (r.participants || []).map(pid => (pMap[pid] && pMap[pid].name) ? pMap[pid].name : pid).join(' • ');
+        const badgeCls = r.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : r.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-300';
+        return `
+          <div class="apple-subcard p-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="min-w-0 flex-1 space-y-0.5">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${escapeHtml(r.status || 'active')}</span>
+                <span class="text-xs font-bold truncate">${escapeHtml(r.subject || 'ENT')} — ${escapeHtml(r.topicTitle || '')}</span>
+              </div>
+              <div class="text-[11px] truncate" style="color: var(--text-muted);">الأعضاء (${(r.participants || []).length}): ${escapeHtml(names)}</div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" data-admin-view-room="${r.id}" class="admin-view-room-btn tap-btn px-3 py-1.5 rounded-lg apple-card text-[11px] font-bold text-[#38bdf8] cursor-pointer">عرض الغرفة</button>
+              <button type="button" data-admin-del-room="${r.id}" class="admin-del-room-btn tap-btn px-3 py-1.5 rounded-lg bg-rose-500/15 text-rose-400 text-[11px] font-bold cursor-pointer">حذف نهائي</button>
+            </div>
+          </div>`;
+      }).join('');
     }
 
     function initFirebaseSync() {
@@ -2742,8 +3055,8 @@
           shared.adminEmail = user ? user.email : '';
           document.getElementById('admin-email-display').textContent = shared.adminEmail || '--';
           applyAdminUI();
-          if (shared.isAdmin) subscribeAdminStudents();
-          else if (studentsUnsub) { studentsUnsub(); studentsUnsub = null; }
+          if (shared.isAdmin) { subscribeAdminStudents(); subscribeAdminStudyRooms(); }
+          else { if (studentsUnsub) { studentsUnsub(); studentsUnsub = null; } if (adminRoomsUnsub) { adminRoomsUnsub(); adminRoomsUnsub = null; } }
         });
       } catch (e) {
         badge.textContent = 'تعذر الاتصال بـ Firebase';
@@ -3797,7 +4110,7 @@
       };
       document.getElementById('chat-go-together-btn').onclick = () => switchTab('together');
 
-      // Study Together Peer Search & Invite Handlers
+      // Study Together Peer Search, Multi-User Invites, Archive & Hide Handlers
       document.getElementById('home-peer-search-form').onsubmit = (e) => {
         e.preventDefault();
         searchPeerById(document.getElementById('home-peer-search-input'), document.getElementById('home-peer-search-result'));
@@ -3806,32 +4119,113 @@
         e.preventDefault();
         searchPeerById(document.getElementById('together-peer-search-input'), document.getElementById('together-peer-search-result'));
       };
+      document.getElementById('room-invite-more-btn').onclick = () => {
+        document.getElementById('room-invite-peer-box').classList.toggle('hidden');
+      };
+      document.getElementById('room-invite-box-close').onclick = () => document.getElementById('room-invite-peer-box').classList.add('hidden');
+      document.getElementById('room-invite-search-form').onsubmit = (e) => {
+        e.preventDefault();
+        searchPeerById(document.getElementById('room-invite-search-input'), document.getElementById('room-invite-search-result'), shared.activeRoomId);
+      };
+
       document.body.addEventListener('click', async (e) => {
         const invBtn = e.target.closest('.send-study-invite-btn');
         if (invBtn) {
-          await sendStudyInvite(invBtn.dataset.inviteId, invBtn.dataset.inviteName, invBtn.dataset.inviteAv);
+          await sendStudyInvite(invBtn.dataset.inviteId, invBtn.dataset.inviteName, invBtn.dataset.inviteAv, invBtn.dataset.targetRoom || '', invBtn);
           return;
         }
         const accBtn = e.target.closest('.accept-room-btn');
-        if (accBtn && fbDb) {
+        if (accBtn && fbDb && state.studentProfile) {
           const rid = accBtn.dataset.acceptRoom;
-          await fbDb.collection('study_rooms').doc(rid).set({ status: 'active' }, { merge: true });
+          const room = shared.studyRooms.find(x => x.id === rid);
+          const my = state.studentProfile;
+          const nextParts = Array.from(new Set([...(room?.participants || []), my.studentId]));
+          const nextPending = (room?.pendingInvites || []).filter(x => x !== my.studentId);
+          const nextProfiles = { ...(room?.participantProfiles || {}), [my.studentId]: { name: my.name, avatarType: my.avatarType || '' } };
+          await fbDb.collection('study_rooms').doc(rid).set({ status: 'active', participants: nextParts, pendingInvites: nextPending, participantProfiles: nextProfiles }, { merge: true });
           document.getElementById('notifications-modal').classList.add('hidden');
           switchTab('together');
           setTimeout(() => enterStudyRoom(rid), 150);
           return;
         }
         const rejBtn = e.target.closest('.reject-room-btn');
-        if (rejBtn && fbDb) {
-          await fbDb.collection('study_rooms').doc(rejBtn.dataset.rejectRoom).set({ status: 'rejected' }, { merge: true });
+        if (rejBtn && fbDb && state.studentProfile) {
+          const rid = rejBtn.dataset.rejectRoom;
+          const room = shared.studyRooms.find(x => x.id === rid);
+          const my = state.studentProfile;
+          if (room && (room.pendingInvites || []).includes(my.studentId)) {
+            await fbDb.collection('study_rooms').doc(rid).set({ pendingInvites: (room.pendingInvites || []).filter(x => x !== my.studentId) }, { merge: true });
+          } else {
+            await fbDb.collection('study_rooms').doc(rid).set({ status: 'rejected', rejectedByName: my.name, rejectedById: my.studentId }, { merge: true });
+          }
           showToast('تم رفض الدعوة');
           return;
         }
+        const ackBtn = e.target.closest('.ack-rej-btn');
+        if (ackBtn && fbDb) {
+          await fbDb.collection('study_rooms').doc(ackBtn.dataset.ackRej).set({ rejectionAck: true }, { merge: true });
+          return;
+        }
         const entBtn = e.target.closest('.enter-room-btn');
-        if (entBtn) {
-          enterStudyRoom(entBtn.dataset.enterRoom);
+        if (entBtn) { enterStudyRoom(entBtn.dataset.enterRoom); return; }
+
+        const hideBtn = e.target.closest('.hide-room-btn');
+        if (hideBtn && fbDb && state.studentProfile) {
+          const rid = hideBtn.dataset.hideRoom;
+          const room = shared.studyRooms.find(x => x.id === rid);
+          const nextHidden = Array.from(new Set([...(room?.hiddenFor || []), state.studentProfile.studentId]));
+          await fbDb.collection('study_rooms').doc(rid).set({ hiddenFor: nextHidden }, { merge: true });
+          showToast('تم حذف الغرفة من قائمتك');
+          return;
+        }
+
+        // Admin Delete Student Trigger
+        const delStuBtn = e.target.closest('.admin-del-student-btn');
+        if (delStuBtn && shared.isAdmin) {
+          pendingDeleteStudentId = delStuBtn.dataset.delStudent;
+          document.getElementById('admin-del-stu-msg').textContent = `هل أنت متأكد من حذف حساب الطالب ${delStuBtn.dataset.delStudentName} نهائياً؟`;
+          gsapModalOpen('admin-delete-student-modal');
+          return;
+        }
+
+        // Admin View Room
+        const admViewBtn = e.target.closest('.admin-view-room-btn');
+        if (admViewBtn && shared.isAdmin && fbDb) {
+          const r = shared.adminRoomsList.find(x => x.id === admViewBtn.dataset.adminViewRoom);
+          if (!r) return;
+          const pMap = r.participantProfiles || {};
+          document.getElementById('admin-viewer-members').textContent = (r.participants || []).map(p => pMap[p]?.name || p).join(' • ');
+          const mSnap = await fbDb.collection('study_rooms').doc(r.id).collection('messages').orderBy('createdAt', 'asc').get();
+          const msgs = []; mSnap.forEach(d => msgs.push(d.data()));
+          document.getElementById('admin-viewer-msgs').innerHTML = msgs.length
+            ? msgs.map(m => buildRoomMessageHtml(m, '__admin_view__')).join('')
+            : '<div class="apple-subcard p-4 text-center text-xs">لا توجد رسائل داخل هذه الغرفة.</div>';
+          gsapModalOpen('admin-room-viewer-modal');
+          refreshLucideIcons();
+          return;
+        }
+
+        // Admin Permanent Delete Room
+        const admDelRoomBtn = e.target.closest('.admin-del-room-btn');
+        if (admDelRoomBtn && shared.isAdmin && fbDb) {
+          const rid = admDelRoomBtn.dataset.adminDelRoom;
+          const mSnap = await fbDb.collection('study_rooms').doc(rid).collection('messages').get();
+          await Promise.all(mSnap.docs.map(d => d.ref.delete()));
+          await fbDb.collection('study_rooms').doc(rid).delete();
+          showToast('تم حذف الغرفة ورسائلها نهائياً من Firestore');
         }
       });
+
+      // Admin Delete Student Modal Confirm / Cancel
+      document.getElementById('admin-del-stu-no').onclick = () => { pendingDeleteStudentId = null; document.getElementById('admin-delete-student-modal').classList.add('hidden'); };
+      document.getElementById('admin-del-stu-yes').onclick = async () => {
+        if (!pendingDeleteStudentId || !shared.isAdmin || !fbDb) return;
+        await fbDb.collection('students').doc(pendingDeleteStudentId).delete();
+        pendingDeleteStudentId = null;
+        document.getElementById('admin-delete-student-modal').classList.add('hidden');
+        showToast('تم حذف حساب الطالب نهائياً من Firestore');
+      };
+      document.getElementById('admin-viewer-close').onclick = () => document.getElementById('admin-room-viewer-modal').classList.add('hidden');
 
       // Active Study Room Controls
       document.getElementById('room-back-lobby').onclick = exitActiveStudyRoom;
@@ -3840,7 +4234,7 @@
         const rid = shared.activeRoomId;
         exitActiveStudyRoom();
         await fbDb.collection('study_rooms').doc(rid).set({ status: 'closed' }, { merge: true });
-        showToast('تم إغلاق الغرفة');
+        showToast('تم نقل الغرفة للأرشيف');
       };
       document.getElementById('room-subject-select').onchange = async (e) => {
         if (!shared.activeRoomId || !fbDb) return;
@@ -3854,17 +4248,47 @@
         await fbDb.collection('study_rooms').doc(shared.activeRoomId).set({ topicId: e.target.value, topicTitle: title }, { merge: true });
       };
       document.getElementById('room-mode-select').onchange = async (e) => {
+        calcRoomTotalMins();
         if (!shared.activeRoomId || !fbDb) return;
         await fbDb.collection('study_rooms').doc(shared.activeRoomId).set({ mode: e.target.value }, { merge: true });
       };
-      document.getElementById('room-duration-select').onchange = async (e) => {
+      document.getElementById('room-vid-yes').onclick = () => { roomHasVideo = true; document.getElementById('room-vid-details').classList.remove('hidden'); calcRoomTotalMins(); };
+      document.getElementById('room-vid-no').onclick = () => { roomHasVideo = false; document.getElementById('room-vid-durations').innerHTML = ''; calcRoomTotalMins(); };
+      document.getElementById('room-vid-count').oninput = renderRoomVidDurations;
+      document.getElementById('room-vid-speed').oninput = calcRoomTotalMins;
+      document.getElementById('room-pages-input').oninput = calcRoomTotalMins;
+      document.getElementById('room-calc-apply-btn').onclick = async () => {
         if (!shared.activeRoomId || !fbDb) return;
-        const mins = parseInt(e.target.value, 10) || 45;
+        const mins = calcRoomTotalMins();
         await fbDb.collection('study_rooms').doc(shared.activeRoomId).set({
+          hasVideo: roomHasVideo,
           durationMins: mins,
           timer: { running: false, totalSec: mins * 60, remainingSec: mins * 60, updatedAt: Date.now(), pauseSec: 0, pauseCount: 0 }
         }, { merge: true });
+        showToast(`تم ضبط تايمر الغرفة على ${mins} دقيقة للجميع!`);
       };
+
+      // Interactive Page Tracker Handlers
+      async function syncMyPageProgress(nextCur, nextTot) {
+        if (!shared.activeRoomId || !fbDb || !state.studentProfile) return;
+        const myId = state.studentProfile.studentId;
+        const cur = Math.max(0, parseInt(nextCur, 10) || 0);
+        const tot = Math.max(1, parseInt(nextTot, 10) || 20);
+        await fbDb.collection('study_rooms').doc(shared.activeRoomId).set({ pageProgress: { [myId]: { current: cur, total: tot } } }, { merge: true });
+      }
+      document.getElementById('room-page-plus').onclick = () => {
+        const c = (parseInt(document.getElementById('room-my-page-input').value, 10) || 0) + 1;
+        document.getElementById('room-my-page-input').value = c;
+        syncMyPageProgress(c, document.getElementById('room-my-total-pages-input').value);
+      };
+      document.getElementById('room-page-minus').onclick = () => {
+        const c = Math.max(0, (parseInt(document.getElementById('room-my-page-input').value, 10) || 0) - 1);
+        document.getElementById('room-my-page-input').value = c;
+        syncMyPageProgress(c, document.getElementById('room-my-total-pages-input').value);
+      };
+      document.getElementById('room-my-page-input').onchange = () => syncMyPageProgress(document.getElementById('room-my-page-input').value, document.getElementById('room-my-total-pages-input').value);
+      document.getElementById('room-my-total-pages-input').onchange = () => syncMyPageProgress(document.getElementById('room-my-page-input').value, document.getElementById('room-my-total-pages-input').value);
+
       document.getElementById('room-timer-toggle').onclick = async () => {
         const room = shared.studyRooms.find(r => r.id === shared.activeRoomId);
         if (!room || !fbDb) return;
@@ -3872,23 +4296,17 @@
         const diff = t.updatedAt ? Math.floor((Date.now() - t.updatedAt) / 1000) : 0;
         if (t.running) {
           const nextRem = Math.max(0, t.remainingSec - diff);
-          await fbDb.collection('study_rooms').doc(room.id).set({
-            timer: { ...t, running: false, remainingSec: nextRem, pauseCount: (t.pauseCount || 0) + 1, updatedAt: Date.now() }
-          }, { merge: true });
+          await fbDb.collection('study_rooms').doc(room.id).set({ timer: { ...t, running: false, remainingSec: nextRem, pauseCount: (t.pauseCount || 0) + 1, updatedAt: Date.now() } }, { merge: true });
         } else {
           const nextPauseSec = (t.pauseCount || 0) > 0 ? (t.pauseSec || 0) + diff : (t.pauseSec || 0);
-          await fbDb.collection('study_rooms').doc(room.id).set({
-            timer: { ...t, running: true, pauseSec: nextPauseSec, updatedAt: Date.now() }
-          }, { merge: true });
+          await fbDb.collection('study_rooms').doc(room.id).set({ timer: { ...t, running: true, pauseSec: nextPauseSec, updatedAt: Date.now() } }, { merge: true });
         }
       };
       document.getElementById('room-timer-reset').onclick = async () => {
         const room = shared.studyRooms.find(r => r.id === shared.activeRoomId);
         if (!room || !fbDb) return;
         const sec = (room.durationMins || 45) * 60;
-        await fbDb.collection('study_rooms').doc(room.id).set({
-          timer: { running: false, totalSec: sec, remainingSec: sec, updatedAt: Date.now(), pauseSec: 0, pauseCount: 0 }
-        }, { merge: true });
+        await fbDb.collection('study_rooms').doc(room.id).set({ timer: { running: false, totalSec: sec, remainingSec: sec, updatedAt: Date.now(), pauseSec: 0, pauseCount: 0 } }, { merge: true });
       };
 
       // Room Finish Lecture Confirmation Modal
@@ -3904,13 +4322,14 @@
           topicId: room.topicId || '',
           topicTitle: room.topicTitle || 'جلسة دراسة سوا',
           mode: room.mode || 'first',
+          hasVideo: !!room.hasVideo,
           durationMins: room.durationMins || 45,
           at: Date.now()
         };
         await fbDb.collection('study_rooms').doc(room.id).set({ finishedEvent: ev }, { merge: true });
       };
 
-      // Room Private Chat (Text, Compressed Image, Voice Note <= 30s)
+      // Room Private Chat (Text, Compressed Image, Files <= 500KB, Voice Note <= 30s)
       document.getElementById('room-img-btn').onclick = () => document.getElementById('room-img-input').click();
       document.getElementById('room-img-cancel').onclick = () => {
         shared.roomPendingImage = null;
@@ -3928,21 +4347,39 @@
           document.getElementById('room-img-preview-bar').classList.remove('hidden');
         } catch (err) { showToast('تعذر تجهيز الصورة'); }
       };
+
+      document.getElementById('room-file-btn').onclick = () => document.getElementById('room-file-input').click();
+      document.getElementById('room-file-cancel').onclick = () => {
+        shared.roomPendingFile = null;
+        document.getElementById('room-file-preview-bar').classList.add('hidden');
+        document.getElementById('room-file-input').value = '';
+      };
+      document.getElementById('room-file-input').onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (file.size > 500 * 1024) {
+          showToast('حجم الملف يتجاوز 500KB! يرجى اختيار ملف أصغر.');
+          e.target.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          shared.roomPendingFile = { fileData: reader.result, fileName: file.name, fileSizeKB: Math.max(1, Math.round(file.size / 1024)) };
+          document.getElementById('room-file-name-lbl').textContent = file.name;
+          document.getElementById('room-file-size-lbl').textContent = `${shared.roomPendingFile.fileSizeKB} KB`;
+          document.getElementById('room-file-preview-bar').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      };
+
       document.getElementById('room-messages-list').onclick = (e) => {
         const imgEl = e.target.closest('.chat-msg-img');
-        if (imgEl) {
-          document.getElementById('chat-lightbox-img').src = imgEl.src;
-          gsapModalOpen('chat-lightbox-modal');
-        }
+        if (imgEl) { document.getElementById('chat-lightbox-img').src = imgEl.src; gsapModalOpen('chat-lightbox-modal'); }
       };
       document.getElementById('room-voice-btn').onclick = async () => {
-        if (voiceRecorder && voiceRecorder.state === 'recording') {
-          voiceRecorder.stop();
-          return;
-        }
+        if (voiceRecorder && voiceRecorder.state === 'recording') { voiceRecorder.stop(); return; }
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
-          showToast('المتصفح لا يدعم تسجيل الصوت');
-          return;
+          showToast('المتصفح لا يدعم تسجيل الصوت'); return;
         }
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -3960,10 +4397,7 @@
             reader.onloadend = async () => {
               if (!shared.activeRoomId || !fbDb || !state.studentProfile) return;
               await fbDb.collection('study_rooms').doc(shared.activeRoomId).collection('messages').add({
-                senderId: state.studentProfile.studentId,
-                senderName: state.studentProfile.name,
-                voiceData: reader.result,
-                createdAt: Date.now()
+                senderId: state.studentProfile.studentId, senderName: state.studentProfile.name, voiceData: reader.result, createdAt: Date.now()
               });
               playSFX('check');
             };
@@ -3979,9 +4413,7 @@
             stEl.textContent = `● جاري التسجيل... 00:${pad2(voiceSecs)} / 00:30`;
             if (voiceSecs >= 30 && voiceRecorder.state === 'recording') voiceRecorder.stop();
           }, 1000);
-        } catch (err) {
-          showToast('يرجى السماح بصلاحية الميكروفون للتسجيل');
-        }
+        } catch (err) { showToast('يرجى السماح بصلاحية الميكروفون للتسجيل'); }
       };
       document.getElementById('room-chat-form').onsubmit = async (e) => {
         e.preventDefault();
@@ -3989,22 +4421,27 @@
         const inp = document.getElementById('room-msg-input');
         const text = inp.value.trim();
         const imageData = shared.roomPendingImage || null;
-        if (!text && !imageData) return;
+        const fObj = shared.roomPendingFile || null;
+        if (!text && !imageData && !fObj) return;
         inp.value = '';
         shared.roomPendingImage = null;
+        shared.roomPendingFile = null;
         document.getElementById('room-img-preview-bar').classList.add('hidden');
         document.getElementById('room-img-input').value = '';
+        document.getElementById('room-file-preview-bar').classList.add('hidden');
+        document.getElementById('room-file-input').value = '';
         await fbDb.collection('study_rooms').doc(shared.activeRoomId).collection('messages').add({
           senderId: state.studentProfile.studentId,
           senderName: state.studentProfile.name,
           text,
           imageData,
+          fileData: fObj ? fObj.fileData : null,
+          fileName: fObj ? fObj.fileName : null,
+          fileSizeKB: fObj ? fObj.fileSizeKB : null,
           createdAt: Date.now()
         });
         playSFX('click');
       };
-
-      // Admin Lock / Unlock Group Chat placeholder
       // Admin Moderation Custom Words Handlers
       document.getElementById('admin-mod-form').onsubmit = async (e) => {
         e.preventDefault();
