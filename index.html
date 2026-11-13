@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mansoura National University — Faculty of Medicine (Semester 9)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MNU Med • Sem 9 — Mansoura National University</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <!-- Firebase Web SDK v10.14.1 (Compat CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -11,77 +11,204 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       color-scheme: light;
       --bg-canvas: #f2f5fa;
-      --bg-surface: rgba(255, 255, 255, 0.9);
-      --bg-elevated: #f8fafc;
-      --border-hairline: rgba(15, 23, 42, 0.08);
+      --bg-surface: rgba(255, 255, 255, 0.86);
+      --bg-elevated: rgba(248, 250, 252, 0.92);
+      --border-hairline: rgba(15, 23, 42, 0.09);
       --text-main: #1d1d1f;
       --text-muted: #6e6e73;
       --apple-blue: #007aff;
-      --header-bg: rgba(255, 255, 255, 0.86);
+      --header-bg: rgba(255, 255, 255, 0.82);
     }
     body.dark-mode {
       color-scheme: dark;
-      --bg-canvas: #070b14;
-      --bg-surface: rgba(17, 24, 39, 0.86);
-      --bg-elevated: #162033;
-      --border-hairline: rgba(255, 255, 255, 0.09);
+      --bg-canvas: #060913;
+      --bg-surface: rgba(17, 24, 39, 0.72);
+      --bg-elevated: rgba(22, 32, 51, 0.84);
+      --border-hairline: rgba(255, 255, 255, 0.11);
       --text-main: #f5f5f7;
       --text-muted: #94a3b8;
       --apple-blue: #0a84ff;
-      --header-bg: rgba(7, 11, 20, 0.88);
+      --header-bg: rgba(6, 9, 19, 0.82);
+    }
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Cairo', 'Inter', sans-serif;
+      font-family: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-canvas);
       color: var(--text-main);
-      overflow-x: hidden;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
       -webkit-font-smoothing: antialiased;
-      transition: background-color 0.25s ease, color 0.25s ease;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    @media (min-width: 640px) {
+      body {
+        padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+      }
+    }
+    @media (max-width: 640px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+    .safe-top-pad {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+    .safe-bottom-nav {
+      padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
     }
     .font-mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    [dir="ltr"], .font-en { font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', sans-serif; }
+    .med-icon-glow { box-shadow: 0 0 18px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+
+    /* Ambient Dynamic Gradient Orbs (60fps GPU) */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .ambient-orb {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(78px);
+      will-change: transform, opacity;
+      opacity: 0.16;
+    }
+    body:not(.dark-mode) .ambient-orb {
+      opacity: 0.11;
+    }
+    .orb-1 {
+      width: 340px; height: 340px;
+      top: -80px; right: -60px;
+      background: radial-gradient(circle, #0a84ff, transparent 70%);
+      animation: orbFloat1 16s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 380px; height: 380px;
+      bottom: 8%; left: -90px;
+      background: radial-gradient(circle, #bf5af2, transparent 70%);
+      animation: orbFloat2 20s ease-in-out infinite alternate;
+    }
+    .orb-3 {
+      width: 280px; height: 280px;
+      top: 42%; right: 22%;
+      background: radial-gradient(circle, #30d158, transparent 70%);
+      animation: orbPulse 12s ease-in-out infinite;
+    }
+    @keyframes orbFloat1 {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      100% { transform: translate3d(-45px, 55px, 0) scale(1.16); }
+    }
+    @keyframes orbFloat2 {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      100% { transform: translate3d(55px, -45px, 0) scale(1.14); }
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.10; }
+      50% { transform: translate3d(-20px, 20px, 0) scale(1.12); opacity: 0.19; }
+    }
+
+    /* Glassmorphism Cards & Micro-interactions */
     .apple-card {
       background-color: var(--bg-surface);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(22px) saturate(150%);
+      -webkit-backdrop-filter: blur(22px) saturate(150%);
       border: 1px solid var(--border-hairline);
       border-radius: 20px;
-      box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.18);
-      transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.22s ease;
+      box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
     }
-    .apple-subcard { background-color: var(--bg-elevated); border: 1px solid var(--border-hairline); border-radius: 14px; transition: transform 0.18s ease, border-color 0.18s ease; }
-    .apple-card-hover:hover { transform: translateY(-2px); border-color: rgba(10, 132, 255, 0.38); }
-    .tap-btn { transition: transform 0.12s ease, opacity 0.15s ease; }
-    .tap-btn:active { transform: scale(0.97); }
-    .seg-control { background-color: var(--bg-elevated); border: 1px solid var(--border-hairline); border-radius: 12px; padding: 4px; }
-    .nav-pill { transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 9px; }
-    .nav-pill.active { background-color: var(--apple-blue); color: #ffffff; box-shadow: 0 3px 12px rgba(10, 132, 255, 0.32); }
-    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 999px; }
+    .apple-subcard {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-hairline);
+      border-radius: 14px;
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .apple-card-hover:hover {
+      transform: translate3d(0, -3px, 0);
+      border-color: rgba(10, 132, 255, 0.48);
+      box-shadow: 0 16px 38px -12px rgba(10, 132, 255, 0.22), 0 0 0 1px rgba(10, 132, 255, 0.18);
+    }
+    .tap-btn {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease, box-shadow 0.2s ease;
+    }
+    .tap-btn:hover { box-shadow: 0 4px 14px rgba(10, 132, 255, 0.18); }
+    .tap-btn:active { transform: scale(0.95); }
+    .ripple-wave {
+      position: absolute;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.32);
+      transform: scale(0);
+      pointer-events: none;
+      animation: rippleAnim 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(2.8); opacity: 0; }
+    }
 
-    @keyframes fadeSlide { from { opacity: 0; transform: translate3d(0, 8px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
-    .fade-in { animation: fadeSlide 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes staggerIn { from { opacity: 0; transform: translate3d(0, 10px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
-    .stagger-item { opacity: 0; animation: staggerIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: calc(var(--i, 0) * 30ms); }
-    @keyframes modalPop { from { opacity: 0; transform: scale(0.95) translate3d(0, 6px, 0); } to { opacity: 1; transform: scale(1) translate3d(0, 0, 0); } }
-    .modal-pop { animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes timerGlow { 0%, 100% { filter: drop-shadow(0 0 4px rgba(10, 132, 255, 0.35)); } 50% { filter: drop-shadow(0 0 12px rgba(10, 132, 255, 0.75)); } }
+    .seg-control { background-color: var(--bg-elevated); border: 1px solid var(--border-hairline); border-radius: 12px; padding: 4px; }
+    .nav-pill { transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 9px; }
+    .nav-pill.active { background-color: var(--apple-blue); color: #ffffff; box-shadow: 0 3px 14px rgba(10, 132, 255, 0.38); }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 999px; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translate3d(0, 14px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    .fade-in { animation: fadeSlide 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes staggerIn {
+      from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.985); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    .stagger-item { opacity: 0; animation: staggerIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: calc(var(--i, 0) * 40ms); }
+    @keyframes modalPop {
+      0% { opacity: 0; transform: scale(0.9) translate3d(0, 16px, 0); }
+      100% { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+    }
+    .modal-pop { animation: modalPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    @keyframes countPop {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.16); color: #34d399; }
+      100% { transform: scale(1); }
+    }
+    .live-pop { animation: countPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes timerGlow {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(10, 132, 255, 0.35)); }
+      50% { filter: drop-shadow(0 0 14px rgba(10, 132, 255, 0.85)); }
+    }
     .timer-running-glow { animation: timerGlow 2s ease-in-out infinite; }
-    @keyframes ecgDraw { 0% { stroke-dashoffset: 600; opacity: 0.28; } 50% { stroke-dashoffset: 0; opacity: 0.65; } 100% { stroke-dashoffset: -600; opacity: 0.28; } }
+    @keyframes ecgDraw { 0% { stroke-dashoffset: 600; opacity: 0.28; } 50% { stroke-dashoffset: 0; opacity: 0.68; } 100% { stroke-dashoffset: -600; opacity: 0.28; } }
     .ecg-line { stroke-dasharray: 600; animation: ecgDraw 5.5s linear infinite; }
     @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.7; } 45% { transform: scale(1.34); opacity: 1; } }
     .breathe-ring { animation: breathe 9s infinite ease-in-out; }
-    .confetti-dot { position: fixed; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; z-index: 9999; }
+    .confetti-dot { position: fixed; width: 7px; height: 7px; border-radius: 3px; pointer-events: none; z-index: 9999; }
   </style>
 </head>
-<body class="dark-mode min-h-screen flex flex-col pb-20 sm:pb-8">
+<body class="dark-mode flex flex-col">
+
+  <!-- Animated Ambient Orbs -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
 
   <!-- Batch Announcement Bar -->
-  <div id="global-notice-bar" class="hidden relative z-40 px-4 py-2 text-center text-xs font-bold text-white bg-[#0a84ff]">
+  <div id="global-notice-bar" class="hidden relative z-40 safe-top-pad px-4 py-2 text-center text-xs font-bold text-white bg-[#0a84ff]">
     <div class="max-w-7xl mx-auto flex items-center justify-center gap-2">
       <span class="px-2 py-0.5 rounded bg-white/20 text-[10px]">تنبيه الدفعة</span>
       <span id="global-notice-text"></span>
@@ -89,29 +216,57 @@
   </div>
 
   <!-- Header -->
-  <header class="sticky top-0 z-40 border-b px-4 sm:px-6 py-3.5 backdrop-blur-xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2 flex-wrap">
-          <h1 class="text-sm sm:text-base font-extrabold tracking-tight truncate" dir="ltr">
-            Mansoura National University — Faculty of Medicine (Semester 9)
-          </h1>
-          <span id="cloud-sync-badge" class="px-2 py-0.5 rounded-full bg-slate-500/15 text-slate-400 text-[10px] font-semibold">وضع محلي</span>
-          <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">وضع الأدمن</span>
+  <header class="sticky top-0 z-40 safe-top-pad border-b px-3 sm:px-6 py-3 backdrop-blur-2xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
+      <div class="min-w-0 flex-1 flex items-center gap-3">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
+          <svg class="w-6 h-6 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h3.5l2.2-5.5 3.3 11 2.4-6.5L16 12h5" />
+            <circle cx="19.5" cy="6.5" r="1.5" fill="#30d158" stroke="none" />
+          </svg>
         </div>
-        <p class="text-[11px] flex items-center gap-2 mt-0.5" style="color: var(--text-muted);">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-sm sm:text-lg font-extrabold tracking-tight truncate font-en" dir="ltr">
+              MNU Med • Sem 9
+            </h1>
+            <span id="cloud-sync-badge" class="px-2 py-0.5 rounded-full bg-slate-500/15 text-slate-400 text-[10px] font-semibold">وضع محلي</span>
+            <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">وضع الأدمن</span>
+          </div>
+          <div class="text-[10px] sm:text-[11px] font-semibold truncate font-en" dir="ltr" style="color: var(--text-muted);">
+            Mansoura National University — Faculty of Medicine
+          </div>
+        <div class="text-[11px] flex items-center gap-2 flex-wrap mt-1" style="color: var(--text-muted);">
           <span id="live-clock-str" class="font-mono-num font-semibold">--:--</span>
           <span>•</span>
           <span id="header-hours-badge" class="text-emerald-400 font-bold font-mono-num">0.0h مذاكرة</span>
-        </p>
+          <span>•</span>
+          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/12 border border-emerald-500/25 text-emerald-400 text-[10px] font-bold">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>يذاكرون الآن:</span>
+            <span id="live-studying-count" class="font-mono-num font-extrabold">41</span>
+          </span>
+        </div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-2 shrink-0">
-        <button id="btn-theme-toggle" class="tap-btn p-2.5 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <!-- Student Auth / Greeting Button -->
+        <button id="btn-student-auth" type="button" class="tap-btn px-3 py-2 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1.5 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+          <span id="student-header-label" class="max-w-[115px] sm:max-w-[160px] truncate">تسجيل الدخول</span>
+        </button>
+
+        <button id="btn-student-logout" type="button" class="hidden tap-btn px-2.5 py-2 rounded-full apple-subcard text-[10px] font-bold text-rose-400 cursor-pointer" title="تسجيل خروج / تبديل الحساب">خروج</button>
+
+        <button id="btn-theme-toggle" type="button" class="tap-btn p-2.5 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
           <svg class="w-4 h-4 text-[#0a84ff]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
         </button>
 
-        <button id="btn-admin-lock" class="tap-btn px-3 py-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1.5 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
+        <button id="btn-admin-lock" type="button" class="tap-btn px-2.5 sm:px-3 py-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
           <span id="admin-lock-label">Admin</span>
         </button>
@@ -123,21 +278,22 @@
         <button data-tab="home" class="nav-pill tap-btn active px-4 py-1.5 text-xs font-semibold cursor-pointer">الرئيسية والامتحانات</button>
         <button data-tab="planner" class="nav-pill tap-btn px-4 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المخطط والدراسة</button>
         <button data-tab="syllabus" class="nav-pill tap-btn px-4 py-1.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">المنهج والتشيك ليست</button>
+        <button data-tab="chat" class="nav-pill tap-btn px-4 py-1.5 text-xs font-semibold cursor-pointer flex items-center gap-1.5" style="color: var(--text-muted);"><span>المذاكرة الجماعية</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span></button>
         <button id="nav-admin-tab" data-tab="admin" class="hidden nav-pill tap-btn px-4 py-1.5 text-xs font-bold cursor-pointer text-amber-400">إدارة الأدمن</button>
       </nav>
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+  <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto p-3.5 sm:p-6 space-y-5 sm:space-y-6">
 
     <!-- TAB 1: HOME & EXAMS -->
-    <section id="tab-home" class="tab-panel space-y-6 fade-in">
-      <div class="rounded-[22px] overflow-hidden relative shadow-xl bg-gradient-to-br from-slate-950 via-sky-950 to-indigo-950 text-white border border-sky-400/20">
+    <section id="tab-home" class="tab-panel space-y-5 sm:space-y-6 fade-in">
+      <div class="rounded-[22px] overflow-hidden relative shadow-xl bg-gradient-to-br from-slate-950 via-sky-950 to-indigo-950 text-white border border-sky-400/25">
         <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-30" viewBox="0 0 800 220" preserveAspectRatio="none">
           <path class="ecg-line" fill="none" stroke="#38bdf8" stroke-width="2.5" d="M0,130 L180,130 L205,130 L220,95 L235,155 L255,40 L275,180 L295,115 L315,130 L520,130 L545,130 L560,95 L575,155 L595,40 L615,180 L635,115 L655,130 L800,130" />
         </svg>
 
-        <div class="relative z-10 p-5 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="relative z-10 p-5 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div class="space-y-2 min-w-0">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/35 text-sky-300 text-[11px] font-semibold">
               <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
@@ -145,37 +301,69 @@
             </div>
             <h2 id="hero-exam-title" class="text-xl sm:text-3xl font-bold tracking-tight">Ophthalmology — Final</h2>
             <p id="hero-exam-meta" class="text-xs sm:text-sm text-sky-100/80">--</p>
-            <div class="pt-2">
+            <div class="pt-2 flex flex-wrap items-center gap-2.5">
               <button type="button" id="hero-go-planner" class="tap-btn px-5 py-2.5 rounded-full bg-[#0a84ff] hover:opacity-90 text-white text-xs font-bold transition cursor-pointer shadow-md">
                 بدء المذاكرة والـ Timer
+              </button>
+              <button type="button" id="hero-open-student-auth" class="tap-btn px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition cursor-pointer">
+                مزامنة حسابك الجامعي
               </button>
             </div>
           </div>
 
           <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center" dir="ltr">
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2.5 sm:px-4 py-3 min-w-[60px]"><div id="hero-days" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">DAYS</div></div>
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2.5 sm:px-4 py-3 min-w-[60px]"><div id="hero-hours" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">HRS</div></div>
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2.5 sm:px-4 py-3 min-w-[60px]"><div id="hero-mins" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">MIN</div></div>
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2.5 sm:px-4 py-3 min-w-[60px]"><div id="hero-secs" class="font-mono-num text-xl sm:text-4xl font-bold text-sky-400">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">SEC</div></div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-days" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">DAYS</div></div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-hours" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">HRS</div></div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-mins" class="font-mono-num text-xl sm:text-4xl font-bold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">MIN</div></div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 sm:px-4 py-3 min-w-[54px]"><div id="hero-secs" class="font-mono-num text-xl sm:text-4xl font-bold text-sky-400">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">SEC</div></div>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- KPIs + Daily Goal Ring -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="apple-card apple-card-hover stagger-item p-5" style="--i:0">
           <div class="text-xs font-semibold" style="color: var(--text-muted);">نسبة إنجاز المنهج الكلي</div>
           <div class="flex items-baseline justify-between mt-1"><div id="kpi-overall-pct" class="text-2xl font-bold font-mono-num text-[#0a84ff]">0%</div><div id="kpi-overall-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 / 0</div></div>
-          <div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-2.5 overflow-hidden"><div id="kpi-overall-bar" class="bg-[#0a84ff] h-full transition-all duration-500" style="width: 0%"></div></div>
+          <div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-2.5 overflow-hidden"><div id="kpi-overall-bar" class="bg-[#0a84ff] h-full transition-all duration-700" style="width: 0%"></div></div>
         </div>
+
         <div class="apple-card apple-card-hover stagger-item p-5" style="--i:1">
           <div class="text-xs font-semibold" style="color: var(--text-muted);">إنجاز خطة اليوم</div>
           <div class="flex items-baseline justify-between mt-1"><div id="kpi-today-pct" class="text-2xl font-bold font-mono-num text-emerald-400">0%</div><div id="kpi-today-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 / 0 مهام</div></div>
-          <div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-2.5 overflow-hidden"><div id="kpi-today-bar" class="bg-emerald-400 h-full transition-all duration-500" style="width: 0%"></div></div>
+          <div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-2.5 overflow-hidden"><div id="kpi-today-bar" class="bg-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
         </div>
+
         <div class="apple-card apple-card-hover stagger-item p-5" style="--i:2">
           <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات التركيز</div>
-          <div id="kpi-hours-logged" class="text-2xl font-bold font-mono-num mt-1">0.0h</div>
-          <div class="text-[11px] mt-1" style="color: var(--text-muted);">تُحفظ محلياً على جهازك</div>
+          <div class="flex items-baseline justify-between mt-1">
+            <div id="kpi-hours-logged" class="text-2xl font-bold font-mono-num">0.0h</div>
+            <div id="kpi-sessions-count" class="text-[11px] font-mono-num text-purple-400 font-bold">0 جلسات</div>
+          </div>
+          <div id="kpi-sync-hint" class="text-[11px] mt-2" style="color: var(--text-muted);">محفوظ على جهازك</div>
+        </div>
+
+        <!-- Daily Goal Ring -->
+        <div class="apple-card apple-card-hover stagger-item p-4 flex items-center gap-3.5" style="--i:3">
+          <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="6"></circle>
+              <circle id="daily-goal-ring" cx="40" cy="40" r="33" fill="none" stroke="#30d158" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3" class="transition-all duration-700"></circle>
+            </svg>
+            <span id="daily-goal-pct" class="absolute font-mono-num text-xs font-extrabold text-emerald-400">0%</span>
+          </div>
+          <div class="flex-1 min-w-0 space-y-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="text-xs font-bold truncate">الهدف اليومي</span>
+              <select id="daily-goal-select" class="apple-subcard px-1.5 py-0.5 text-[11px] font-mono-num font-bold focus:outline-none cursor-pointer">
+                <option value="2">2h</option>
+                <option value="4" selected>4h</option>
+                <option value="6">6h</option>
+                <option value="8">8h</option>
+              </select>
+            </div>
+            <div id="daily-goal-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0.0 / 4.0h اليوم</div>
+          </div>
         </div>
       </div>
 
@@ -193,7 +381,7 @@
     </section>
 
     <!-- TAB 2: STUDY PLANNER & UNIFIED TIMER -->
-    <section id="tab-planner" class="tab-panel hidden space-y-6 fade-in">
+    <section id="tab-planner" class="tab-panel hidden space-y-5 sm:space-y-6 fade-in">
       <div class="apple-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-r-4 border-r-[#0a84ff]">
         <div class="min-w-0">
           <h2 class="text-base sm:text-lg font-bold">المخطط والدراسة (نظام التايمر الموحد)</h2>
@@ -206,8 +394,14 @@
 
       <div class="apple-card p-4 sm:p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div><h3 class="text-base font-bold">التايمر الموحد للمحاضرة النشطة</h3><p class="text-xs" style="color: var(--text-muted);">مرتبط مباشرة بجدول اليوم وبعداد التوقف التراكمي.</p></div>
-          <button id="btn-sos-burnout" class="tap-btn px-3.5 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تهدئة 10د</button>
+          <div><h3 class="text-base font-bold">التايمر الموحد للمحاضرة النشطة</h3><p class="text-xs" style="color: var(--text-muted);">يظهر العد التنازلي في تبويب المتصفح مع تنبيه صوتي اختياري عند الانتهاء.</p></div>
+          <div class="flex items-center gap-2">
+            <label class="tap-btn flex items-center gap-1.5 px-3 py-2 rounded-xl apple-subcard text-[11px] font-semibold cursor-pointer">
+              <input id="bell-toggle-chk" type="checkbox" class="accent-[#0a84ff]" checked />
+              <span>تنبيه الانتهاء</span>
+            </label>
+            <button id="btn-sos-burnout" class="tap-btn px-3.5 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تهدئة 10د</button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,7 +449,7 @@
     <section id="tab-syllabus" class="tab-panel hidden space-y-5 fade-in">
       <div class="apple-card p-5 space-y-2">
         <div class="flex items-center justify-between text-xs sm:text-sm font-bold"><span>تقدمك الكلي في المنهج النظري</span><span id="syl-overall-label" class="font-mono-num text-[#0a84ff]">0%</span></div>
-        <div class="w-full bg-slate-700/40 h-2.5 rounded-full overflow-hidden"><div id="syl-overall-bar" class="bg-gradient-to-l from-[#0a84ff] to-emerald-400 h-full transition-all duration-500" style="width: 0%"></div></div>
+        <div class="w-full bg-slate-700/40 h-2.5 rounded-full overflow-hidden"><div id="syl-overall-bar" class="bg-gradient-to-l from-[#0a84ff] to-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
       </div>
 
       <div id="subjects-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
@@ -264,7 +458,7 @@
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b pb-4" style="border-color: var(--border-hairline);">
           <h3 id="active-subject-title" class="text-base font-bold text-[#0a84ff]">ENT</h3>
           <div class="flex flex-wrap items-center gap-2">
-            <input id="topic-search-input" type="text" placeholder="بحث سريع في المحاضرات..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none" />
+            <input id="topic-search-input" type="text" placeholder="بحث سريع في المحاضرات..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none w-full sm:w-auto" />
             <div class="seg-control inline-flex text-[11px] font-semibold">
               <button data-topic-filter="ALL" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
               <button data-topic-filter="Post-Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">فاينل (Post-Midterm)</button>
@@ -283,8 +477,92 @@
       </div>
     </section>
 
-    <!-- TAB 4: ADMIN TAB -->
+    <!-- TAB: LIVE GROUP STUDY CHAT -->
+    <section id="tab-chat" class="tab-panel hidden space-y-4 fade-in">
+      <div class="apple-card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-base sm:text-lg font-bold">غرفة المذاكرة الجماعية</h2>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold">Firestore Live</span>
+          </div>
+          <p class="text-xs mt-0.5" style="color: var(--text-muted);">اسأل زمايلك في أي مادة، رد على الرسائل، وتفاعل بالـ Reactions لحظياً.</p>
+        </div>
+        <div class="seg-control inline-flex flex-wrap gap-1 text-[11px] font-semibold">
+          <button type="button" data-chat-filter="ALL" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
+          <button type="button" data-chat-filter="عام" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">عام</button>
+          <button type="button" data-chat-filter="ENT" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">ENT</button>
+          <button type="button" data-chat-filter="OPTH" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">OPTH</button>
+          <button type="button" data-chat-filter="EBMR" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">EBMR</button>
+          <button type="button" data-chat-filter="FMIMC" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">FMIMC</button>
+        </div>
+      </div>
+
+      <div class="apple-card flex flex-col overflow-hidden">
+        <div id="chat-messages-list" class="h-[50dvh] sm:h-[54dvh] overflow-y-auto custom-scroll p-3.5 sm:p-5 space-y-3">
+          <div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">جاري تحميل رسائل غرفة المذاكرة...</div>
+        </div>
+
+        <!-- Guest Lock Notice -->
+        <div id="chat-guest-banner" class="hidden px-4 py-3 border-t flex flex-wrap items-center justify-between gap-2 bg-[#0a84ff]/10" style="border-color: var(--border-hairline);">
+          <span class="text-xs font-semibold">يجب تسجيل الدخول بالاسم والكود الجامعي للمشاركة وإرسال الرسائل.</span>
+          <button type="button" id="chat-open-login-btn" class="tap-btn px-4 py-1.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تسجيل الدخول</button>
+        </div>
+
+        <!-- Reply Preview Bar -->
+        <div id="chat-reply-preview" class="hidden px-4 py-2 border-t flex items-center justify-between gap-2 bg-[#0a84ff]/10" style="border-color: var(--border-hairline);">
+          <div class="min-w-0 text-xs">
+            <span class="font-bold text-[#0a84ff]">الرد على <span id="chat-reply-sender"></span>:</span>
+            <span id="chat-reply-snippet" class="truncate block text-[11px]" style="color: var(--text-muted);"></span>
+          </div>
+          <button type="button" id="chat-reply-cancel" class="tap-btn px-2 py-1 text-xs font-bold text-rose-400 cursor-pointer">✕</button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form id="chat-form" class="p-3 sm:p-4 border-t flex flex-wrap sm:flex-nowrap items-center gap-2" style="border-color: var(--border-hairline);">
+          <select id="chat-tag-select" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-bold focus:outline-none shrink-0">
+            <option value="عام">عام</option>
+            <option value="ENT">ENT</option>
+            <option value="OPTH">Ophthalmology</option>
+            <option value="EBMR">EBMR</option>
+            <option value="FMIMC">Family Med</option>
+          </select>
+          <input id="chat-message-input" type="text" placeholder="اكتب سؤالك أو مشاركتك هنا..." class="flex-1 min-w-[160px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" />
+          <button type="submit" id="chat-send-btn" class="tap-btn px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer shrink-0">إرسال</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 4: ADMIN TAB & STUDENT STATS -->
     <section id="tab-admin" class="tab-panel hidden space-y-6 fade-in">
+      <!-- Admin Student Stats -->
+      <div class="apple-card p-5 sm:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
+          <div>
+            <h2 class="text-base font-bold">لوحة إحصائيات الطلبة (Firestore Live)</h2>
+            <p class="text-xs" style="color: var(--text-muted);">مرتبة تلقائياً حسب الأكثر مذاكرة، مع متابعة الجلسات وآخر نشاط.</p>
+          </div>
+          <input id="admin-student-search" type="text" placeholder="بحث بالاسم أو الكود..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none w-full sm:w-56" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="apple-subcard p-4">
+            <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الطلبة المسجلين</div>
+            <div id="admin-stat-students" class="text-2xl font-extrabold font-mono-num text-[#0a84ff] mt-1">0</div>
+          </div>
+          <div class="apple-subcard p-4">
+            <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات مذاكرة الدفعة</div>
+            <div id="admin-stat-hours" class="text-2xl font-extrabold font-mono-num text-emerald-400 mt-1">0.0h</div>
+          </div>
+          <div class="apple-subcard p-4">
+            <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الجلسات المكتملة</div>
+            <div id="admin-stat-sessions" class="text-2xl font-extrabold font-mono-num text-purple-400 mt-1">0</div>
+          </div>
+        </div>
+
+        <div id="admin-students-list" class="space-y-2.5 max-h-[420px] overflow-y-auto custom-scroll pr-0.5"></div>
+      </div>
+
+      <!-- Batch Announcement -->
       <div class="apple-card p-5 sm:p-6 space-y-4">
         <div class="flex items-center justify-between">
           <div><h2 class="text-base font-bold">شريط التنبيهات العلوي للدفعة (Firestore Live)</h2><p class="text-xs" style="color: var(--text-muted);">أي تنبيه تنشره يظهر فوراً لجميع الطلبة في الوقت الفعلي.</p></div>
@@ -297,6 +575,7 @@
         </form>
       </div>
 
+      <!-- Firestore Controls -->
       <div class="apple-card p-5 sm:p-6 space-y-3">
         <h3 class="text-base font-bold">إدارة بيانات Cloud Firestore</h3>
         <p class="text-xs" style="color: var(--text-muted);">مسجل الدخول: <span id="admin-email-display" class="font-mono-num text-[#0a84ff]">--</span></p>
@@ -310,16 +589,56 @@
   </main>
 
   <!-- Mobile Bottom Navigation -->
-  <nav class="sm:hidden fixed bottom-0 inset-x-0 z-40 border-t backdrop-blur-xl flex justify-around py-3 text-xs font-bold" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
-    <button data-tab="home" class="mob-nav tap-btn text-[#0a84ff] cursor-pointer px-3 py-1">الرئيسية</button>
-    <button data-tab="planner" class="mob-nav tap-btn cursor-pointer px-3 py-1" style="color: var(--text-muted);">الدراسة</button>
-    <button data-tab="syllabus" class="mob-nav tap-btn cursor-pointer px-3 py-1" style="color: var(--text-muted);">المنهج</button>
-    <button id="mob-admin-btn" data-tab="admin" class="hidden mob-nav tap-btn cursor-pointer px-3 py-1 text-amber-400">الأدمن</button>
+  <nav class="sm:hidden fixed bottom-0 inset-x-0 z-40 safe-bottom-nav border-t backdrop-blur-2xl flex justify-around pt-2.5 text-xs font-bold" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
+    <button data-tab="home" class="mob-nav tap-btn text-[#0a84ff] cursor-pointer px-3 py-1.5">الرئيسية</button>
+    <button data-tab="planner" class="mob-nav tap-btn cursor-pointer px-3 py-1.5" style="color: var(--text-muted);">الدراسة</button>
+    <button data-tab="syllabus" class="mob-nav tap-btn cursor-pointer px-2.5 py-1.5" style="color: var(--text-muted);">المنهج</button>
+    <button data-tab="chat" class="mob-nav tap-btn cursor-pointer px-2.5 py-1.5" style="color: var(--text-muted);">المذاكرة الجماعية</button>
+    <button id="mob-admin-btn" data-tab="admin" class="hidden mob-nav tap-btn cursor-pointer px-2.5 py-1.5 text-amber-400">الأدمن</button>
   </nav>
+
+  <!-- Student Auth Modal (No Email — University ID + Password) -->
+  <div id="student-auth-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 max-h-[90dvh] overflow-y-auto custom-scroll">
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
+        <div>
+          <h3 class="text-base font-bold">حساب الطالب (مزامنة سحابية)</h3>
+          <p class="text-[11px]" style="color: var(--text-muted);">احفظ ساعاتك وجدولك والتشيك ليست على حسابك بدون إيميل</p>
+        </div>
+        <button type="button" id="student-auth-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
+      </div>
+
+      <div class="seg-control grid grid-cols-2 gap-1 text-xs font-bold">
+        <button type="button" id="tab-stu-login" class="tap-btn py-2 rounded-lg bg-[#0a84ff] text-white cursor-pointer">تسجيل الدخول</button>
+        <button type="button" id="tab-stu-signup" class="tap-btn py-2 rounded-lg cursor-pointer" style="color: var(--text-muted);">إنشاء حساب جديد</button>
+      </div>
+
+      <form id="student-auth-form" class="space-y-3 text-xs">
+        <div id="stu-name-wrap" class="hidden space-y-1">
+          <label class="block font-semibold" style="color: var(--text-muted);">الاسم بالكامل</label>
+          <input id="stu-name-input" type="text" value="" placeholder="أدخل الاسم بالكامل" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" />
+        </div>
+        <div class="space-y-1">
+          <label class="block font-semibold" style="color: var(--text-muted);">الكود الجامعي / ID</label>
+          <input id="stu-id-input" type="text" inputmode="numeric" value="" placeholder="أدخل الكود الجامعي" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-[#0a84ff]" required />
+        </div>
+        <div class="space-y-1">
+          <label class="block font-semibold" style="color: var(--text-muted);">كلمة السر</label>
+          <input id="stu-pass-input" type="password" value="" placeholder="أدخل كلمة المرور" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-[#0a84ff]" required />
+        </div>
+        <div id="stu-auth-error" class="hidden text-xs font-semibold text-rose-400 text-center py-1"></div>
+        <button type="submit" id="stu-auth-submit" class="tap-btn w-full py-3 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer shadow-lg shadow-[#0a84ff]/25">دخول لحسابي</button>
+      </form>
+
+      <button type="button" id="stu-guest-continue" class="tap-btn w-full py-2 rounded-xl apple-subcard text-[11px] font-semibold cursor-pointer" style="color: var(--text-muted);">
+        المتابعة مؤقتاً بدون حساب (حفظ محلي على هذا الجهاز فقط)
+      </button>
+    </div>
+  </div>
 
   <!-- Step-by-Step Study Wizard Modal -->
   <div id="study-wizard-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="apple-card modal-pop max-w-lg w-full p-5 sm:p-6 space-y-5 max-h-[90vh] overflow-y-auto custom-scroll">
+    <div class="apple-card modal-pop max-w-lg w-full p-5 sm:p-6 space-y-5 max-h-[90dvh] overflow-y-auto custom-scroll">
       <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
         <div><h3 class="text-base font-bold">هتذاكر إيه النهارده؟</h3><p id="wiz-step-indicator" class="text-[11px] font-bold text-[#0a84ff]">الخطوة 1 من 5</p></div>
         <button type="button" id="wiz-modal-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
@@ -366,8 +685,8 @@
     <form id="admin-login-form" class="apple-card modal-pop max-w-sm w-full p-6 space-y-4">
       <div class="flex items-center justify-between"><h3 class="text-base font-bold">دخول الأدمن (Firebase Auth)</h3><button type="button" id="admin-login-close" class="text-sm cursor-pointer">✕</button></div>
       <div class="space-y-3 text-xs">
-        <input id="admin-email-input" type="email" placeholder="البريد الإلكتروني للأدمن" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" required />
-        <input id="admin-pass-input" type="password" placeholder="كلمة المرور" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" required />
+        <input id="admin-email-input" type="email" value="" placeholder="البريد الإلكتروني" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" required />
+        <input id="admin-pass-input" type="password" value="" placeholder="أدخل كلمة المرور" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" required />
       </div>
       <div id="admin-login-error" class="hidden text-xs font-semibold text-rose-400 text-center"></div>
       <button type="submit" class="tap-btn w-full py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تسجيل الدخول</button>
@@ -398,11 +717,11 @@
     </div>
   </div>
 
-  <div id="toast" class="fixed bottom-20 sm:bottom-5 left-5 z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl"></div>
+  <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
 
   <script>
     // =========================================================================
-    // 1. ضع إعدادات FIREBASE الخاصة بمشروعك هنا (FIREBASE CONFIG)
+    // 1. إعدادات FIREBASE الخاصة بمشروعك (FIREBASE CONFIG)
     // =========================================================================
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyB40UfePbJ64NybvNLtR6I351fcAprc0KY",
@@ -414,6 +733,7 @@
       measurementId: "G-2R680W223Y"
     };
 
+    const BASE_PAGE_TITLE = 'MNU Med • Sem 9 — Mansoura National University';
     let fbAuth = null;
     let fbDb = null;
     function isFirebaseReady() {
@@ -514,8 +834,12 @@
       ]
     };
 
-    // Private student data stored locally in localStorage
     const STORAGE_KEY = 'mnu_sem9_student_local_v6';
+    function getTodayDateStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
     let state = {
       darkMode: true,
       activeTab: 'home',
@@ -526,17 +850,38 @@
       stages: {},
       notes: {},
       todayQueue: [],
-      hoursLogged: 0
+      hoursLogged: 0,
+      completedSessions: 0,
+      dailyGoalHours: 4,
+      todayDate: getTodayDateStr(),
+      todayHoursLogged: 0,
+      bellEnabled: true,
+      studentProfile: null, // { studentId, name }
+      guestDismissed: false
     };
 
-    // Shared batch data (Synced in real-time via Cloud Firestore)
     let shared = {
       isAdmin: false,
       adminEmail: '',
       notice: { text: '', level: 'info' },
       exams: JSON.parse(JSON.stringify(DEFAULT_EXAMS)),
-      topics: JSON.parse(JSON.stringify(DEFAULT_TOPICS))
+      topics: JSON.parse(JSON.stringify(DEFAULT_TOPICS)),
+      studentsList: [],
+      chatMessages: [],
+      chatFilter: 'ALL',
+      chatReplyTo: null
     };
+
+    let studentsUnsub = null;
+    let studentSyncTimer = null;
+
+    function ensureTodayReset() {
+      const today = getTodayDateStr();
+      if (state.todayDate !== today) {
+        state.todayDate = today;
+        state.todayHoursLogged = 0;
+      }
+    }
 
     function loadLocalStudentState() {
       try {
@@ -549,10 +894,92 @@
           if (!state.notes) state.notes = {};
           if (!Array.isArray(state.todayQueue)) state.todayQueue = [];
           if (typeof state.hoursLogged !== 'number' || isNaN(state.hoursLogged)) state.hoursLogged = 0;
+          if (typeof state.completedSessions !== 'number' || isNaN(state.completedSessions)) state.completedSessions = 0;
+          if (typeof state.dailyGoalHours !== 'number' || isNaN(state.dailyGoalHours)) state.dailyGoalHours = 4;
+          if (typeof state.todayHoursLogged !== 'number' || isNaN(state.todayHoursLogged)) state.todayHoursLogged = 0;
+          if (typeof state.bellEnabled !== 'boolean') state.bellEnabled = true;
+        }
+      } catch (e) {}
+      ensureTodayReset();
+    }
+
+    function saveLocalStudentState(immediateCloud = false) {
+      ensureTodayReset();
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      if (state.studentProfile && state.studentProfile.studentId && fbDb) {
+        if (immediateCloud) {
+          clearTimeout(studentSyncTimer);
+          syncStudentToFirestore();
+        } else {
+          clearTimeout(studentSyncTimer);
+          studentSyncTimer = setTimeout(syncStudentToFirestore, 900);
+        }
+      }
+    }
+
+    async function hashPassword(str) {
+      try {
+        if (window.crypto && window.crypto.subtle) {
+          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+          return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+      } catch (e) {}
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24); }
+      return 'fb_' + (h >>> 0).toString(16);
+    }
+
+    async function syncStudentToFirestore() {
+      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      try {
+        await fbDb.collection('students').doc(state.studentProfile.studentId).set({
+          name: state.studentProfile.name,
+          studentId: state.studentProfile.studentId,
+          hoursLogged: Number((state.hoursLogged || 0).toFixed(3)),
+          completedSessions: state.completedSessions || 0,
+          dailyGoalHours: state.dailyGoalHours || 4,
+          todayDate: state.todayDate || getTodayDateStr(),
+          todayHoursLogged: Number((state.todayHoursLogged || 0).toFixed(3)),
+          todayQueue: state.todayQueue || [],
+          stages: state.stages || {},
+          notes: state.notes || {},
+          lastActive: new Date().toISOString()
+        }, { merge: true });
+      } catch (e) {}
+    }
+
+    async function loadStudentFromFirestoreOnBoot() {
+      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      try {
+        const doc = await fbDb.collection('students').doc(state.studentProfile.studentId).get();
+        if (doc.exists) {
+          const d = doc.data();
+          if (typeof d.hoursLogged === 'number' && d.hoursLogged > state.hoursLogged) state.hoursLogged = d.hoursLogged;
+          if (typeof d.completedSessions === 'number' && d.completedSessions > state.completedSessions) state.completedSessions = d.completedSessions;
+          if (d.stages && Object.keys(d.stages).length) state.stages = { ...d.stages, ...state.stages };
+          if (d.notes && Object.keys(d.notes).length) state.notes = { ...d.notes, ...state.notes };
+          if (Array.isArray(d.todayQueue) && d.todayQueue.length && !state.todayQueue.length) state.todayQueue = d.todayQueue;
+          saveLocalStudentState(false);
+          renderTimeline(); renderSubjects(); updateKPIs();
         }
       } catch (e) {}
     }
-    function saveLocalStudentState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
+
+    function updateStudentHeaderUI() {
+      const label = document.getElementById('student-header-label');
+      const logoutBtn = document.getElementById('btn-student-logout');
+      const hint = document.getElementById('kpi-sync-hint');
+      if (state.studentProfile && state.studentProfile.studentId) {
+        label.textContent = `أهلاً، ${state.studentProfile.name.split(' ')[0]}`;
+        logoutBtn.classList.remove('hidden');
+        if (hint) hint.textContent = `متزامن (${state.studentProfile.studentId})`;
+      } else {
+        label.textContent = 'تسجيل الدخول';
+        logoutBtn.classList.add('hidden');
+        if (hint) hint.textContent = 'محفوظ على جهازك';
+      }
+      updateChatAuthUI();
+    }
 
     async function saveSharedToFirestore(docName, payload) {
       if (!fbDb || !shared.isAdmin) return;
@@ -561,6 +988,197 @@
       } catch (err) {
         showToast('خطأ في الحفظ السحابي: ' + err.message);
       }
+    }
+
+    function subscribeAdminStudents() {
+      if (!fbDb || !shared.isAdmin) return;
+      if (studentsUnsub) studentsUnsub();
+      studentsUnsub = fbDb.collection('students').onSnapshot(snap => {
+        const list = [];
+        snap.forEach(doc => list.push(doc.data()));
+        shared.studentsList = list;
+        renderAdminStudentsStats();
+      }, () => {});
+    }
+
+    function renderAdminStudentsStats() {
+      const listEl = document.getElementById('admin-students-list');
+      if (!listEl) return;
+      const q = (document.getElementById('admin-student-search')?.value || '').trim().toLowerCase();
+      const sorted = [...shared.studentsList].sort((a, b) => (b.hoursLogged || 0) - (a.hoursLogged || 0));
+      const totalHours = sorted.reduce((acc, s) => acc + (s.hoursLogged || 0), 0);
+      const totalSess = sorted.reduce((acc, s) => acc + (s.completedSessions || 0), 0);
+
+      document.getElementById('admin-stat-students').textContent = sorted.length;
+      document.getElementById('admin-stat-hours').textContent = totalHours.toFixed(1) + 'h';
+      document.getElementById('admin-stat-sessions').textContent = totalSess;
+
+      const filtered = sorted.filter(s => !q || (s.name || '').toLowerCase().includes(q) || (s.studentId || '').toLowerCase().includes(q));
+      if (!filtered.length) {
+        listEl.innerHTML = `<div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">لا يوجد طلبة مسجلين مطابقين للبحث حالياً.</div>`;
+        return;
+      }
+
+      let totTopics = 0;
+      Object.values(shared.topics).forEach(arr => totTopics += arr.length);
+
+      listEl.innerHTML = filtered.map((s, idx) => {
+        let sumPct = 0;
+        if (s.stages && totTopics) {
+          Object.values(shared.topics).forEach(arr => arr.forEach(t => {
+            const st = s.stages[t.id];
+            if (st) sumPct += ((st.videos?1:0)+(st.studied?1:0)+(st.reviewed?1:0)+(st.solved?1:0)) * 25;
+          }));
+        }
+        const sylPct = totTopics ? Math.round(sumPct / totTopics) : 0;
+        let lastStr = '--';
+        if (s.lastActive) {
+          try { lastStr = new Date(s.lastActive).toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) {}
+        }
+        const rankColor = idx === 0 ? 'bg-amber-500/20 text-amber-400' : idx === 1 ? 'bg-slate-400/20 text-slate-300' : idx === 2 ? 'bg-orange-500/20 text-orange-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
+        return `
+          <div class="apple-subcard p-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-[190px] flex-1">
+              <span class="w-7 h-7 rounded-full ${rankColor} flex items-center justify-center font-mono-num text-xs font-extrabold shrink-0">${idx + 1}</span>
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold truncate">${s.name || 'طالب'}</div>
+                <div class="text-[11px] font-mono-num" style="color: var(--text-muted);">ID: ${s.studentId || '--'} • آخر نشاط: ${lastStr}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-4 shrink-0 text-center">
+              <div class="px-2.5 py-1 rounded-xl apple-card">
+                <div class="text-[10px]" style="color: var(--text-muted);">المذاكرة</div>
+                <div class="font-mono-num text-xs font-extrabold text-emerald-400">${(s.hoursLogged || 0).toFixed(1)}h</div>
+              </div>
+              <div class="px-2.5 py-1 rounded-xl apple-card">
+                <div class="text-[10px]" style="color: var(--text-muted);">الجلسات</div>
+                <div class="font-mono-num text-xs font-extrabold text-purple-400">${s.completedSessions || 0}</div>
+              </div>
+              <div class="px-2.5 py-1 rounded-xl apple-card">
+                <div class="text-[10px]" style="color: var(--text-muted);">المنهج</div>
+                <div class="font-mono-num text-xs font-extrabold text-[#0a84ff]">${sylPct}%</div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+
+    // Live Group Study Chat (Firestore chat_messages)
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function canUserChat() {
+      return !!(shared.isAdmin || (state.studentProfile && state.studentProfile.studentId));
+    }
+    function getCurrentChatActor() {
+      if (shared.isAdmin) {
+        return { id: 'admin_' + (shared.adminEmail || 'mnu'), name: (state.studentProfile && state.studentProfile.name) ? state.studentProfile.name : 'Admin', isAdmin: true };
+      }
+      if (state.studentProfile && state.studentProfile.studentId) {
+        return { id: state.studentProfile.studentId, name: state.studentProfile.name, isAdmin: false };
+      }
+      return null;
+    }
+    function updateChatAuthUI() {
+      const guestBanner = document.getElementById('chat-guest-banner');
+      if (!guestBanner) return;
+      guestBanner.classList.toggle('hidden', canUserChat());
+    }
+    function initChatListener() {
+      if (!fbDb) return;
+      fbDb.collection('chat_messages').orderBy('createdAt', 'asc').limitToLast(100).onSnapshot(snap => {
+        const msgs = [];
+        snap.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
+        shared.chatMessages = msgs;
+        renderChatMessages();
+      }, () => {});
+    }
+    function renderChatMessages() {
+      const wrap = document.getElementById('chat-messages-list');
+      if (!wrap) return;
+      const actor = getCurrentChatActor();
+      const filtered = shared.chatMessages.filter(m => shared.chatFilter === 'ALL' || m.tag === shared.chatFilter);
+      if (!filtered.length) {
+        wrap.innerHTML = `<div class="apple-subcard p-6 text-center text-xs" style="color: var(--text-muted);">لا توجد رسائل في هذا التصنيف بعد. ابدأ أول سؤال أو نقاش!</div>`;
+        return;
+      }
+      const tagColors = {
+        'عام': 'bg-slate-500/20 text-slate-300',
+        'ENT': 'bg-amber-500/20 text-amber-400',
+        'OPTH': 'bg-[#0a84ff]/20 text-[#0a84ff]',
+        'EBMR': 'bg-purple-500/20 text-purple-400',
+        'FMIMC': 'bg-emerald-500/20 text-emerald-400'
+      };
+      wrap.innerHTML = filtered.map((m, idx) => {
+        const isMine = actor && m.senderId === actor.id;
+        const tStr = m.createdAt ? new Date(m.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
+        const reactions = m.reactions || {};
+        const emojis = ['👍', '💡', '❤️'];
+        const reactHtml = emojis.map(em => {
+          const arr = Array.isArray(reactions[em]) ? reactions[em] : [];
+          const active = actor && arr.includes(actor.id);
+          return `<button type="button" data-react-id="${m.id}" data-react-emoji="${em}" class="chat-react-btn tap-btn px-2 py-0.5 rounded-full text-[11px] flex items-center gap-1 cursor-pointer border ${active ? 'bg-[#0a84ff]/25 border-[#0a84ff]/50 text-[#0a84ff] font-bold' : 'apple-card border-transparent opacity-80 hover:opacity-100'}"><span>${em}</span>${arr.length ? `<span class="font-mono-num text-[10px]">${arr.length}</span>` : ''}</button>`;
+        }).join('');
+        const replyHtml = m.replyTo ? `
+          <div class="mb-2 px-2.5 py-1.5 rounded-xl bg-black/20 border-r-2 border-r-[#0a84ff] text-[11px]">
+            <div class="font-bold text-[#0a84ff]">${escapeHtml(m.replyTo.senderName)}</div>
+            <div class="truncate opacity-80">${escapeHtml(m.replyTo.text)}</div>
+          </div>` : '';
+        return `
+          <div class="stagger-item flex flex-col ${isMine ? 'items-start' : 'items-end'}" style="--i:${Math.min(idx, 10)}">
+            <div class="max-w-[88%] sm:max-w-[75%] apple-subcard p-3 sm:p-3.5 space-y-1.5 ${m.isAdmin ? 'border-amber-500/45 bg-amber-500/5' : isMine ? 'border-[#0a84ff]/40 bg-[#0a84ff]/10' : ''}">
+              <div class="flex items-center justify-between gap-2 flex-wrap text-[11px]">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-extrabold ${m.isAdmin ? 'text-amber-400' : 'text-[#0a84ff]'}">${escapeHtml(m.senderName || 'طالب')}</span>
+                  ${m.isAdmin ? `<span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[9px] font-extrabold">Admin</span>` : ''}
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${tagColors[m.tag] || tagColors['عام']}">${escapeHtml(m.tag || 'عام')}</span>
+                </div>
+                <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
+              </div>
+              ${replyHtml}
+              <div class="text-xs sm:text-sm leading-relaxed break-words">${escapeHtml(m.text)}</div>
+              <div class="flex items-center justify-between gap-2 pt-1 flex-wrap">
+                <div class="flex items-center gap-1">${reactHtml}</div>
+                <button type="button" data-reply-id="${m.id}" class="chat-reply-btn tap-btn text-[11px] font-semibold px-2 py-0.5 rounded-lg hover:bg-white/10 cursor-pointer" style="color: var(--text-muted);">رد</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+    function setChatReply(msgId) {
+      const m = shared.chatMessages.find(x => x.id === msgId);
+      if (!m) return;
+      shared.chatReplyTo = { id: m.id, senderName: m.senderName || 'طالب', text: m.text || '' };
+      document.getElementById('chat-reply-sender').textContent = shared.chatReplyTo.senderName;
+      document.getElementById('chat-reply-snippet').textContent = shared.chatReplyTo.text;
+      document.getElementById('chat-reply-preview').classList.remove('hidden');
+      document.getElementById('chat-message-input').focus();
+    }
+    function clearChatReply() {
+      shared.chatReplyTo = null;
+      document.getElementById('chat-reply-preview').classList.add('hidden');
+    }
+    async function toggleChatReaction(msgId, emoji) {
+      if (!canUserChat()) {
+        showToast('سجّل دخولك أولاً للتفاعل مع الرسائل');
+        openStudentAuthModal('login');
+        return;
+      }
+      if (!fbDb) return;
+      const actor = getCurrentChatActor();
+      const m = shared.chatMessages.find(x => x.id === msgId);
+      if (!m || !actor) return;
+      const reactions = m.reactions ? JSON.parse(JSON.stringify(m.reactions)) : {};
+      const arr = Array.isArray(reactions[emoji]) ? [...reactions[emoji]] : [];
+      const i = arr.indexOf(actor.id);
+      if (i >= 0) arr.splice(i, 1); else arr.push(actor.id);
+      reactions[emoji] = arr;
+      try {
+        await fbDb.collection('chat_messages').doc(msgId).set({ reactions }, { merge: true });
+        playSFX('click');
+      } catch (e) {}
     }
 
     function initFirebaseSync() {
@@ -576,7 +1194,6 @@
         badge.textContent = 'متصل بـ Firestore Live';
         badge.className = 'px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold';
 
-        // Real-time listeners for shared batch data
         fbDb.collection('shared').doc('exams').onSnapshot(doc => {
           if (doc.exists && Array.isArray(doc.data().items)) {
             shared.exams = doc.data().items;
@@ -596,12 +1213,16 @@
           }
         });
 
-        // Firebase Admin Auth state
+        loadStudentFromFirestoreOnBoot();
+        initChatListener();
+
         fbAuth.onAuthStateChanged(user => {
           shared.isAdmin = !!user;
           shared.adminEmail = user ? user.email : '';
           document.getElementById('admin-email-display').textContent = shared.adminEmail || '--';
           applyAdminUI();
+          if (shared.isAdmin) subscribeAdminStudents();
+          else if (studentsUnsub) { studentsUnsub(); studentsUnsub = null; }
         });
       } catch (e) {
         badge.textContent = 'تعذر الاتصال بـ Firebase';
@@ -624,18 +1245,25 @@
     }
 
     function triggerConfetti() {
-      const colors = ['#0a84ff', '#30d158', '#ff9f0a', '#bf5af2'];
-      for (let i = 0; i < 16; i++) {
-        const el = document.createElement('div'); el.className = 'confetti-dot'; el.style.backgroundColor = colors[i % colors.length];
-        el.style.left = (window.innerWidth / 2 + (Math.random() - 0.5) * 140) + 'px'; el.style.top = (window.innerHeight / 2) + 'px';
+      const colors = ['#0a84ff', '#30d158', '#ff9f0a', '#bf5af2', '#ff375f'];
+      for (let i = 0; i < 24; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-dot';
+        el.style.backgroundColor = colors[i % colors.length];
+        el.style.left = (window.innerWidth / 2 + (Math.random() - 0.5) * 180) + 'px';
+        el.style.top = (window.innerHeight / 2 + (Math.random() - 0.5) * 60) + 'px';
         document.body.appendChild(el);
-        const dx = (Math.random() - 0.5) * 260, dy = -90 - Math.random() * 140;
-        el.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: `translate(${dx}px, ${dy + 240}px)`, opacity: 0 }], { duration: 680, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => el.remove();
+        const dx = (Math.random() - 0.5) * 320, dy = -120 - Math.random() * 160;
+        const rot = (Math.random() - 0.5) * 540;
+        el.animate([
+          { transform: 'translate3d(0,0,0) rotate(0deg) scale(1)', opacity: 1 },
+          { transform: `translate3d(${dx}px, ${dy + 280}px, 0) rotate(${rot}deg) scale(0.4)`, opacity: 0 }
+        ], { duration: 820, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => el.remove();
       }
     }
 
     let toastTimer = null;
-    function showToast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add('hidden'), 2800); }
+    function showToast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add('hidden'), 3000); }
 
     let audioCtx = null, ambientNode = null, ambientGain = null;
     function playSFX(type) {
@@ -644,9 +1272,14 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const now = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
       o.connect(g); g.connect(audioCtx.destination);
-      if (type === 'click') { o.frequency.setValueAtTime(580, now); o.frequency.exponentialRampToValueAtTime(300, now + 0.04); g.gain.setValueAtTime(0.05, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.045); o.start(now); o.stop(now + 0.05); }
+      if (type === 'click') { o.frequency.setValueAtTime(580, now); o.frequency.exponentialRampToValueAtTime(300, now + 0.04); g.gain.setValueAtTime(0.045, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.045); o.start(now); o.stop(now + 0.05); }
       else if (type === 'check') { o.type = 'triangle'; o.frequency.setValueAtTime(523, now); o.frequency.setValueAtTime(784, now + 0.08); g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.22); o.start(now); o.stop(now + 0.23); }
-      else if (type === 'bell') { o.frequency.setValueAtTime(880, now); o.frequency.exponentialRampToValueAtTime(440, now + 0.8); g.gain.setValueAtTime(0.15, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.85); o.start(now); o.stop(now + 0.9); }
+      else if (type === 'bell') {
+        if (!state.bellEnabled) return;
+        o.frequency.setValueAtTime(880, now); o.frequency.exponentialRampToValueAtTime(523, now + 0.75);
+        g.gain.setValueAtTime(0.14, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+        o.start(now); o.stop(now + 0.9);
+      }
     }
     function setAmbientSound(type) {
       if (ambientNode) { try { ambientNode.stop(); } catch (e) {} ambientNode = null; }
@@ -663,6 +1296,23 @@
       n.connect(f); f.connect(ambientGain); n.start(); ambientNode = n;
     }
 
+    // Live Studying Counter (natural fluctuation 34 - 49)
+    let liveStudyingVal = 39 + Math.floor(Math.random() * 5);
+    function startLiveStudyingCounter() {
+      const el = document.getElementById('live-studying-count');
+      if (!el) return;
+      el.textContent = liveStudyingVal;
+      setInterval(() => {
+        const delta = Math.random() < 0.5 ? -1 : 1;
+        const step = Math.random() < 0.25 ? delta * 2 : delta;
+        liveStudyingVal = Math.min(49, Math.max(34, liveStudyingVal + step));
+        el.textContent = liveStudyingVal;
+        el.classList.remove('live-pop');
+        void el.offsetWidth;
+        el.classList.add('live-pop');
+      }, 4500);
+    }
+
     function applyAdminUI() {
       const adm = !!shared.isAdmin;
       document.getElementById('admin-active-badge').classList.toggle('hidden', !adm);
@@ -672,6 +1322,7 @@
       document.getElementById('admin-lock-label').textContent = adm ? 'Admin ✓' : 'Admin';
       renderExamsTimeline();
       renderSubjects();
+      updateChatAuthUI();
     }
 
     function renderNoticeBar() {
@@ -679,7 +1330,7 @@
       if (!shared.notice || !shared.notice.text) { bar.classList.add('hidden'); return; }
       bar.classList.remove('hidden');
       document.getElementById('global-notice-text').textContent = shared.notice.text;
-      bar.className = `relative z-40 px-4 py-2 text-center text-xs font-bold text-white ${shared.notice.level === 'urgent' ? 'bg-rose-600' : shared.notice.level === 'warn' ? 'bg-amber-600' : 'bg-[#0a84ff]'}`;
+      bar.className = `relative z-40 safe-top-pad px-4 py-2 text-center text-xs font-bold text-white ${shared.notice.level === 'urgent' ? 'bg-rose-600' : shared.notice.level === 'warn' ? 'bg-amber-600' : 'bg-[#0a84ff]'}`;
     }
 
     // Exams
@@ -707,10 +1358,10 @@
         const accentColor = (SUBJECTS_META[ex.code] && SUBJECTS_META[ex.code].color) || '#0a84ff';
         const typeBadge = ex.type === 'Final' ? 'bg-[#0a84ff]/15 text-[#0a84ff] border-[#0a84ff]/25' : 'bg-purple-500/15 text-purple-400 border-purple-500/25';
         return `
-          <div class="apple-subcard stagger-item p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 relative overflow-hidden hover:border-[#0a84ff]/40" style="--i:${i}">
+          <div class="apple-subcard apple-card-hover stagger-item p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 relative overflow-hidden" style="--i:${i}">
             <span class="absolute right-0 top-0 bottom-0 w-1.5" style="background:${accentColor};"></span>
-            <div class="flex items-center gap-3 sm:gap-4 pr-2 flex-1 min-w-[210px]">
-              <div class="text-center min-w-[78px] px-2.5 py-1.5 rounded-xl apple-card shrink-0">
+            <div class="flex items-center gap-3 sm:gap-4 pr-2 flex-1 min-w-[200px]">
+              <div class="text-center min-w-[74px] px-2.5 py-1.5 rounded-xl apple-card shrink-0">
                 <div class="text-[11px] font-bold text-[#0a84ff]">${formatArabicDateShort(ex.dateStr)}</div>
                 <div class="text-[10px] font-mono-num" style="color: var(--text-muted);">${ex.dateStr}</div>
               </div>
@@ -796,17 +1447,21 @@
         document.getElementById('pomo-display').textContent = '00:00'; document.getElementById('pomo-ring').style.strokeDashoffset = 0;
         badgeEl.classList.add('hidden'); titleEl.textContent = 'اختر محاضرة من الجدول أو اضغط تشغيل';
         document.getElementById('pause-stopwatch-display').textContent = '00:00'; document.getElementById('pause-count-badge').textContent = '(0 توقف)';
-        document.getElementById('pomo-start-btn').textContent = 'تشغيل'; return;
+        document.getElementById('pomo-start-btn').textContent = 'تشغيل';
+        document.title = BASE_PAGE_TITLE;
+        return;
       }
       pomoTotalSec = task.durationMins * 60;
       pomoLeftSec = task.remainingSec !== undefined ? task.remainingSec : pomoTotalSec;
-      document.getElementById('pomo-display').textContent = `${pad2(Math.floor(pomoLeftSec / 60))}:${pad2(pomoLeftSec % 60)}`;
+      const timeStr = `${pad2(Math.floor(pomoLeftSec / 60))}:${pad2(pomoLeftSec % 60)}`;
+      document.getElementById('pomo-display').textContent = timeStr;
       document.getElementById('pomo-ring').style.strokeDashoffset = 326.7 * (1 - (pomoTotalSec > 0 ? pomoLeftSec / pomoTotalSec : 0));
       badgeEl.textContent = MODE_LABELS[task.mode] || 'مذاكرة'; badgeEl.classList.remove('hidden');
       titleEl.textContent = `[${task.subject}] ${task.title}`;
       document.getElementById('pause-stopwatch-display').textContent = `${pad2(Math.floor((task.pauseSec || 0) / 60))}:${pad2((task.pauseSec || 0) % 60)}`;
       document.getElementById('pause-count-badge').textContent = `(${task.pauseCount || 0} توقف)`;
       document.getElementById('pomo-start-btn').textContent = pomoRunning ? 'إيقاف مؤقت' : (pomoLeftSec < pomoTotalSec ? 'استئناف' : 'تشغيل');
+      document.title = pomoRunning ? `⏱️ ${timeStr} — ${task.subject} | MNU` : BASE_PAGE_TITLE;
     }
 
     function startTaskInTimer(taskId) {
@@ -842,11 +1497,15 @@
       clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false;
       document.getElementById('pause-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
       if (task) {
+        ensureTodayReset();
         const elapsed = elapsedOverride !== null ? elapsedOverride : Math.max(60, pomoTotalSec - pomoLeftSec);
-        state.hoursLogged = (state.hoursLogged || 0) + (elapsed / 3600);
+        const addHrs = elapsed / 3600;
+        state.hoursLogged = (state.hoursLogged || 0) + addHrs;
+        state.todayHoursLogged = (state.todayHoursLogged || 0) + addHrs;
+        state.completedSessions = (state.completedSessions || 0) + 1;
         task.done = true; autoSyncTaskToChecklist(task);
         state.activeTaskId = null; playSFX('bell'); triggerConfetti();
-        saveLocalStudentState(); renderTimeline(); syncTimerDisplay(); updateKPIs();
+        saveLocalStudentState(true); renderTimeline(); syncTimerDisplay(); updateKPIs();
       }
     }
 
@@ -857,7 +1516,7 @@
       if (task.mode === 'first') st.studied = true;
       else if (task.mode === 'review') st.reviewed = true;
       else if (task.mode === 'solve') st.solved = true;
-      saveLocalStudentState(); renderSubjects();
+      saveLocalStudentState(true); renderSubjects();
       showToast(`تم إنهاء "${task.title}" وتحديث التشيك ليست تلقائياً!`);
     }
 
@@ -871,7 +1530,7 @@
         const isActive = item.id === state.activeTaskId, pInfo = item.pauseSec ? ` • بريك ${Math.floor(item.pauseSec / 60)}د` : '';
         return `
           <div class="apple-subcard stagger-item p-3.5 flex flex-wrap items-center justify-between gap-2 transition ${item.done ? 'opacity-55' : isActive ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/20' : ''}" style="--i:${i}">
-            <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-[190px]">
+            <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-[180px]">
               <input type="checkbox" data-q-check="${item.id}" class="q-check w-4 h-4 accent-[#0a84ff] shrink-0" ${item.done ? 'checked' : ''} />
               <div class="min-w-0"><div class="text-[11px] font-mono-num text-[#0a84ff] font-bold">${item.durationMins} دقيقة • ${MODE_LABELS[item.mode] || ''}${pInfo}</div><div class="text-xs sm:text-sm font-bold truncate ${item.done ? 'line-through' : ''}">[${item.subject}] ${item.title}</div></div>
             </label>
@@ -894,7 +1553,7 @@
             <div class="flex items-center gap-2.5 flex-1 min-w-[200px]"><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
             <div class="flex items-center gap-2 shrink-0"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
           </div>
-          <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-300 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
+          <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
           <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
             <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="videos" class="stage-check accent-[#0a84ff]" ${st.videos ? 'checked' : ''} /><span>شوفت الفيديوهات</span></label>
             <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="studied" class="stage-check accent-[#0a84ff]" ${st.studied ? 'checked' : ''} /><span>ذاكرتها</span></label>
@@ -916,7 +1575,7 @@
         const m = SUBJECTS_META[c], items = shared.topics[c] || [];
         const sPct = items.length ? Math.round(items.reduce((a, t) => a + getTopicPct(t.id), 0) / items.length) : 0;
         const doneFull = items.filter(t => getTopicPct(t.id) === 100).length;
-        return `<button data-subj="${c}" class="subj-card tap-btn apple-card apple-card-hover stagger-item p-4 text-right cursor-pointer ${state.activeSubject === c ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/30' : ''}" style="--i:${idx}"><div class="flex justify-between"><span class="font-bold text-xs px-2 py-0.5 rounded apple-subcard text-[#0a84ff]">${c}</span><span class="font-mono-num text-[11px] font-bold">${doneFull}/${items.length} مكتمل</span></div><div class="font-bold text-sm mt-2 truncate">${m.name}</div><div class="mt-2 flex justify-between text-[11px]"><span style="color: var(--text-muted);">التقدم العام</span><span class="font-mono-num font-bold">${sPct}%</span></div><div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-1"><div class="h-full rounded-full transition-all" style="width:${sPct}%; background:${m.color}"></div></div></button>`;
+        return `<button data-subj="${c}" class="subj-card tap-btn apple-card apple-card-hover stagger-item p-4 text-right cursor-pointer ${state.activeSubject === c ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/30' : ''}" style="--i:${idx}"><div class="flex justify-between"><span class="font-bold text-xs px-2 py-0.5 rounded apple-subcard text-[#0a84ff]">${c}</span><span class="font-mono-num text-[11px] font-bold">${doneFull}/${items.length} مكتمل</span></div><div class="font-bold text-sm mt-2 truncate">${m.name}</div><div class="mt-2 flex justify-between text-[11px]"><span style="color: var(--text-muted);">التقدم العام</span><span class="font-mono-num font-bold">${sPct}%</span></div><div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-1"><div class="h-full rounded-full transition-all duration-500" style="width:${sPct}%; background:${m.color}"></div></div></button>`;
       }).join('');
 
       document.getElementById('active-subject-title').textContent = SUBJECTS_META[state.activeSubject].name;
@@ -936,6 +1595,7 @@
     }
 
     function updateKPIs() {
+      ensureTodayReset();
       let sumPct = 0, tot = 0;
       Object.values(shared.topics).forEach(a => a.forEach(t => { tot++; sumPct += getTopicPct(t.id); }));
       const pct = tot ? Math.round(sumPct / tot) : 0;
@@ -950,35 +1610,235 @@
 
       const hrs = state.hoursLogged || 0;
       document.getElementById('kpi-hours-logged').textContent = hrs.toFixed(1) + 'h';
+      document.getElementById('kpi-sessions-count').textContent = `${state.completedSessions || 0} جلسات`;
       document.getElementById('header-hours-badge').textContent = `${hrs.toFixed(1)}h مذاكرة`;
+
+      // Daily Goal Ring
+      const goal = state.dailyGoalHours || 4;
+      const tHrs = state.todayHoursLogged || 0;
+      const gPct = Math.min(100, Math.round((tHrs / goal) * 100));
+      document.getElementById('daily-goal-select').value = String(goal);
+      document.getElementById('daily-goal-pct').textContent = `${gPct}%`;
+      document.getElementById('daily-goal-sub').textContent = `${tHrs.toFixed(1)} / ${goal}.0h اليوم`;
+      document.getElementById('daily-goal-ring').style.strokeDashoffset = 207.3 * (1 - gPct / 100);
     }
 
     function switchTab(id) {
       if (id === 'admin' && !shared.isAdmin) return;
       state.activeTab = id;
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById(`tab-${id}`).classList.remove('hidden');
+      const panel = document.getElementById(`tab-${id}`);
+      panel.classList.remove('hidden');
+      panel.classList.remove('fade-in');
+      void panel.offsetWidth;
+      panel.classList.add('fade-in');
       document.querySelectorAll('.nav-pill').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('active', on); b.style.color = on ? '#fff' : (b.id === 'nav-admin-tab' ? '#fbbf24' : 'var(--text-muted)'); });
       document.querySelectorAll('.mob-nav').forEach(b => { const on = b.dataset.tab === id; b.style.color = on ? '#0a84ff' : (b.id === 'mob-admin-btn' ? '#fbbf24' : 'var(--text-muted)'); });
+      if (id === 'chat') { const w = document.getElementById('chat-messages-list'); if (w) w.scrollTop = w.scrollHeight; }
       saveLocalStudentState();
+    }
+
+    // Student Auth Modal State
+    let stuAuthMode = 'login';
+    function openStudentAuthModal(mode = 'login') {
+      stuAuthMode = mode;
+      const isSignup = mode === 'signup';
+      document.getElementById('stu-name-wrap').classList.toggle('hidden', !isSignup);
+      document.getElementById('stu-name-input').required = isSignup;
+      document.getElementById('stu-auth-submit').textContent = isSignup ? 'إنشاء حساب وبدء المذاكرة' : 'دخول لحسابي';
+      document.getElementById('tab-stu-login').className = !isSignup ? 'tap-btn py-2 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'tap-btn py-2 rounded-lg cursor-pointer';
+      document.getElementById('tab-stu-login').style.color = !isSignup ? '#fff' : 'var(--text-muted)';
+      document.getElementById('tab-stu-signup').className = isSignup ? 'tap-btn py-2 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'tap-btn py-2 rounded-lg cursor-pointer';
+      document.getElementById('tab-stu-signup').style.color = isSignup ? '#fff' : 'var(--text-muted)';
+      document.getElementById('stu-name-input').value = '';
+      document.getElementById('stu-id-input').value = '';
+      document.getElementById('stu-pass-input').value = '';
+      document.getElementById('stu-auth-error').classList.add('hidden');
+      document.getElementById('student-auth-modal').classList.remove('hidden');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       loadLocalStudentState();
       document.body.classList.toggle('dark-mode', state.darkMode);
+      document.getElementById('bell-toggle-chk').checked = state.bellEnabled;
       initFirebaseSync();
+      updateStudentHeaderUI();
       renderNoticeBar(); applyAdminUI(); renderTimeline(); syncTimerDisplay();
+      startLiveStudyingCounter();
       setInterval(updateCountdowns, 1000);
       switchTab(state.activeTab || 'home');
-      window.addEventListener('beforeunload', saveLocalStudentState);
+      window.addEventListener('beforeunload', () => saveLocalStudentState(true));
+
+      // Auto-open Student Auth Pop-up on first visit if not logged in
+      if (!state.studentProfile && !state.guestDismissed) {
+        setTimeout(() => openStudentAuthModal('login'), 450);
+      }
+
+      // Tap ripple feedback
+      document.body.addEventListener('pointerdown', (e) => {
+        const btn = e.target.closest('.tap-btn');
+        if (!btn) return;
+        const r = btn.getBoundingClientRect();
+        const span = document.createElement('span');
+        span.className = 'ripple-wave';
+        const size = Math.max(r.width, r.height);
+        span.style.width = span.style.height = size + 'px';
+        span.style.left = (e.clientX - r.left - size / 2) + 'px';
+        span.style.top = (e.clientY - r.top - size / 2) + 'px';
+        btn.appendChild(span);
+        setTimeout(() => span.remove(), 500);
+      });
 
       document.querySelectorAll('.nav-pill, .mob-nav').forEach(b => b.addEventListener('click', () => { playSFX('click'); switchTab(b.dataset.tab); }));
       document.getElementById('hero-go-planner').onclick = () => switchTab('planner');
+      document.getElementById('hero-open-student-auth').onclick = () => openStudentAuthModal('login');
       document.getElementById('btn-theme-toggle').onclick = () => { state.darkMode = !state.darkMode; document.body.classList.toggle('dark-mode', state.darkMode); saveLocalStudentState(); };
+
+      // Daily goal & Bell toggle
+      document.getElementById('daily-goal-select').onchange = (e) => {
+        state.dailyGoalHours = parseInt(e.target.value, 10) || 4;
+        saveLocalStudentState(true); updateKPIs();
+      };
+      document.getElementById('bell-toggle-chk').onchange = (e) => {
+        state.bellEnabled = e.target.checked;
+        saveLocalStudentState();
+      };
+
+      // Student Auth Modal Handlers
+      document.getElementById('btn-student-auth').onclick = () => openStudentAuthModal('login');
+      document.getElementById('student-auth-close').onclick = () => { state.guestDismissed = true; saveLocalStudentState(); document.getElementById('student-auth-modal').classList.add('hidden'); };
+      document.getElementById('stu-guest-continue').onclick = () => { state.guestDismissed = true; saveLocalStudentState(); document.getElementById('student-auth-modal').classList.add('hidden'); };
+      document.getElementById('tab-stu-login').onclick = () => openStudentAuthModal('login');
+      document.getElementById('tab-stu-signup').onclick = () => openStudentAuthModal('signup');
+
+      document.getElementById('btn-student-logout').onclick = () => {
+        state.studentProfile = null;
+        state.guestDismissed = false;
+        updateStudentHeaderUI();
+        saveLocalStudentState();
+        showToast('تم تسجيل خروج الطالب');
+        openStudentAuthModal('login');
+      };
+
+      document.getElementById('student-auth-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('stu-auth-error');
+        errEl.classList.add('hidden');
+        if (!fbDb) { errEl.textContent = 'تعذر الاتصال بقاعدة البيانات حالياً.'; errEl.classList.remove('hidden'); return; }
+
+        const stuId = document.getElementById('stu-id-input').value.trim();
+        const pass = document.getElementById('stu-pass-input').value;
+        const name = document.getElementById('stu-name-input').value.trim();
+        if (!stuId || pass.length < 4) { errEl.textContent = 'أدخل الكود الجامعي وكلمة سر لا تقل عن 4 أحرف/أرقام.'; errEl.classList.remove('hidden'); return; }
+
+        const passHash = await hashPassword(pass);
+        const docRef = fbDb.collection('students').doc(stuId);
+        try {
+          const snap = await docRef.get();
+          if (stuAuthMode === 'signup') {
+            if (!name) { errEl.textContent = 'يرجى كتابة الاسم بالكامل.'; errEl.classList.remove('hidden'); return; }
+            if (snap.exists) { errEl.textContent = 'هذا الكود الجامعي مسجل بالفعل، اختار "تسجيل الدخول".'; errEl.classList.remove('hidden'); return; }
+            state.studentProfile = { studentId: stuId, name };
+            await docRef.set({
+              name, studentId: stuId, passwordHash: passHash,
+              hoursLogged: state.hoursLogged || 0,
+              completedSessions: state.completedSessions || 0,
+              dailyGoalHours: state.dailyGoalHours || 4,
+              todayDate: state.todayDate || getTodayDateStr(),
+              todayHoursLogged: state.todayHoursLogged || 0,
+              todayQueue: state.todayQueue || [],
+              stages: state.stages || {},
+              notes: state.notes || {},
+              createdAt: new Date().toISOString(),
+              lastActive: new Date().toISOString()
+            });
+            showToast(`أهلاً بك يا دكتور ${name.split(' ')[0]}! تم إنشاء حسابك.`);
+            triggerConfetti();
+          } else {
+            if (!snap.exists) { errEl.textContent = 'الكود الجامعي غير مسجل. أنشئ حساباً جديداً أولاً.'; errEl.classList.remove('hidden'); return; }
+            const d = snap.data();
+            if (d.passwordHash !== passHash) { errEl.textContent = 'كلمة السر غير صحيحة.'; errEl.classList.remove('hidden'); return; }
+            state.studentProfile = { studentId: stuId, name: d.name || stuId };
+            state.hoursLogged = d.hoursLogged || 0;
+            state.completedSessions = d.completedSessions || 0;
+            state.dailyGoalHours = d.dailyGoalHours || 4;
+            state.todayDate = d.todayDate || getTodayDateStr();
+            state.todayHoursLogged = d.todayHoursLogged || 0;
+            state.todayQueue = Array.isArray(d.todayQueue) ? d.todayQueue : [];
+            state.stages = d.stages || {};
+            state.notes = d.notes || {};
+            ensureTodayReset();
+            await docRef.set({ lastActive: new Date().toISOString() }, { merge: true });
+            showToast(`أهلاً بعودتك، ${state.studentProfile.name.split(' ')[0]}!`);
+          }
+          document.getElementById('student-auth-modal').classList.add('hidden');
+          document.getElementById('stu-pass-input').value = '';
+          updateStudentHeaderUI();
+          saveLocalStudentState(false);
+          renderTimeline(); renderSubjects(); syncTimerDisplay(); updateKPIs();
+        } catch (err) {
+          errEl.textContent = 'حدث خطأ: ' + err.message;
+          errEl.classList.remove('hidden');
+        }
+      };
+
+      // Live Group Study Chat Handlers
+      updateChatAuthUI();
+      document.getElementById('chat-open-login-btn').onclick = () => openStudentAuthModal('login');
+      document.getElementById('chat-reply-cancel').onclick = clearChatReply;
+      document.querySelectorAll('.chat-filter-btn').forEach(b => b.onclick = () => {
+        shared.chatFilter = b.dataset.chatFilter;
+        document.querySelectorAll('.chat-filter-btn').forEach(x => {
+          const on = x.dataset.chatFilter === shared.chatFilter;
+          x.className = on ? 'chat-filter-btn tap-btn px-2.5 py-1 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer';
+          x.style.color = on ? '#fff' : 'var(--text-muted)';
+        });
+        renderChatMessages();
+      });
+      document.getElementById('chat-messages-list').onclick = (e) => {
+        const rep = e.target.closest('.chat-reply-btn');
+        if (rep) { setChatReply(rep.dataset.replyId); return; }
+        const rct = e.target.closest('.chat-react-btn');
+        if (rct) { toggleChatReaction(rct.dataset.reactId, rct.dataset.reactEmoji); }
+      };
+      document.getElementById('chat-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!canUserChat()) {
+          showToast('يرجى تسجيل الدخول بالاسم والكود الجامعي أولاً للمشاركة في الشات');
+          openStudentAuthModal('login');
+          return;
+        }
+        if (!fbDb) { showToast('تعذر الاتصال بـ Firestore'); return; }
+        const inp = document.getElementById('chat-message-input');
+        const text = inp.value.trim();
+        if (!text) return;
+        const actor = getCurrentChatActor();
+        const tag = document.getElementById('chat-tag-select').value;
+        inp.value = '';
+        const payload = {
+          senderId: actor.id,
+          senderName: actor.name,
+          isAdmin: actor.isAdmin,
+          tag,
+          text,
+          replyTo: shared.chatReplyTo || null,
+          reactions: { '👍': [], '💡': [], '❤️': [] },
+          createdAt: Date.now()
+        };
+        clearChatReply();
+        try {
+          await fbDb.collection('chat_messages').add(payload);
+          playSFX('check');
+        } catch (err) {
+          showToast('تعذر إرسال الرسالة: ' + err.message);
+        }
+      };
 
       // Firebase Admin Login
       document.getElementById('btn-admin-lock').onclick = () => {
         if (shared.isAdmin) { switchTab('admin'); return; }
+        document.getElementById('admin-email-input').value = '';
+        document.getElementById('admin-pass-input').value = '';
         document.getElementById('admin-login-error').classList.add('hidden');
         document.getElementById('admin-login-modal').classList.remove('hidden');
       };
@@ -1003,6 +1863,7 @@
         if (fbAuth) await fbAuth.signOut();
         switchTab('home'); showToast('تم تسجيل خروج الأدمن');
       };
+      document.getElementById('admin-student-search').oninput = renderAdminStudentsStats;
 
       // Seed Default Data to Firestore
       document.getElementById('btn-seed-firestore').onclick = async () => {
@@ -1085,7 +1946,7 @@
         state.todayQueue.push({ id: 'q-' + Date.now(), subject: wizData.subj, topicId: wizData.topicId, title: wizData.title || `جلسة ${wizData.subj}`, hasVideo: wizData.hasVideo, mode: wizData.mode, durationMins: est.total, pauseSec: 0, pauseCount: 0, done: false });
         document.getElementById('wiz-lecture-custom').value = '';
         document.getElementById('study-wizard-modal').classList.add('hidden');
-        saveLocalStudentState(); renderTimeline(); playSFX('check'); showToast('تمت إضافة الجلسة لجدول اليوم');
+        saveLocalStudentState(true); renderTimeline(); playSFX('check'); showToast('تمت إضافة الجلسة لجدول اليوم');
       };
 
       // Unified Timer Controls
@@ -1109,9 +1970,10 @@
           it.done = e.target.checked;
           if (it.done) {
             if (state.activeTaskId === it.id) { finishActiveTask(); return; }
+            state.completedSessions = (state.completedSessions || 0) + 1;
             playSFX('check'); triggerConfetti(); autoSyncTaskToChecklist(it);
           }
-          saveLocalStudentState(); renderTimeline();
+          saveLocalStudentState(true); renderTimeline();
         }
       };
       document.getElementById('timeline-rail').onclick = (e) => {
@@ -1119,12 +1981,12 @@
           const delId = e.target.dataset.qDel;
           if (state.activeTaskId === delId) { clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null; syncTimerDisplay(); }
           state.todayQueue = state.todayQueue.filter(x => x.id !== delId);
-          saveLocalStudentState(); renderTimeline();
+          saveLocalStudentState(true); renderTimeline();
         } else if (e.target.classList.contains('q-start-btn')) startTaskInTimer(e.target.dataset.qStart);
       };
       document.getElementById('btn-clear-today').onclick = () => {
         clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null;
-        state.todayQueue = []; saveLocalStudentState(); renderTimeline(); syncTimerDisplay();
+        state.todayQueue = []; saveLocalStudentState(true); renderTimeline(); syncTimerDisplay();
       };
 
       document.querySelectorAll('.ambient-btn').forEach(b => b.onclick = () => setAmbientSound(b.dataset.ambient));
@@ -1132,7 +1994,7 @@
       document.getElementById('btn-sos-burnout').onclick = () => document.getElementById('sos-modal').classList.remove('hidden');
       document.getElementById('sos-close').onclick = () => document.getElementById('sos-modal').classList.add('hidden');
 
-      // 4-Stage Syllabus Checklist (Student Local + Admin Cloud Sync)
+      // 4-Stage Syllabus Checklist
       document.getElementById('subjects-cards-grid').onclick = (e) => { const b = e.target.closest('.subj-card'); if (b) { state.activeSubject = b.dataset.subj; saveLocalStudentState(); renderSubjects(); } };
       document.getElementById('topic-search-input').oninput = renderSubjects;
       document.querySelectorAll('.topic-filter-btn').forEach(b => b.onclick = () => {
@@ -1145,7 +2007,7 @@
         const st = getTopicStage(e.target.dataset.stId);
         st[e.target.dataset.stKey] = e.target.checked;
         if (e.target.checked) { playSFX('check'); if (getTopicPct(e.target.dataset.stId) === 100) triggerConfetti(); }
-        saveLocalStudentState(); renderSubjects();
+        saveLocalStudentState(true); renderSubjects();
       };
       document.getElementById('topics-sections-container').oninput = (e) => {
         if (!e.target.classList.contains('topic-note-input')) return;
