@@ -45,7 +45,7 @@
       color: var(--text-main);
       min-height: 100vh;
       min-height: 100dvh;
-      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
       transition: background-color 0.3s ease, color 0.3s ease;
@@ -69,6 +69,8 @@
     .font-mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
     [dir="ltr"], .font-en { font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', sans-serif; }
     .med-icon-glow { box-shadow: 0 0 18px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     /* Ambient Dynamic Gradient Orbs (60fps GPU) */
     .ambient-bg {
@@ -215,33 +217,83 @@
     </div>
   </div>
 
-  <!-- Header -->
-  <header class="sticky top-0 z-40 safe-top-pad border-b px-3 sm:px-6 py-3 backdrop-blur-2xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
-      <div class="min-w-0 flex-1 flex items-center gap-3">
-        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
-          <svg class="w-6 h-6 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h3.5l2.2-5.5 3.3 11 2.4-6.5L16 12h5" />
-            <circle cx="19.5" cy="6.5" r="1.5" fill="#30d158" stroke="none" />
-          </svg>
-        </div>
-        <div class="min-w-0 flex-1">
+  <!-- Real-Time Broadcast Notification Top Toast -->
+  <div id="broadcast-toast" class="hidden fixed top-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-50 safe-top-pad">
+    <div id="broadcast-toast-card" class="apple-card modal-pop p-3.5 sm:p-4 border border-[#0a84ff]/50 shadow-2xl flex items-start justify-between gap-3">
+      <div class="flex items-start gap-2.5 min-w-0">
+        <span class="text-lg shrink-0">🔔</span>
+        <div class="min-w-0">
           <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="text-sm sm:text-lg font-extrabold tracking-tight truncate font-en" dir="ltr">
-              MNU Med • Sem 9
-            </h1>
-            <span id="cloud-sync-badge" class="px-2 py-0.5 rounded-full bg-slate-500/15 text-slate-400 text-[10px] font-semibold">وضع محلي</span>
-            <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">وضع الأدمن</span>
+            <span id="broadcast-toast-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0a84ff]/20 text-[#0a84ff]">إشعار جديد</span>
+            <h4 id="broadcast-toast-title" class="text-xs sm:text-sm font-extrabold truncate"></h4>
           </div>
-          <div class="text-[10px] sm:text-[11px] font-semibold truncate font-en" dir="ltr" style="color: var(--text-muted);">
-            Mansoura National University — Faculty of Medicine
+          <p id="broadcast-toast-body" class="text-xs mt-1 leading-relaxed" style="color: var(--text-muted);"></p>
+        </div>
+      </div>
+      <button type="button" id="broadcast-toast-close" class="tap-btn text-xs px-2 py-1 cursor-pointer shrink-0" style="color: var(--text-muted);">✕</button>
+    </div>
+  </div>
+
+  <!-- Header (2-Row Responsive Mobile Layout) -->
+  <header class="sticky top-0 z-40 safe-top-pad border-b px-3 sm:px-6 py-2.5 sm:py-3 backdrop-blur-2xl" style="background-color: var(--header-bg); border-color: var(--border-hairline);">
+    <div class="max-w-7xl mx-auto space-y-2">
+      <!-- Row 1: Brand + Compact Action Buttons -->
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0a84ff]/25 to-emerald-500/20 border border-[#0a84ff]/40 flex items-center justify-center shrink-0 med-icon-glow" aria-hidden="true">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h3.5l2.2-5.5 3.3 11 2.4-6.5L16 12h5" />
+              <circle cx="19.5" cy="6.5" r="1.5" fill="#30d158" stroke="none" />
+            </svg>
           </div>
-        <div class="text-[11px] flex items-center gap-2 flex-wrap mt-1" style="color: var(--text-muted);">
-          <span id="live-clock-str" class="font-mono-num font-semibold">--:--</span>
-          <span>•</span>
+          <div>
+            <h1 class="text-sm sm:text-lg font-extrabold tracking-tight whitespace-nowrap font-en" dir="ltr">MNU Med • Sem 9</h1>
+            <div class="hidden sm:block text-[11px] font-semibold font-en" dir="ltr" style="color: var(--text-muted);">Mansoura National University — Faculty of Medicine</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+          <!-- Notifications Bell -->
+          <button id="btn-notifications-bell" type="button" class="tap-btn relative p-2 rounded-full apple-subcard cursor-pointer" title="إشعارات الدفعة">
+            <svg class="w-4 h-4 text-[#0a84ff]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+            <span id="notif-unread-badge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-extrabold font-mono-num flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Student Auth / Greeting Button -->
+          <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+            <span id="student-header-label" class="max-w-[78px] sm:max-w-[150px] truncate">دخول</span>
+          </button>
+
+          <button id="btn-student-logout" type="button" class="hidden tap-btn px-2 py-1.5 rounded-full apple-subcard text-[10px] font-bold text-rose-400 cursor-pointer" title="تسجيل خروج / تبديل الحساب">خروج</button>
+
+          <button id="btn-admin-lock" type="button" class="tap-btn px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+            <span id="admin-lock-label" class="hidden sm:inline">Admin</span>
+          </button>
+
+          <button id="btn-theme-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
+            <svg class="w-4 h-4 text-[#0a84ff]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Row 2: Clean Single-Line Status Bar -->
+      <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar whitespace-nowrap py-1 px-2.5 rounded-xl apple-subcard text-[11px]" style="color: var(--text-muted);">
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="cloud-sync-badge" class="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            <span>محلي</span>
+          </span>
+          <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">Admin</span>
+          <span class="hidden sm:inline">•</span>
+          <span id="live-clock-str" class="hidden sm:inline font-mono-num font-semibold">--:--</span>
+        </div>
+
+        <div class="flex items-center gap-2.5 shrink-0">
           <span id="header-hours-badge" class="text-emerald-400 font-bold font-mono-num">0.0h مذاكرة</span>
           <span>•</span>
-          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/12 border border-emerald-500/25 text-emerald-400 text-[10px] font-bold">
+          <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold">
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -250,26 +302,6 @@
             <span id="live-studying-count" class="font-mono-num font-extrabold">41</span>
           </span>
         </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <!-- Student Auth / Greeting Button -->
-        <button id="btn-student-auth" type="button" class="tap-btn px-3 py-2 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1.5 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
-          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-          <span id="student-header-label" class="max-w-[115px] sm:max-w-[160px] truncate">تسجيل الدخول</span>
-        </button>
-
-        <button id="btn-student-logout" type="button" class="hidden tap-btn px-2.5 py-2 rounded-full apple-subcard text-[10px] font-bold text-rose-400 cursor-pointer" title="تسجيل خروج / تبديل الحساب">خروج</button>
-
-        <button id="btn-theme-toggle" type="button" class="tap-btn p-2.5 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
-          <svg class="w-4 h-4 text-[#0a84ff]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
-        </button>
-
-        <button id="btn-admin-lock" type="button" class="tap-btn px-2.5 sm:px-3 py-2 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-          <span id="admin-lock-label">Admin</span>
-        </button>
       </div>
     </div>
 
@@ -498,6 +530,24 @@
       </div>
 
       <div class="apple-card flex flex-col overflow-hidden">
+        <!-- Pinned Message Bar -->
+        <div id="chat-pinned-bar" class="hidden px-3.5 py-2.5 border-b bg-amber-500/10 flex items-center justify-between gap-2" style="border-color: var(--border-hairline);">
+          <div class="flex items-center gap-2 min-w-0 text-xs">
+            <span class="shrink-0">📌</span>
+            <div class="min-w-0 truncate">
+              <span class="font-bold text-amber-400" id="chat-pinned-sender"></span>:
+              <span id="chat-pinned-text" style="color: var(--text-main);"></span>
+            </div>
+          </div>
+          <button type="button" id="chat-unpin-btn" class="hidden tap-btn text-xs px-2 py-0.5 text-rose-400 font-bold cursor-pointer shrink-0">إلغاء التثبيت</button>
+        </div>
+
+        <!-- Moderation Bot Warning Alert -->
+        <div id="chat-bot-warning" class="hidden px-4 py-2.5 border-b bg-rose-500/15 text-rose-300 text-xs font-bold flex items-center justify-between gap-2" style="border-color: var(--border-hairline);">
+          <span id="chat-bot-warning-text"></span>
+          <button type="button" id="chat-bot-warning-close" class="tap-btn text-xs px-2 py-0.5 cursor-pointer">✕</button>
+        </div>
+
         <div id="chat-messages-list" class="h-[50dvh] sm:h-[54dvh] overflow-y-auto custom-scroll p-3.5 sm:p-5 space-y-3">
           <div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">جاري تحميل رسائل غرفة المذاكرة...</div>
         </div>
@@ -517,6 +567,18 @@
           <button type="button" id="chat-reply-cancel" class="tap-btn px-2 py-1 text-xs font-bold text-rose-400 cursor-pointer">✕</button>
         </div>
 
+        <!-- Image Attachment Preview Bar -->
+        <div id="chat-img-preview-bar" class="hidden px-4 py-2.5 border-t flex items-center justify-between gap-3 bg-[#0a84ff]/10" style="border-color: var(--border-hairline);">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <img id="chat-img-thumb" src="" alt="معاينة" class="w-12 h-12 rounded-xl object-cover border border-white/20 shrink-0" />
+            <div class="min-w-0 text-xs">
+              <div class="font-bold text-[#0a84ff]">صورة جاهزة للإرسال</div>
+              <div id="chat-img-size" class="font-mono-num text-[11px]" style="color: var(--text-muted);">-- KB</div>
+            </div>
+          </div>
+          <button type="button" id="chat-img-cancel" class="tap-btn px-2.5 py-1 text-xs font-bold text-rose-400 cursor-pointer shrink-0">✕</button>
+        </div>
+
         <!-- Chat Input Form -->
         <form id="chat-form" class="p-3 sm:p-4 border-t flex flex-wrap sm:flex-nowrap items-center gap-2" style="border-color: var(--border-hairline);">
           <select id="chat-tag-select" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-bold focus:outline-none shrink-0">
@@ -526,7 +588,9 @@
             <option value="EBMR">EBMR</option>
             <option value="FMIMC">Family Med</option>
           </select>
-          <input id="chat-message-input" type="text" placeholder="اكتب سؤالك أو مشاركتك هنا..." class="flex-1 min-w-[160px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" />
+          <input id="chat-img-input" type="file" accept="image/*" class="hidden" />
+          <button type="button" id="chat-img-btn" class="tap-btn px-3 py-2.5 rounded-xl apple-subcard text-base leading-none cursor-pointer shrink-0" title="إرسال صورة">📷</button>
+          <input id="chat-message-input" type="text" placeholder="اكتب سؤالك أو مشاركتك هنا..." class="flex-1 min-w-[140px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" />
           <button type="submit" id="chat-send-btn" class="tap-btn px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer shrink-0">إرسال</button>
         </form>
       </div>
@@ -560,6 +624,40 @@
         </div>
 
         <div id="admin-students-list" class="space-y-2.5 max-h-[420px] overflow-y-auto custom-scroll pr-0.5"></div>
+      </div>
+
+      <!-- Admin Broadcast Notifications (shared/notifications) -->
+      <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-500">
+        <div>
+          <h2 class="text-base font-bold">إرسال إشعار للدفعة (Notifications Live)</h2>
+          <p class="text-xs" style="color: var(--text-muted);">يصل فوراً للطلبة كإشعار منبثق أعلى الشاشة ويُحفظ في أيقونة الجرس.</p>
+        </div>
+        <form id="admin-broadcast-form" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <input id="admin-notif-title" type="text" placeholder="عنوان الإشعار..." class="sm:col-span-2 px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+            <select id="admin-notif-priority" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold">
+              <option value="normal">عادي</option>
+              <option value="urgent">هام جداً</option>
+            </select>
+          </div>
+          <div class="flex flex-wrap gap-2.5">
+            <input id="admin-notif-body" type="text" placeholder="نص الرسالة..." class="flex-1 min-w-[200px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+            <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إرسال الإشعار الآن</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Smart Moderation Bot Settings (shared/moderation) -->
+      <div class="apple-card p-5 sm:p-6 space-y-4">
+        <div>
+          <h2 class="text-base font-bold">إعدادات بوت المراقبة (كلمات محظورة إضافية)</h2>
+          <p class="text-xs" style="color: var(--text-muted);">أضف كلمات جديدة لمنعها تلقائياً في غرفة المذاكرة الجماعية.</p>
+        </div>
+        <form id="admin-mod-form" class="flex flex-wrap gap-2.5">
+          <input id="admin-mod-word-input" type="text" placeholder="أضف كلمة محظورة..." class="flex-1 min-w-[180px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+          <button type="submit" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">+ إضافة للفلتر</button>
+        </form>
+        <div id="admin-mod-words-list" class="flex flex-wrap gap-2"></div>
       </div>
 
       <!-- Batch Announcement -->
@@ -717,6 +815,23 @@
     </div>
   </div>
 
+  <!-- Notifications History Modal -->
+  <div id="notifications-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 max-h-[85dvh] flex flex-col">
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
+        <h3 class="text-base font-bold">إشعارات الدفعة</h3>
+        <button type="button" id="notifications-modal-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
+      </div>
+      <div id="notifications-history-list" class="flex-1 overflow-y-auto custom-scroll space-y-2.5"></div>
+    </div>
+  </div>
+
+  <!-- Chat Image Lightbox Modal -->
+  <div id="chat-lightbox-modal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <button type="button" id="chat-lightbox-close" class="tap-btn fixed top-5 left-5 z-50 w-10 h-10 rounded-full bg-white/15 text-white text-lg font-bold flex items-center justify-center cursor-pointer">✕</button>
+    <img id="chat-lightbox-img" src="" alt="صورة مكبرة" class="modal-pop max-w-full max-h-[88dvh] rounded-2xl shadow-2xl object-contain" />
+  </div>
+
   <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
 
   <script>
@@ -857,7 +972,10 @@
       todayHoursLogged: 0,
       bellEnabled: true,
       studentProfile: null, // { studentId, name }
-      guestDismissed: false
+      guestDismissed: false,
+      modWarnings: 0,
+      modMutedUntil: 0,
+      lastNotifReadAt: 0
     };
 
     let shared = {
@@ -869,7 +987,11 @@
       studentsList: [],
       chatMessages: [],
       chatFilter: 'ALL',
-      chatReplyTo: null
+      chatReplyTo: null,
+      chatPendingImage: null,
+      pinnedChat: null,
+      customBannedWords: [],
+      notifications: []
     };
 
     let studentsUnsub = null;
@@ -974,7 +1096,7 @@
         logoutBtn.classList.remove('hidden');
         if (hint) hint.textContent = `متزامن (${state.studentProfile.studentId})`;
       } else {
-        label.textContent = 'تسجيل الدخول';
+        label.textContent = 'دخول';
         logoutBtn.classList.add('hidden');
         if (hint) hint.textContent = 'محفوظ على جهازك';
       }
@@ -1064,7 +1186,68 @@
     }
 
 
-    // Live Group Study Chat (Firestore chat_messages)
+    // =========================================================================
+    // Smart Moderation Bot (Arabic + English + Franco-Arabic)
+    // =========================================================================
+    const DEFAULT_BANNED_WORDS = [
+      // Arabic
+      'كس', 'كسمك', 'كسم', 'احا', 'أحا', 'خول', 'متناك', 'منيك', 'شرموط', 'شرموطة', 'شرموطه',
+      'عرص', 'معرص', 'ابن الوسخة', 'وسخ', 'زبالة', 'كلب', 'حمار', 'غبي', 'تافه', 'قحبة', 'قحبه',
+      'لبوة', 'لبوه', 'مخنث', 'نجس', 'حقير', 'سافل', 'منحط', 'زبي', 'زب', 'طيز', 'نيك', 'انيك',
+      'يتناك', 'بضان', 'مبضون', 'فشخ', 'هفشخك', 'يلعن', 'ملعون', 'دين امك', 'كفر',
+      // Franco-Arabic
+      'a7a', 'a7eh', 'ksmk', 'kosomk', 'kosomak', '5awal', 'khawal', 'mtnak', 'metnak', 'sharmota',
+      'sharmoota', '3ars', 'aars', 'ma3ras', 'b7b', 'zeby', 'zebi', 'teez', 'tiz', 'neek', 'badaan',
+      'badan', 'fash5', 'fashkh', 'ibn el kalb', 'wes5a', 'weskha',
+      // English
+      'fuck', 'fucking', 'fck', 'fuk', 'shit', 'bitch', 'asshole', 'bastard', 'dick', 'pussy',
+      'cunt', 'whore', 'slut', 'motherfucker', 'mf', 'retard', 'idiot', 'dumbass', 'stfu', 'kys'
+    ];
+
+    function normalizeModText(text) {
+      let s = String(text || '').toLowerCase();
+      s = s.replace(/[\u064B-\u065F\u0670]/g, ''); // strip Arabic tashkeel
+      s = s.replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
+      s = s.replace(/[._\-*~`|/\\]+/g, '');
+      const strippedSpaces = s.replace(/\s+/g, '');
+      const collapsedRepeats = s.replace(/(.)\1+/g, '$1');
+      const collapsedNoSpaces = strippedSpaces.replace(/(.)\1+/g, '$1');
+      return { raw: s, noSpaces: strippedSpaces, collapsed: collapsedRepeats, collapsedNoSpaces };
+    }
+
+    function containsBannedWord(text) {
+      const allWords = [...DEFAULT_BANNED_WORDS, ...(shared.customBannedWords || [])].filter(Boolean);
+      const norm = normalizeModText(text);
+      const tokens = norm.raw.split(/\s+/);
+      for (const word of allWords) {
+        const wNorm = normalizeModText(word);
+        if (!wNorm.collapsedNoSpaces || wNorm.collapsedNoSpaces.length < 2) continue;
+        // Exact token or collapsed-repeat token match
+        for (const tok of tokens) {
+          const tCol = tok.replace(/(.)\1+/g, '$1');
+          if (tok === wNorm.raw || tCol === wNorm.collapsedNoSpaces) return word;
+        }
+        // Check bypass via spacing for words >= 3 chars
+        if (wNorm.collapsedNoSpaces.length >= 3) {
+          if (norm.noSpaces.includes(wNorm.noSpaces) || norm.collapsedNoSpaces.includes(wNorm.collapsedNoSpaces)) {
+            return word;
+          }
+        }
+      }
+      return null;
+    }
+
+    function showBotWarning(msg) {
+      const box = document.getElementById('chat-bot-warning');
+      const txt = document.getElementById('chat-bot-warning-text');
+      if (!box || !txt) return;
+      txt.textContent = msg;
+      box.classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // Live Group Study Chat (Firestore chat_messages + shared/chat_meta)
+    // =========================================================================
     function escapeHtml(str) {
       return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
@@ -1085,6 +1268,40 @@
       if (!guestBanner) return;
       guestBanner.classList.toggle('hidden', canUserChat());
     }
+    function getAvatarColor(name) {
+      const colors = ['#0a84ff', '#30d158', '#bf5af2', '#ff9f0a', '#ff375f', '#38bdf8'];
+      let hash = 0;
+      const s = String(name || 'A');
+      for (let i = 0; i < s.length; i++) hash = s.charCodeAt(i) + ((hash << 5) - hash);
+      return colors[Math.abs(hash) % colors.length];
+    }
+    function renderPinnedBar() {
+      const bar = document.getElementById('chat-pinned-bar');
+      const unpinBtn = document.getElementById('chat-unpin-btn');
+      if (!bar) return;
+      if (!shared.pinnedChat || !shared.pinnedChat.text) {
+        bar.classList.add('hidden');
+        return;
+      }
+      bar.classList.remove('hidden');
+      document.getElementById('chat-pinned-sender').textContent = shared.pinnedChat.senderName || 'Admin';
+      document.getElementById('chat-pinned-text').textContent = shared.pinnedChat.text;
+      if (unpinBtn) unpinBtn.classList.toggle('hidden', !shared.isAdmin);
+    }
+    function renderAdminModWords() {
+      const wrap = document.getElementById('admin-mod-words-list');
+      if (!wrap) return;
+      if (!shared.customBannedWords.length) {
+        wrap.innerHTML = `<span class="text-xs" style="color: var(--text-muted);">لا توجد كلمات مضافة يدوياً (الفلتر الافتراضي نشط).</span>`;
+        return;
+      }
+      wrap.innerHTML = shared.customBannedWords.map(w => `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-subcard text-xs font-semibold">
+          <span>${escapeHtml(w)}</span>
+          <button type="button" data-del-mod="${escapeHtml(w)}" class="del-mod-word-btn text-rose-400 font-bold cursor-pointer">✕</button>
+        </span>
+      `).join('');
+    }
     function initChatListener() {
       if (!fbDb) return;
       fbDb.collection('chat_messages').orderBy('createdAt', 'asc').limitToLast(100).onSnapshot(snap => {
@@ -1092,6 +1309,14 @@
         snap.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
         shared.chatMessages = msgs;
         renderChatMessages();
+      }, () => {});
+      fbDb.collection('shared').doc('chat_meta').onSnapshot(doc => {
+        shared.pinnedChat = doc.exists ? doc.data().pinned : null;
+        renderPinnedBar();
+      }, () => {});
+      fbDb.collection('shared').doc('moderation').onSnapshot(doc => {
+        shared.customBannedWords = (doc.exists && Array.isArray(doc.data().customWords)) ? doc.data().customWords : [];
+        renderAdminModWords();
       }, () => {});
     }
     function renderChatMessages() {
@@ -1121,32 +1346,97 @@
           return `<button type="button" data-react-id="${m.id}" data-react-emoji="${em}" class="chat-react-btn tap-btn px-2 py-0.5 rounded-full text-[11px] flex items-center gap-1 cursor-pointer border ${active ? 'bg-[#0a84ff]/25 border-[#0a84ff]/50 text-[#0a84ff] font-bold' : 'apple-card border-transparent opacity-80 hover:opacity-100'}"><span>${em}</span>${arr.length ? `<span class="font-mono-num text-[10px]">${arr.length}</span>` : ''}</button>`;
         }).join('');
         const replyHtml = m.replyTo ? `
-          <div class="mb-2 px-2.5 py-1.5 rounded-xl bg-black/20 border-r-2 border-r-[#0a84ff] text-[11px]">
+          <div class="mb-2 px-2.5 py-1.5 rounded-xl bg-black/25 border-r-2 border-r-[#0a84ff] text-[11px]">
             <div class="font-bold text-[#0a84ff]">${escapeHtml(m.replyTo.senderName)}</div>
             <div class="truncate opacity-80">${escapeHtml(m.replyTo.text)}</div>
           </div>` : '';
+        const initial = (m.senderName || 'ط').trim().charAt(0).toUpperCase();
+        const avColor = getAvatarColor(m.senderName);
+        const bubbleStyle = m.isAdmin
+          ? 'border-amber-500/45 bg-amber-500/10'
+          : isMine
+            ? 'border-[#0a84ff]/45 bg-[#0a84ff]/15 rounded-tl-sm'
+            : 'rounded-tr-sm';
         return `
-          <div class="stagger-item flex flex-col ${isMine ? 'items-start' : 'items-end'}" style="--i:${Math.min(idx, 10)}">
-            <div class="max-w-[88%] sm:max-w-[75%] apple-subcard p-3 sm:p-3.5 space-y-1.5 ${m.isAdmin ? 'border-amber-500/45 bg-amber-500/5' : isMine ? 'border-[#0a84ff]/40 bg-[#0a84ff]/10' : ''}">
+          <div class="stagger-item flex items-end gap-2 ${isMine ? 'flex-row' : 'flex-row-reverse'}" style="--i:${Math.min(idx, 10)}">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 shadow-md" style="background:${avColor};">${escapeHtml(initial)}</div>
+            <div class="max-w-[82%] sm:max-w-[70%] apple-subcard p-3 sm:p-3.5 space-y-1.5 ${bubbleStyle}">
               <div class="flex items-center justify-between gap-2 flex-wrap text-[11px]">
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="font-extrabold ${m.isAdmin ? 'text-amber-400' : 'text-[#0a84ff]'}">${escapeHtml(m.senderName || 'طالب')}</span>
-                  ${m.isAdmin ? `<span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[9px] font-extrabold">Admin</span>` : ''}
+                  ${m.isAdmin ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[9px] font-extrabold">Admin</span>` : ''}
                   <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${tagColors[m.tag] || tagColors['عام']}">${escapeHtml(m.tag || 'عام')}</span>
                 </div>
                 <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
               </div>
               ${replyHtml}
-              <div class="text-xs sm:text-sm leading-relaxed break-words">${escapeHtml(m.text)}</div>
+              ${m.imageData ? `<div class="pt-0.5"><img src="${m.imageData}" alt="صورة مرفقة" class="chat-msg-img max-h-64 w-auto max-w-full rounded-xl border border-white/10 object-cover cursor-pointer hover:opacity-95 transition" /></div>` : ''}
+              ${m.text ? `<div class="text-xs sm:text-sm leading-relaxed break-words">${escapeHtml(m.text)}</div>` : ''}
               <div class="flex items-center justify-between gap-2 pt-1 flex-wrap">
                 <div class="flex items-center gap-1">${reactHtml}</div>
-                <button type="button" data-reply-id="${m.id}" class="chat-reply-btn tap-btn text-[11px] font-semibold px-2 py-0.5 rounded-lg hover:bg-white/10 cursor-pointer" style="color: var(--text-muted);">رد</button>
+                <div class="flex items-center gap-1">
+                  <button type="button" data-reply-id="${m.id}" class="chat-reply-btn tap-btn text-[11px] font-semibold px-2 py-0.5 rounded-lg hover:bg-white/10 cursor-pointer" style="color: var(--text-muted);">رد</button>
+                  ${shared.isAdmin ? `<button type="button" data-pin-id="${m.id}" class="chat-pin-btn tap-btn text-[11px] px-1.5 py-0.5 rounded-lg hover:bg-amber-500/20 cursor-pointer" title="تثبيت">📌</button><button type="button" data-del-chat="${m.id}" class="chat-del-btn tap-btn text-[11px] px-1.5 py-0.5 rounded-lg hover:bg-rose-500/20 cursor-pointer" title="حذف الرسالة">🗑️</button>` : ''}
+                </div>
               </div>
             </div>
           </div>`;
       }).join('');
       wrap.scrollTop = wrap.scrollHeight;
     }
+    function compressImageToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('تعذر قراءة الصورة'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('ملف صورة غير صالح'));
+          img.onload = () => {
+            const maxW = 900;
+            let w = img.width, h = img.height;
+            if (w > maxW) {
+              h = Math.round((h * maxW) / w);
+              w = maxW;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            const maxBytes = 250 * 1024;
+            let quality = 0.7;
+            let dataUrl = canvas.toDataURL('image/webp', quality);
+            if (!dataUrl.startsWith('data:image/webp')) {
+              dataUrl = canvas.toDataURL('image/jpeg', quality);
+            }
+            const mime = dataUrl.startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg';
+            while (dataUrl.length * 0.75 > maxBytes && quality > 0.25) {
+              quality -= 0.12;
+              dataUrl = canvas.toDataURL(mime, quality);
+            }
+            if (dataUrl.length * 0.75 > maxBytes) {
+              const scale = 0.7;
+              canvas.width = Math.round(w * scale);
+              canvas.height = Math.round(h * scale);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              dataUrl = canvas.toDataURL(mime, 0.6);
+            }
+            resolve(dataUrl);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    function clearChatPendingImage() {
+      shared.chatPendingImage = null;
+      const bar = document.getElementById('chat-img-preview-bar');
+      const inp = document.getElementById('chat-img-input');
+      if (bar) bar.classList.add('hidden');
+      if (inp) inp.value = '';
+    }
+
     function setChatReply(msgId) {
       const m = shared.chatMessages.find(x => x.id === msgId);
       if (!m) return;
@@ -1181,18 +1471,69 @@
       } catch (e) {}
     }
 
+    // =========================================================================
+    // Broadcast Notifications (shared/notifications)
+    // =========================================================================
+    let notifBooted = false;
+    let broadcastToastTimer = null;
+    function updateNotifBadgeAndList() {
+      const badge = document.getElementById('notif-unread-badge');
+      const listEl = document.getElementById('notifications-history-list');
+      const items = [...(shared.notifications || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      const unread = items.filter(n => (n.createdAt || 0) > (state.lastNotifReadAt || 0)).length;
+      if (badge) {
+        badge.textContent = unread > 9 ? '9+' : String(unread);
+        badge.classList.toggle('hidden', unread === 0);
+      }
+      if (listEl) {
+        if (!items.length) {
+          listEl.innerHTML = `<div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">لا توجد إشعارات من الإدارة حالياً.</div>`;
+        } else {
+          listEl.innerHTML = items.map(n => {
+            const tStr = n.createdAt ? new Date(n.createdAt).toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+            const isUrg = n.priority === 'urgent';
+            return `
+              <div class="apple-subcard p-3.5 space-y-1 ${isUrg ? 'border-rose-500/45 bg-rose-500/10' : ''}">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isUrg ? 'bg-rose-500/20 text-rose-400' : 'bg-[#0a84ff]/20 text-[#0a84ff]'}">${isUrg ? 'هام جداً' : 'عادي'}</span>
+                  <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
+                </div>
+                <div class="text-xs sm:text-sm font-bold">${escapeHtml(n.title)}</div>
+                <div class="text-xs leading-relaxed" style="color: var(--text-muted);">${escapeHtml(n.body)}</div>
+              </div>`;
+          }).join('');
+        }
+      }
+    }
+    function showBroadcastTopToast(n) {
+      const wrap = document.getElementById('broadcast-toast');
+      const card = document.getElementById('broadcast-toast-card');
+      const badge = document.getElementById('broadcast-toast-badge');
+      if (!wrap || !n) return;
+      const isUrg = n.priority === 'urgent';
+      badge.textContent = isUrg ? 'إشعار هام جداً' : 'إشعار للدفعة';
+      badge.className = `px-2 py-0.5 rounded text-[10px] font-bold ${isUrg ? 'bg-rose-500/20 text-rose-400' : 'bg-[#0a84ff]/20 text-[#0a84ff]'}`;
+      card.className = `apple-card modal-pop p-3.5 sm:p-4 shadow-2xl flex items-start justify-between gap-3 border ${isUrg ? 'border-rose-500/60' : 'border-[#0a84ff]/50'}`;
+      document.getElementById('broadcast-toast-title').textContent = n.title || '';
+      document.getElementById('broadcast-toast-body').textContent = n.body || '';
+      wrap.classList.remove('hidden');
+      playSFX('check');
+      clearTimeout(broadcastToastTimer);
+      broadcastToastTimer = setTimeout(() => wrap.classList.add('hidden'), 6500);
+    }
+
     function initFirebaseSync() {
       const badge = document.getElementById('cloud-sync-badge');
       if (!isFirebaseReady()) {
-        badge.textContent = 'وضع محلي (أضف firebaseConfig)';
+        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>محلي</span>';
         return;
       }
       try {
         if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
         fbAuth = firebase.auth();
         fbDb = firebase.firestore();
-        badge.textContent = 'متصل بـ Firestore Live';
-        badge.className = 'px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold';
+        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>Live</span>';
+        badge.className = 'inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-400';
 
         fbDb.collection('shared').doc('exams').onSnapshot(doc => {
           if (doc.exists && Array.isArray(doc.data().items)) {
@@ -1213,6 +1554,17 @@
           }
         });
 
+        fbDb.collection('shared').doc('notifications').onSnapshot(doc => {
+          const prevCount = (shared.notifications || []).length;
+          const items = (doc.exists && Array.isArray(doc.data().items)) ? doc.data().items : [];
+          shared.notifications = items;
+          updateNotifBadgeAndList();
+          if (notifBooted && items.length > prevCount) {
+            const latest = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+            if (latest && (latest.createdAt || 0) > (state.lastNotifReadAt || 0)) showBroadcastTopToast(latest);
+          }
+          notifBooted = true;
+        }, () => {});
         loadStudentFromFirestoreOnBoot();
         initChatListener();
 
@@ -1323,6 +1675,8 @@
       renderExamsTimeline();
       renderSubjects();
       updateChatAuthUI();
+      renderChatMessages();
+      renderPinnedBar();
     }
 
     function renderNoticeBar() {
@@ -1795,11 +2149,71 @@
         });
         renderChatMessages();
       });
-      document.getElementById('chat-messages-list').onclick = (e) => {
+      document.getElementById('chat-bot-warning-close').onclick = () => document.getElementById('chat-bot-warning').classList.add('hidden');
+      document.getElementById('chat-unpin-btn').onclick = async () => {
+        if (!shared.isAdmin || !fbDb) return;
+        await fbDb.collection('shared').doc('chat_meta').set({ pinned: null }, { merge: true });
+        showToast('تم إلغاء تثبيت الرسالة');
+      };
+      document.getElementById('chat-img-btn').onclick = () => {
+        if (!canUserChat()) {
+          showToast('يرجى تسجيل الدخول أولاً لإرسال الصور');
+          openStudentAuthModal('login');
+          return;
+        }
+        document.getElementById('chat-img-input').click();
+      };
+      document.getElementById('chat-img-cancel').onclick = clearChatPendingImage;
+      document.getElementById('chat-img-input').onchange = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+          const dataUrl = await compressImageToDataURL(file);
+          const kb = Math.round((dataUrl.length * 0.75) / 1024);
+          if (kb > 250) {
+            showToast('حجم الصورة كبير جداً حتى بعد الضغط، جرب صورة أخرى');
+            clearChatPendingImage();
+            return;
+          }
+          shared.chatPendingImage = dataUrl;
+          document.getElementById('chat-img-thumb').src = dataUrl;
+          document.getElementById('chat-img-size').textContent = `${kb} KB (مضغوطة)`;
+          document.getElementById('chat-img-preview-bar').classList.remove('hidden');
+        } catch (err) {
+          showToast(err.message || 'تعذر تجهيز الصورة');
+          clearChatPendingImage();
+        }
+      };
+      document.getElementById('chat-lightbox-close').onclick = () => document.getElementById('chat-lightbox-modal').classList.add('hidden');
+      document.getElementById('chat-lightbox-modal').onclick = (e) => {
+        if (e.target.id === 'chat-lightbox-modal') document.getElementById('chat-lightbox-modal').classList.add('hidden');
+      };
+
+      document.getElementById('chat-messages-list').onclick = async (e) => {
+        const imgEl = e.target.closest('.chat-msg-img');
+        if (imgEl) {
+          document.getElementById('chat-lightbox-img').src = imgEl.src;
+          document.getElementById('chat-lightbox-modal').classList.remove('hidden');
+          return;
+        }
         const rep = e.target.closest('.chat-reply-btn');
         if (rep) { setChatReply(rep.dataset.replyId); return; }
         const rct = e.target.closest('.chat-react-btn');
-        if (rct) { toggleChatReaction(rct.dataset.reactId, rct.dataset.reactEmoji); }
+        if (rct) { toggleChatReaction(rct.dataset.reactId, rct.dataset.reactEmoji); return; }
+        const del = e.target.closest('.chat-del-btn');
+        if (del && shared.isAdmin && fbDb) {
+          await fbDb.collection('chat_messages').doc(del.dataset.delChat).delete();
+          showToast('تم حذف الرسالة');
+          return;
+        }
+        const pin = e.target.closest('.chat-pin-btn');
+        if (pin && shared.isAdmin && fbDb) {
+          const msg = shared.chatMessages.find(x => x.id === pin.dataset.pinId);
+          if (msg) {
+            await fbDb.collection('shared').doc('chat_meta').set({ pinned: { id: msg.id, senderName: msg.senderName, text: msg.text } }, { merge: true });
+            showToast('تم تثبيت الرسالة في أعلى الغرفة');
+          }
+        }
       };
       document.getElementById('chat-form').onsubmit = async (e) => {
         e.preventDefault();
@@ -1808,10 +2222,32 @@
           openStudentAuthModal('login');
           return;
         }
+        // Check temporary 10-minute mute
+        if (!shared.isAdmin && state.modMutedUntil && Date.now() < state.modMutedUntil) {
+          const remMins = Math.ceil((state.modMutedUntil - Date.now()) / 60000);
+          showBotWarning(`🤖 مشرف الغرفة: تم تقييدك مؤقتاً من الكتابة لمدة ${remMins} دقيقة بسبب تكرار المخالفات.`);
+          return;
+        }
         if (!fbDb) { showToast('تعذر الاتصال بـ Firestore'); return; }
         const inp = document.getElementById('chat-message-input');
         const text = inp.value.trim();
-        if (!text) return;
+        const imageData = shared.chatPendingImage || null;
+        if (!text && !imageData) return;
+
+        // Smart Moderation Bot Check
+        if (!shared.isAdmin && containsBannedWord(text)) {
+          state.modWarnings = (state.modWarnings || 0) + 1;
+          if (state.modWarnings >= 3) {
+            state.modMutedUntil = Date.now() + 10 * 60 * 1000;
+            state.modWarnings = 0;
+            showBotWarning('🤖 مشرف الغرفة: تم منع رسالتك، وبسبب تكرار الألفاظ غير اللائقة (3 مرات) تم منعك من الكتابة لمدة 10 دقائق.');
+          } else {
+            showBotWarning(`🤖 مشرف الغرفة: تم منع رسالتك لاحتوائها على ألفاظ غير لائقة. يرجى الالتزام بأسلوب محترم للمذاكرة (تنبيه ${state.modWarnings}/3).`);
+          }
+          saveLocalStudentState();
+          return;
+        }
+
         const actor = getCurrentChatActor();
         const tag = document.getElementById('chat-tag-select').value;
         inp.value = '';
@@ -1821,17 +2257,61 @@
           isAdmin: actor.isAdmin,
           tag,
           text,
+          imageData,
           replyTo: shared.chatReplyTo || null,
           reactions: { '👍': [], '💡': [], '❤️': [] },
           createdAt: Date.now()
         };
         clearChatReply();
+        clearChatPendingImage();
         try {
           await fbDb.collection('chat_messages').add(payload);
           playSFX('check');
         } catch (err) {
           showToast('تعذر إرسال الرسالة: ' + err.message);
         }
+      };
+
+      // Broadcast Notifications & Bell Modal Handlers
+      updateNotifBadgeAndList();
+      document.getElementById('broadcast-toast-close').onclick = () => document.getElementById('broadcast-toast').classList.add('hidden');
+      document.getElementById('btn-notifications-bell').onclick = () => {
+        state.lastNotifReadAt = Date.now();
+        saveLocalStudentState();
+        updateNotifBadgeAndList();
+        document.getElementById('notifications-modal').classList.remove('hidden');
+      };
+      document.getElementById('notifications-modal-close').onclick = () => document.getElementById('notifications-modal').classList.add('hidden');
+      document.getElementById('admin-broadcast-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!shared.isAdmin || !fbDb) return;
+        const title = document.getElementById('admin-notif-title').value.trim();
+        const body = document.getElementById('admin-notif-body').value.trim();
+        const priority = document.getElementById('admin-notif-priority').value;
+        if (!title || !body) return;
+        const nextItems = [{ id: 'n-' + Date.now(), title, body, priority, createdAt: Date.now() }, ...(shared.notifications || [])].slice(0, 30);
+        document.getElementById('admin-notif-title').value = '';
+        document.getElementById('admin-notif-body').value = '';
+        await saveSharedToFirestore('notifications', { items: nextItems });
+        showToast('تم إرسال الإشعار لجميع الطلبة فوراً!');
+      };
+
+      // Admin Moderation Custom Words Handlers
+      document.getElementById('admin-mod-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!shared.isAdmin || !fbDb) return;
+        const w = document.getElementById('admin-mod-word-input').value.trim();
+        if (!w) return;
+        const next = Array.from(new Set([...(shared.customBannedWords || []), w]));
+        document.getElementById('admin-mod-word-input').value = '';
+        await saveSharedToFirestore('moderation', { customWords: next });
+        showToast('تمت إضافة الكلمة لقائمة الحظر');
+      };
+      document.getElementById('admin-mod-words-list').onclick = async (e) => {
+        const btn = e.target.closest('.del-mod-word-btn');
+        if (!btn || !shared.isAdmin || !fbDb) return;
+        const next = (shared.customBannedWords || []).filter(x => x !== btn.dataset.delMod);
+        await saveSharedToFirestore('moderation', { customWords: next });
       };
 
       // Firebase Admin Login
