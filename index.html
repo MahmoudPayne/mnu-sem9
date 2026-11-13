@@ -76,6 +76,16 @@
     .font-mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
     [dir="ltr"], .font-en { font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', sans-serif; }
     .med-icon-glow { box-shadow: 0 0 18px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    @keyframes bellSwing {
+      0%, 60%, 100% { transform: rotate(0deg); }
+      10% { transform: rotate(14deg); }
+      20% { transform: rotate(-12deg); }
+      30% { transform: rotate(9deg); }
+      40% { transform: rotate(-6deg); }
+      50% { transform: rotate(3deg); }
+    }
+    .bell-anim-svg { transform-origin: 12px 3px; animation: bellSwing 2.8s ease-in-out infinite; }
+    .bell-anim-svg.bell-urgent { animation-duration: 1.5s; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -287,12 +297,14 @@
           <span id="admin-active-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">Admin</span>
 
           <button id="btn-notifications-bell" type="button" class="tap-btn relative p-2 rounded-full apple-subcard cursor-pointer" title="إشعارات الدفعة">
-            <i data-lucide="bell" class="w-4 h-4 text-[#0a84ff]"></i>
+            <svg id="bell-icon-svg" class="w-4 h-4 text-[#38bdf8] bell-anim-svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+            </svg>
             <span id="notif-unread-badge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-extrabold font-mono-num flex items-center justify-center">0</span>
           </button>
 
-          <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
-            <i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>
+          <button id="btn-student-auth" type="button" class="tap-btn px-2.5 sm:px-3 py-1.5 rounded-full apple-subcard text-[11px] font-bold flex items-center gap-1.5 cursor-pointer border border-[#0a84ff]/30 text-[#0a84ff]">
+            <span id="header-student-avatar" class="inline-flex items-center justify-center shrink-0" title="تغيير الأفاتار"><i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i></span>
             <span id="student-header-label" class="max-w-[74px] sm:max-w-[120px] truncate">دخول</span>
           </button>
 
@@ -644,14 +656,14 @@
     <section id="tab-chat" class="tab-panel hidden space-y-4 fade-in">
       <div class="apple-card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
-          <dotlottie-player
-            src="https://lottie.host/d47ef3dd-6431-4f24-8f96-af6a748558f0/ZLl8dic0bP.lottie"
+          <lottie-player
+            src="https://mnu-sem9.vercel.app/chat.json"
             background="transparent"
             speed="1"
             loop
             autoplay
-            class="w-[70px] h-[70px] sm:w-[88px] sm:h-[88px] shrink-0"
-          ></dotlottie-player>
+            class="w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] shrink-0"
+          ></lottie-player>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <h2 class="text-base sm:text-lg font-bold">غرفة المذاكرة الجماعية</h2>
@@ -1045,6 +1057,38 @@
     </div>
   </div>
 
+  <!-- Student Avatar Picker Modal (One-time Boy / Girl selection) -->
+  <div id="avatar-picker-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 text-center">
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
+        <h3 class="text-base font-bold">اختر الأفاتار الخاص بك</h3>
+        <button type="button" id="avatar-picker-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
+      </div>
+      <p class="text-xs leading-relaxed" style="color: var(--text-muted);">
+        اختر الأفاتار المناسب ليك ليظهر كصورة رمزية ليك في حسابك وفي غرفة المذاكرة الجماعية
+      </p>
+      <div class="grid grid-cols-2 gap-3.5 pt-1">
+        <button type="button" data-pick-avatar="man" class="pick-avatar-card tap-btn apple-subcard apple-card-hover p-4 flex flex-col items-center gap-2.5 cursor-pointer border-2 border-transparent hover:border-[#0a84ff]">
+          <span class="w-20 h-20 rounded-full bg-white/95 p-1 flex items-center justify-center overflow-hidden shadow-md">
+            <lottie-player src="https://mnu-sem9.vercel.app/man.json" background="transparent" speed="1" loop autoplay style="width:72px;height:72px;pointer-events:none;"></lottie-player>
+          </span>
+          <span class="text-xs sm:text-sm font-extrabold text-[#38bdf8]">ولد / دكتور</span>
+        </button>
+        <button type="button" data-pick-avatar="women" class="pick-avatar-card tap-btn apple-subcard apple-card-hover p-4 flex flex-col items-center gap-2.5 cursor-pointer border-2 border-transparent hover:border-emerald-400">
+          <span class="w-20 h-20 rounded-full bg-white/95 p-1 flex items-center justify-center overflow-hidden shadow-md">
+            <lottie-player src="https://mnu-sem9.vercel.app/women.json" background="transparent" speed="1" loop autoplay style="width:72px;height:72px;pointer-events:none;"></lottie-player>
+          </span>
+          <span class="text-xs sm:text-sm font-extrabold text-emerald-400">بنت / دكتورة</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Motivational Study Toast -->
+  <div id="motivational-toast" class="hidden fixed top-16 inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:max-w-sm z-50 safe-top-pad pointer-events-none">
+    <div class="apple-card modal-pop px-4 py-3 border border-emerald-400/50 bg-emerald-950/90 text-white shadow-2xl text-center text-xs sm:text-sm font-bold" id="motivational-toast-text"></div>
+  </div>
+
   <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
 
   <script>
@@ -1304,6 +1348,7 @@
         await fbDb.collection('students').doc(state.studentProfile.studentId).set({
           name: state.studentProfile.name,
           studentId: state.studentProfile.studentId,
+          avatarType: state.studentProfile.avatarType || null,
           hoursLogged: Number((state.hoursLogged || 0).toFixed(3)),
           completedSessions: state.completedSessions || 0,
           dailyGoalHours: state.dailyGoalHours || 4,
@@ -1323,6 +1368,7 @@
         const doc = await fbDb.collection('students').doc(state.studentProfile.studentId).get();
         if (doc.exists) {
           const d = doc.data();
+          if (d.avatarType && state.studentProfile && !state.studentProfile.avatarType) state.studentProfile.avatarType = d.avatarType;
           if (typeof d.hoursLogged === 'number' && d.hoursLogged > state.hoursLogged) state.hoursLogged = d.hoursLogged;
           if (typeof d.completedSessions === 'number' && d.completedSessions > state.completedSessions) state.completedSessions = d.completedSessions;
           if (d.stages && Object.keys(d.stages).length) state.stages = { ...d.stages, ...state.stages };
@@ -1336,17 +1382,25 @@
 
     function updateStudentHeaderUI() {
       const label = document.getElementById('student-header-label');
+      const avSlot = document.getElementById('header-student-avatar');
       const logoutBtn = document.getElementById('btn-student-logout');
       const hint = document.getElementById('kpi-sync-hint');
       if (state.studentProfile && state.studentProfile.studentId) {
         label.textContent = `أهلاً، ${state.studentProfile.name.split(' ')[0]}`;
+        if (avSlot) {
+          avSlot.innerHTML = state.studentProfile.avatarType
+            ? getStudentAvatarHtml(state.studentProfile.avatarType, 22)
+            : '<i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>';
+        }
         logoutBtn.classList.remove('hidden');
         if (hint) hint.textContent = `متزامن (${state.studentProfile.studentId})`;
       } else {
         label.textContent = 'دخول';
+        if (avSlot) avSlot.innerHTML = '<i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>';
         logoutBtn.classList.add('hidden');
         if (hint) hint.textContent = 'محفوظ على جهازك';
       }
+      refreshLucideIcons();
       updateChatAuthUI();
     }
 
@@ -1506,7 +1560,7 @@
         return { id: 'admin_' + (shared.adminEmail || 'mnu'), name: (state.studentProfile && state.studentProfile.name) ? state.studentProfile.name : 'Admin', isAdmin: true };
       }
       if (state.studentProfile && state.studentProfile.studentId) {
-        return { id: state.studentProfile.studentId, name: state.studentProfile.name, isAdmin: false };
+        return { id: state.studentProfile.studentId, name: state.studentProfile.name, isAdmin: false, avatarType: state.studentProfile.avatarType || null };
       }
       return null;
     }
@@ -1607,7 +1661,9 @@
             : 'rounded-tr-sm';
         const avatarHtml = (m.isAdmin && shared.adminAvatar)
           ? `<img src="${shared.adminAvatar}" alt="Admin" class="w-8 h-8 rounded-full object-cover ring-2 ring-amber-400/70 shrink-0 shadow-md" />`
-          : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 shadow-md" style="background:${avColor};">${escapeHtml(initial)}</div>`;
+          : (m.avatarType && STUDENT_AVATAR_URLS[m.avatarType])
+            ? getStudentAvatarHtml(m.avatarType, 30)
+            : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 shadow-md" style="background:${avColor};">${escapeHtml(initial)}</div>`;
         return `
           <div class="stagger-item flex items-end gap-2 ${isMine ? 'flex-row' : 'flex-row-reverse'}" style="--i:${Math.min(idx, 10)}">
             ${avatarHtml}
@@ -1759,6 +1815,7 @@
       if (badge) {
         badge.textContent = unread > 9 ? '9+' : String(unread);
         badge.classList.toggle('hidden', unread === 0);
+        const bellSvg = document.getElementById('bell-icon-svg'); if (bellSvg) bellSvg.classList.toggle('bell-urgent', unread > 0);
       }
       if (modalClearBtn) modalClearBtn.classList.toggle('hidden', !(shared.isAdmin && items.length));
       if (adminClearBtn) adminClearBtn.classList.toggle('hidden', !items.length);
@@ -2045,6 +2102,18 @@
       });
     }
 
+    const STUDENT_AVATAR_URLS = {
+      man: 'https://mnu-sem9.vercel.app/man.json',
+      women: 'https://mnu-sem9.vercel.app/women.json'
+    };
+    function getStudentAvatarHtml(avatarType, px = 28) {
+      const url = STUDENT_AVATAR_URLS[avatarType];
+      if (!url) return '';
+      return `<span class="inline-flex items-center justify-center rounded-full bg-white/95 p-0.5 shrink-0 overflow-hidden shadow-sm"><lottie-player src="${url}" background="transparent" speed="1" loop autoplay style="width:${px}px;height:${px}px;pointer-events:none;"></lottie-player></span>`;
+    }
+    function openAvatarPickerModal() {
+      gsapModalOpen('avatar-picker-modal');
+    }
     function getTopicStage(id) {
       if (!state.stages[id]) state.stages[id] = { videos: false, studied: false, reviewed: false, solved: false };
       return state.stages[id];
@@ -2107,17 +2176,17 @@
       n.connect(f); f.connect(ambientGain); n.start(); ambientNode = n;
     }
 
-    // Live Studying Counter (natural fluctuation 34 - 49)
-    let liveStudyingVal = 39 + Math.floor(Math.random() * 5);
+    // Live Studying Counter (natural varied fluctuation 35 - 98)
+    let liveStudyingVal = 54 + Math.floor(Math.random() * 22);
     function startLiveStudyingCounter() {
       const el = document.getElementById('live-studying-count');
       if (!el) return;
       el.textContent = liveStudyingVal;
       const mobEl = document.getElementById('live-studying-count-mob'); if (mobEl) mobEl.textContent = liveStudyingVal;
       setInterval(() => {
-        const delta = Math.random() < 0.5 ? -1 : 1;
-        const step = Math.random() < 0.25 ? delta * 2 : delta;
-        liveStudyingVal = Math.min(49, Math.max(34, liveStudyingVal + step));
+        const jump = Math.random() < 0.25 ? (Math.floor(Math.random() * 11) + 4) : (Math.floor(Math.random() * 5) + 1);
+        const dir = liveStudyingVal > 88 ? -1 : liveStudyingVal < 42 ? 1 : (Math.random() < 0.52 ? 1 : -1);
+        liveStudyingVal = Math.min(98, Math.max(35, liveStudyingVal + dir * jump));
         el.textContent = liveStudyingVal;
         if (mobEl) mobEl.textContent = liveStudyingVal;
         el.classList.remove('live-pop');
@@ -2289,6 +2358,23 @@
       document.title = pomoRunning ? `⏱️ ${timeStr} — ${task.subject} | MNU` : BASE_PAGE_TITLE;
     }
 
+    const MOTIVATIONAL_QUOTES = [
+      'عاش يا دكتور! تركيزك ممتاز، كمل 💪',
+      'كل دقيقة بتذاكرها بتقربك من الامتياز 🩺✨',
+      'فاضل شوية وتقفل المحاضرة 🔥',
+      'أنت ماشي بمعدل رائع، استمر! 🚀',
+      'نفس عميق وكمل، إنجازك النهارده هيفرق جداً 🌟'
+    ];
+    let motivToastTimer = null;
+    function showMotivationalToast(customMsg = null) {
+      const wrap = document.getElementById('motivational-toast');
+      const txt = document.getElementById('motivational-toast-text');
+      if (!wrap || !txt) return;
+      txt.textContent = customMsg || MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)];
+      wrap.classList.remove('hidden');
+      clearTimeout(motivToastTimer);
+      motivToastTimer = setTimeout(() => wrap.classList.add('hidden'), 4000);
+    }
     function startTaskInTimer(taskId) {
       const target = state.todayQueue.find(t => t.id === taskId && !t.done); if (!target) return;
       clearInterval(pomoInterval); clearInterval(pauseInterval);
@@ -2301,6 +2387,14 @@
       pomoInterval = setInterval(() => {
         pomoLeftSec = Math.max(0, pomoLeftSec - 1); target.remainingSec = pomoLeftSec;
         if (pomoLeftSec % 5 === 0) saveLocalStudentState();
+        if (pomoTotalSec > 0 && pomoLeftSec > 0) {
+          const elapsedSec = pomoTotalSec - pomoLeftSec;
+          const pctDone = elapsedSec / pomoTotalSec;
+          if (!target._m25 && pctDone >= 0.25) { target._m25 = true; showMotivationalToast('عاش يا دكتور! خلصت ربع الجلسة، تركيزك ممتاز 💪'); }
+          else if (!target._m50 && pctDone >= 0.50) { target._m50 = true; showMotivationalToast('كل دقيقة بتذاكرها بتقربك من الامتياز — وصلت لنص الجلسة! 🩺✨'); }
+          else if (!target._m75 && pctDone >= 0.75) { target._m75 = true; showMotivationalToast('فاضل شوية وتقفل المحاضرة 🔥'); }
+          else if (elapsedSec > 0 && elapsedSec % 600 === 0) { showMotivationalToast(); }
+        }
         syncTimerDisplay();
         if (pomoLeftSec <= 0) finishActiveTask(pomoTotalSec);
       }, 1000);
@@ -2545,7 +2639,27 @@
       };
 
       // Student Auth Modal Handlers
-      document.getElementById('btn-student-auth').onclick = () => openStudentAuthModal('login');
+      document.getElementById('btn-student-auth').onclick = (e) => {
+        if (state.studentProfile && state.studentProfile.studentId && e.target.closest('#header-student-avatar')) {
+          openAvatarPickerModal();
+          return;
+        }
+        if (state.studentProfile && state.studentProfile.studentId) {
+          openAvatarPickerModal();
+          return;
+        }
+        openStudentAuthModal('login');
+      };
+      document.getElementById('avatar-picker-close').onclick = () => document.getElementById('avatar-picker-modal').classList.add('hidden');
+      document.querySelectorAll('.pick-avatar-card').forEach(card => card.onclick = () => {
+        if (!state.studentProfile || !state.studentProfile.studentId) return;
+        state.studentProfile.avatarType = card.dataset.pickAvatar;
+        document.getElementById('avatar-picker-modal').classList.add('hidden');
+        updateStudentHeaderUI();
+        saveLocalStudentState(true);
+        playSFX('check');
+        showToast('تم حفظ الأفاتار الخاص بك بنجاح!');
+      });
       document.getElementById('student-auth-close').onclick = () => { state.guestDismissed = true; saveLocalStudentState(); document.getElementById('student-auth-modal').classList.add('hidden'); };
       document.getElementById('stu-guest-continue').onclick = () => { state.guestDismissed = true; saveLocalStudentState(); document.getElementById('student-auth-modal').classList.add('hidden'); };
       document.getElementById('tab-stu-login').onclick = () => openStudentAuthModal('login');
@@ -2598,7 +2712,7 @@
             if (!snap.exists) { errEl.textContent = 'الكود الجامعي غير مسجل. أنشئ حساباً جديداً أولاً.'; errEl.classList.remove('hidden'); return; }
             const d = snap.data();
             if (d.passwordHash !== passHash) { errEl.textContent = 'كلمة السر غير صحيحة.'; errEl.classList.remove('hidden'); return; }
-            state.studentProfile = { studentId: stuId, name: d.name || stuId };
+            state.studentProfile = { studentId: stuId, name: d.name || stuId, avatarType: d.avatarType || null };
             state.hoursLogged = d.hoursLogged || 0;
             state.completedSessions = d.completedSessions || 0;
             state.dailyGoalHours = d.dailyGoalHours || 4;
@@ -2616,6 +2730,7 @@
           updateStudentHeaderUI();
           saveLocalStudentState(false);
           renderTimeline(); renderSubjects(); syncTimerDisplay(); updateKPIs();
+          if (state.studentProfile && !state.studentProfile.avatarType) openAvatarPickerModal();
         } catch (err) {
           errEl.textContent = 'حدث خطأ: ' + err.message;
           errEl.classList.remove('hidden');
@@ -2741,6 +2856,7 @@
           senderId: actor.id,
           senderName: actor.name,
           isAdmin: actor.isAdmin,
+          avatarType: actor.avatarType || null,
           tag,
           text,
           imageData,
@@ -3005,27 +3121,38 @@
         finishActiveTask();
       };
 
-      // Timeline Interactions
+      // Timeline Interactions (Safe session count on check/uncheck/delete)
       document.getElementById('timeline-rail').onchange = (e) => {
         if (!e.target.classList.contains('q-check')) return;
         const it = state.todayQueue.find(x => x.id === e.target.dataset.qCheck);
         if (it) {
+          const wasDone = !!it.done;
           it.done = e.target.checked;
-          if (it.done) {
+          if (it.done && !wasDone) {
             if (state.activeTaskId === it.id) { finishActiveTask(); return; }
             state.completedSessions = (state.completedSessions || 0) + 1;
             playSFX('check'); triggerConfetti(); autoSyncTaskToChecklist(it);
+          } else if (!it.done && wasDone) {
+            state.completedSessions = Math.max(0, (state.completedSessions || 0) - 1);
           }
-          saveLocalStudentState(true); renderTimeline();
+          saveLocalStudentState(true); renderTimeline(); updateKPIs();
         }
       };
       document.getElementById('timeline-rail').onclick = (e) => {
-        if (e.target.classList.contains('q-del-btn')) {
-          const delId = e.target.dataset.qDel;
+        const delBtn = e.target.closest('.q-del-btn');
+        if (delBtn) {
+          const delId = delBtn.dataset.qDel;
+          const delItem = state.todayQueue.find(x => x.id === delId);
+          if (delItem && delItem.done) {
+            state.completedSessions = Math.max(0, (state.completedSessions || 0) - 1);
+          }
           if (state.activeTaskId === delId) { clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null; syncTimerDisplay(); }
           state.todayQueue = state.todayQueue.filter(x => x.id !== delId);
-          saveLocalStudentState(true); renderTimeline();
-        } else if (e.target.classList.contains('q-start-btn')) startTaskInTimer(e.target.dataset.qStart);
+          saveLocalStudentState(true); renderTimeline(); updateKPIs();
+          return;
+        }
+        const startBtn = e.target.closest('.q-start-btn');
+        if (startBtn) startTaskInTimer(startBtn.dataset.qStart);
       };
       document.getElementById('btn-clear-today').onclick = () => {
         clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null;
