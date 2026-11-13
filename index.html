@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
   <!-- Firebase Web SDK v10.14.1 (Compat CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -359,7 +360,7 @@
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                   <span id="calm-alert-banner">أقرب امتحان قادم</span>
                 </div>
-                <h2 id="hero-exam-title" class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">Ophthalmology — Final</h2>
+                <div class="flex items-center gap-2.5"><span id="hero-exam-icon" class="shrink-0 flex items-center"></span><h2 id="hero-exam-title" class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">Ophthalmology — Final</h2></div>
                 <p id="hero-exam-meta" class="text-xs sm:text-sm text-sky-100/80">--</p>
               </div>
               <div class="shrink-0 flex justify-center">
@@ -560,6 +561,7 @@
             </div>
             <div class="flex-1 min-w-0 space-y-2.5">
               <div class="flex items-center gap-2 flex-wrap">
+                <span id="pomo-active-icon" class="hidden shrink-0 flex items-center"></span>
                 <span id="pomo-active-mode-badge" class="hidden px-2 py-0.5 rounded-md bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-bold"></span>
                 <div id="pomo-active-lecture" class="text-xs sm:text-sm font-bold text-[#0a84ff] truncate">اختر محاضرة من الجدول أو اضغط تشغيل</div>
               </div>
@@ -661,10 +663,10 @@
         <div class="seg-control inline-flex flex-wrap gap-1 text-[11px] font-semibold">
           <button type="button" data-chat-filter="ALL" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
           <button type="button" data-chat-filter="عام" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">عام</button>
-          <button type="button" data-chat-filter="ENT" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">ENT</button>
-          <button type="button" data-chat-filter="OPTH" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">OPTH</button>
-          <button type="button" data-chat-filter="EBMR" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">EBMR</button>
-          <button type="button" data-chat-filter="FMIMC" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer" style="color: var(--text-muted);">FMIMC</button>
+          <button type="button" data-chat-filter="ENT" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer inline-flex items-center gap-1" style="color: var(--text-muted);"><span data-mod-icon="ENT" data-mod-size="18"></span><span>ENT</span></button>
+          <button type="button" data-chat-filter="OPTH" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer inline-flex items-center gap-1" style="color: var(--text-muted);"><span data-mod-icon="OPTH" data-mod-size="18"></span><span>OPTH</span></button>
+          <button type="button" data-chat-filter="EBMR" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer inline-flex items-center gap-1" style="color: var(--text-muted);"><span data-mod-icon="EBMR" data-mod-size="18"></span><span>EBMR</span></button>
+          <button type="button" data-chat-filter="FMIMC" class="chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer inline-flex items-center gap-1" style="color: var(--text-muted);"><span data-mod-icon="FMIMC" data-mod-size="18"></span><span>FMIMC</span></button>
         </div>
       </div>
 
@@ -1084,6 +1086,18 @@
       EBMR: { name: 'EBM & Research (EBMR)', color: '#bf5af2' },
       FMIMC: { name: 'Family Medicine (FMIMC)', color: '#30d158' }
     };
+
+    const MODULE_LOTTIE_URLS = {
+      OPTH: 'https://mnu-sem9.vercel.app/eye.json',
+      ENT: 'https://mnu-sem9.vercel.app/ear.json',
+      FMIMC: 'https://mnu-sem9.vercel.app/Family.json',
+      EBMR: 'https://mnu-sem9.vercel.app/analytics.json'
+    };
+    function getModuleLottie(code, px = 24) {
+      const url = MODULE_LOTTIE_URLS[code];
+      if (!url) return '';
+      return `<span class="inline-flex items-center justify-center rounded-full bg-white/90 p-0.5 shrink-0"><lottie-player src="${url}" background="transparent" speed="1" loop autoplay style="width:${px}px;height:${px}px;"></lottie-player></span>`;
+    }
 
     const MODE_LABELS = { first: 'مذاكرة أول مرة', review: 'مراجعة', solve: 'حل أسئلة', video: 'فيديوهات فقط' };
 
@@ -1602,7 +1616,7 @@
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="font-extrabold ${m.isAdmin ? 'text-amber-400' : 'text-[#0a84ff]'}">${escapeHtml(m.senderName || 'طالب')}</span>
                   ${m.isAdmin ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[9px] font-extrabold">Admin</span>` : ''}
-                  <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${tagColors[m.tag] || tagColors['عام']}">${escapeHtml(m.tag || 'عام')}</span>
+                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold ${tagColors[m.tag] || tagColors['عام']}">${getModuleLottie(m.tag, 18)}<span>${escapeHtml(m.tag || 'عام')}</span></span>
                 </div>
                 <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
               </div>
@@ -2023,6 +2037,14 @@
       }
     }
 
+    function renderStaticModuleIcons() {
+      document.querySelectorAll('[data-mod-icon]').forEach(el => {
+        const key = el.dataset.modIcon;
+        const sz = parseInt(el.dataset.modSize, 10) || 18;
+        el.innerHTML = getModuleLottie(key, sz);
+      });
+    }
+
     function getTopicStage(id) {
       if (!state.stages[id]) state.stages[id] = { videos: false, studied: false, reviewed: false, solved: false };
       return state.stages[id];
@@ -2135,6 +2157,7 @@
     function updateCountdowns() {
       document.getElementById('live-clock-str').textContent = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
       const sorted = getSortedExams(), up = sorted.find(e => !getDiffParts(getExamISO(e)).past) || sorted[0], hp = getDiffParts(getExamISO(up));
+      const hIcon = document.getElementById('hero-exam-icon'); if (hIcon) hIcon.innerHTML = getModuleLottie(up.code, 28);
       document.getElementById('hero-exam-title').textContent = `${up.subject} — ${up.type}`;
       document.getElementById('hero-exam-meta').textContent = `${formatArabicDateShort(up.dateStr)} (${up.dateStr}) • ${up.startTime}${up.endTime ? ' - ' + up.endTime : ''} • ${up.place}`;
       document.getElementById('hero-days').textContent = pad2(hp.d); document.getElementById('hero-hours').textContent = pad2(hp.h); document.getElementById('hero-mins').textContent = pad2(hp.m); document.getElementById('hero-secs').textContent = pad2(hp.s);
@@ -2161,6 +2184,7 @@
               </div>
               <div class="space-y-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
+                  ${getModuleLottie(ex.code, 24)}
                   <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ${typeBadge}">${ex.type}</span>
                   <span class="text-xs font-bold" style="color: ${accentColor};">${ex.code}</span>
                   <h4 class="font-bold text-xs sm:text-sm truncate">${ex.subject}</h4>
@@ -2191,7 +2215,7 @@
       document.getElementById('wiz-next-btn').classList.toggle('hidden', wizStep === 5);
       document.getElementById('wiz-submit-btn').classList.toggle('hidden', wizStep !== 5);
       if (wizStep === 1) {
-        document.getElementById('wiz-subj-grid').innerHTML = Object.keys(SUBJECTS_META).map(c => `<button type="button" data-ws="${c}" class="wiz-subj-btn tap-btn p-3.5 rounded-xl text-right font-bold text-xs cursor-pointer ${wizData.subj === c ? 'bg-[#0a84ff] text-white' : 'apple-subcard'}"><div>${c}</div><div class="text-[10px] opacity-80 mt-0.5 truncate">${SUBJECTS_META[c].name}</div></button>`).join('');
+        document.getElementById('wiz-subj-grid').innerHTML = Object.keys(SUBJECTS_META).map(c => `<button type="button" data-ws="${c}" class="wiz-subj-btn tap-btn p-3.5 rounded-xl text-right font-bold text-xs cursor-pointer ${wizData.subj === c ? 'bg-[#0a84ff] text-white' : 'apple-subcard'}"><div class="flex items-center gap-2">${getModuleLottie(c, 24)}<span>${c}</span></div><div class="text-[10px] opacity-80 mt-1 truncate">${SUBJECTS_META[c].name}</div></button>`).join('');
       } else if (wizStep === 2) {
         const list = shared.topics[wizData.subj] || [];
         document.getElementById('wiz-lecture-select').innerHTML = list.map(t => `<option value="${t.id}" ${wizData.topicId === t.id ? 'selected' : ''}>${t.title}</option>`).join('');
@@ -2244,6 +2268,7 @@
       if (!task) {
         pomoTotalSec = 0; pomoLeftSec = 0;
         document.getElementById('pomo-display').textContent = '00:00'; document.getElementById('pomo-ring').style.strokeDashoffset = 0;
+        const pIcon = document.getElementById('pomo-active-icon'); if (pIcon) pIcon.classList.add('hidden');
         badgeEl.classList.add('hidden'); titleEl.textContent = 'اختر محاضرة من الجدول أو اضغط تشغيل';
         document.getElementById('pause-stopwatch-display').textContent = '00:00'; document.getElementById('pause-count-badge').textContent = '(0 توقف)';
         document.getElementById('pomo-start-btn').textContent = 'تشغيل';
@@ -2255,6 +2280,7 @@
       const timeStr = `${pad2(Math.floor(pomoLeftSec / 60))}:${pad2(pomoLeftSec % 60)}`;
       document.getElementById('pomo-display').textContent = timeStr;
       document.getElementById('pomo-ring').style.strokeDashoffset = 326.7 * (1 - (pomoTotalSec > 0 ? pomoLeftSec / pomoTotalSec : 0));
+      const pIcon = document.getElementById('pomo-active-icon'); if (pIcon) { pIcon.innerHTML = getModuleLottie(task.subject, 24); pIcon.classList.remove('hidden'); }
       badgeEl.textContent = MODE_LABELS[task.mode] || 'مذاكرة'; badgeEl.classList.remove('hidden');
       titleEl.textContent = `[${task.subject}] ${task.title}`;
       document.getElementById('pause-stopwatch-display').textContent = `${pad2(Math.floor((task.pauseSec || 0) / 60))}:${pad2((task.pauseSec || 0) % 60)}`;
@@ -2331,7 +2357,7 @@
           <div class="apple-subcard stagger-item p-3.5 flex flex-wrap items-center justify-between gap-2 transition ${item.done ? 'opacity-55' : isActive ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/20' : ''}" style="--i:${i}">
             <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-[180px]">
               <input type="checkbox" data-q-check="${item.id}" class="q-check w-4 h-4 accent-[#0a84ff] shrink-0" ${item.done ? 'checked' : ''} />
-              <div class="min-w-0"><div class="text-[11px] font-mono-num text-[#0a84ff] font-bold">${item.durationMins} دقيقة • ${MODE_LABELS[item.mode] || ''}${pInfo}</div><div class="text-xs sm:text-sm font-bold truncate ${item.done ? 'line-through' : ''}">[${item.subject}] ${item.title}</div></div>
+              <div class="flex items-center gap-2 min-w-0">${getModuleLottie(item.subject, 24)}<div class="min-w-0"><div class="text-[11px] font-mono-num text-[#0a84ff] font-bold">${item.durationMins} دقيقة • ${MODE_LABELS[item.mode] || ''}${pInfo}</div><div class="text-xs sm:text-sm font-bold truncate ${item.done ? 'line-through' : ''}">[${item.subject}] ${item.title}</div></div></div>
             </label>
             <div class="flex gap-1.5 shrink-0">
               ${!item.done ? `<button type="button" data-q-start="${item.id}" class="q-start-btn tap-btn px-3 py-1.5 rounded-lg ${isActive && pomoRunning ? 'bg-amber-500' : 'bg-[#0a84ff]'} text-white text-[11px] font-bold cursor-pointer">${isActive && pomoRunning ? 'شغال الآن' : 'ابدأ'}</button>` : ''}
@@ -2350,7 +2376,7 @@
       return `
         <div class="apple-subcard stagger-item p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}" style="--i:${Math.min(idx, 12)}">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2.5 flex-1 min-w-[200px]"><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
+            <div class="flex items-center gap-2 flex-1 min-w-[200px]">${getModuleLottie(state.activeSubject, 18)}<span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
             <div class="flex items-center gap-2 shrink-0"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
           </div>
           <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
@@ -2375,10 +2401,10 @@
         const m = SUBJECTS_META[c], items = shared.topics[c] || [];
         const sPct = items.length ? Math.round(items.reduce((a, t) => a + getTopicPct(t.id), 0) / items.length) : 0;
         const doneFull = items.filter(t => getTopicPct(t.id) === 100).length;
-        return `<button data-subj="${c}" class="subj-card tap-btn apple-card apple-card-hover stagger-item p-4 text-right cursor-pointer ${state.activeSubject === c ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/30' : ''}" style="--i:${idx}"><div class="flex justify-between"><span class="font-bold text-xs px-2 py-0.5 rounded apple-subcard text-[#0a84ff]">${c}</span><span class="font-mono-num text-[11px] font-bold">${doneFull}/${items.length} مكتمل</span></div><div class="font-bold text-sm mt-2 truncate">${m.name}</div><div class="mt-2 flex justify-between text-[11px]"><span style="color: var(--text-muted);">التقدم العام</span><span class="font-mono-num font-bold">${sPct}%</span></div><div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-1"><div class="h-full rounded-full transition-all duration-500" style="width:${sPct}%; background:${m.color}"></div></div></button>`;
+        return `<button data-subj="${c}" class="subj-card tap-btn apple-card apple-card-hover stagger-item p-4 text-right cursor-pointer ${state.activeSubject === c ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/30' : ''}" style="--i:${idx}"><div class="flex items-center justify-between"><span class="inline-flex items-center gap-1.5 font-bold text-xs px-2 py-0.5 rounded apple-subcard text-[#0a84ff]">${getModuleLottie(c, 28)}<span>${c}</span></span><span class="font-mono-num text-[11px] font-bold">${doneFull}/${items.length} مكتمل</span></div><div class="font-bold text-sm mt-2 truncate">${m.name}</div><div class="mt-2 flex justify-between text-[11px]"><span style="color: var(--text-muted);">التقدم العام</span><span class="font-mono-num font-bold">${sPct}%</span></div><div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-1"><div class="h-full rounded-full transition-all duration-500" style="width:${sPct}%; background:${m.color}"></div></div></button>`;
       }).join('');
 
-      document.getElementById('active-subject-title').textContent = SUBJECTS_META[state.activeSubject].name;
+      document.getElementById('active-subject-title').innerHTML = `<span class="inline-flex items-center gap-2">${getModuleLottie(state.activeSubject, 28)}<span>${SUBJECTS_META[state.activeSubject].name}</span></span>`;
       const q = (document.getElementById('topic-search-input').value || '').trim().toLowerCase();
       const all = (shared.topics[state.activeSubject] || []).filter(t => t.title.toLowerCase().includes(q));
       const postList = all.filter(t => t.kind === 'Post-Midterm'), midList = all.filter(t => t.kind === 'Midterm');
@@ -2429,7 +2455,7 @@
           const items = shared.topics[code] || [];
           const sp = items.length ? Math.round(items.reduce((a, t) => a + getTopicPct(t.id), 0) / items.length) : 0;
           const col = SUBJECTS_META[code].color;
-          return `<div class="space-y-1"><div class="flex justify-between text-[10px] font-bold"><span>${code}</span><span class="font-mono-num" style="color:${col};">${sp}%</span></div><div class="w-full bg-slate-700/40 h-1 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-500" style="width:${sp}%; background:${col};"></div></div></div>`;
+          return `<div class="space-y-1"><div class="flex items-center justify-between text-[10px] font-bold"><span class="inline-flex items-center gap-1">${getModuleLottie(code, 20)}<span>${code}</span></span><span class="font-mono-num" style="color:${col};">${sp}%</span></div><div class="w-full bg-slate-700/40 h-1 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-500" style="width:${sp}%; background:${col};"></div></div></div>`;
         }).join('');
       }
     }
@@ -2473,6 +2499,7 @@
       loadLocalStudentState();
       refreshLucideIcons();
       document.body.classList.toggle('dark-mode', state.darkMode);
+      renderStaticModuleIcons();
       document.getElementById('bell-toggle-chk').checked = state.bellEnabled;
       initFirebaseSync();
       updateStudentHeaderUI();
@@ -2505,7 +2532,7 @@
       document.querySelectorAll('.nav-pill, .mob-nav').forEach(b => b.addEventListener('click', () => { playSFX('click'); switchTab(b.dataset.tab); }));
       document.getElementById('hero-go-planner').onclick = () => switchTab('planner');
       document.getElementById('hero-open-student-auth').onclick = () => openStudentAuthModal('login');
-      document.getElementById('btn-theme-toggle').onclick = () => { state.darkMode = !state.darkMode; document.body.classList.toggle('dark-mode', state.darkMode); saveLocalStudentState(); };
+      document.getElementById('btn-theme-toggle').onclick = () => { state.darkMode = !state.darkMode; document.body.classList.toggle('dark-mode', state.darkMode); saveLocalStudentState(); renderStaticModuleIcons(); renderExamsTimeline(); renderSubjects(); renderTimeline(); syncTimerDisplay(); renderChatMessages(); updateKPIs(); };
 
       // Daily goal & Bell toggle
       document.getElementById('daily-goal-select').onchange = (e) => {
@@ -2603,7 +2630,7 @@
         shared.chatFilter = b.dataset.chatFilter;
         document.querySelectorAll('.chat-filter-btn').forEach(x => {
           const on = x.dataset.chatFilter === shared.chatFilter;
-          x.className = on ? 'chat-filter-btn tap-btn px-2.5 py-1 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer';
+          x.className = on ? 'chat-filter-btn tap-btn px-2.5 py-1 rounded-lg bg-[#0a84ff] text-white cursor-pointer inline-flex items-center gap-1' : 'chat-filter-btn tap-btn px-2.5 py-1 rounded-lg cursor-pointer inline-flex items-center gap-1';
           x.style.color = on ? '#fff' : 'var(--text-muted)';
         });
         renderChatMessages();
