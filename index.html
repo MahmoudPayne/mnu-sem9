@@ -216,6 +216,26 @@
     @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.7; } 45% { transform: scale(1.34); opacity: 1; } }
     .breathe-ring { animation: breathe 9s infinite ease-in-out; }
     .confetti-dot { position: fixed; width: 7px; height: 7px; border-radius: 3px; pointer-events: none; z-index: 9999; }
+
+    /* Fast Performance Mode (body.no-animations) */
+    body.no-animations .ambient-bg { display: none !important; }
+    body.no-animations .apple-card,
+    body.no-animations header,
+    body.no-animations nav {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    body.no-animations.dark-mode .apple-card { background-color: #111827 !important; }
+    body.no-animations:not(.dark-mode) .apple-card { background-color: #ffffff !important; }
+    body.no-animations lottie-player,
+    body.no-animations dotlottie-player { display: none !important; }
+    body.no-animations *,
+    body.no-animations *::before,
+    body.no-animations *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    body.no-animations .stagger-item { opacity: 1 !important; transform: none !important; }
   </style>
 </head>
 <body class="dark-mode flex flex-col">
@@ -313,6 +333,10 @@
           <button id="btn-admin-lock" type="button" class="tap-btn px-2 sm:px-2.5 py-1.5 rounded-full apple-subcard text-[11px] font-semibold flex items-center gap-1 cursor-pointer opacity-85 hover:opacity-100" style="color: var(--text-muted);" title="دخول الأدمن (Firebase)">
             <i data-lucide="lock" class="w-3.5 h-3.5"></i>
             <span id="admin-lock-label" class="hidden xl:inline">Admin</span>
+          </button>
+
+          <button id="btn-perf-quick-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="وضع الأداء السريع (تشغيل/إيقاف الأنيميشنز)">
+            <i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>
           </button>
 
           <button id="btn-theme-toggle" type="button" class="tap-btn p-2 rounded-full apple-subcard cursor-pointer" title="تبديل المظهر">
@@ -1089,6 +1113,83 @@
     <div class="apple-card modal-pop px-4 py-3 border border-emerald-400/50 bg-emerald-950/90 text-white shadow-2xl text-center text-xs sm:text-sm font-bold" id="motivational-toast-text"></div>
   </div>
 
+  <!-- First-Visit Performance Prompt Modal -->
+  <div id="perf-prompt-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-[#0a84ff]/15 border border-[#0a84ff]/35 flex items-center justify-center mx-auto text-[#38bdf8]">
+        <i data-lucide="gauge" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base sm:text-lg font-extrabold">إعدادات الأداء والسرعة</h3>
+      <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-muted);">
+        هل تفضل تشغيل الأنيميشنز والتأثيرات البصرية أم إيقافها لأداء أسرع وأخف على جهازك؟ (يمكنك تغيير هذا الخيار لاحقاً من خانة حسابك).
+      </p>
+      <div class="space-y-2.5 pt-1">
+        <button type="button" id="btn-perf-enable" class="tap-btn btn-grad-primary w-full py-3 rounded-xl text-white text-xs sm:text-sm font-bold cursor-pointer">
+          تشغيل الأنيميشنز (الشكل الكامل)
+        </button>
+        <button type="button" id="btn-perf-disable" class="tap-btn w-full py-3 rounded-xl apple-subcard text-xs sm:text-sm font-bold cursor-pointer hover:border-emerald-400/50">
+          إيقاف الأنيميشنز (أداء سريع وخفيف)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Settings Modal ("إعدادات حسابي") -->
+  <div id="account-settings-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <form id="account-settings-form" class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 max-h-[90dvh] overflow-y-auto custom-scroll">
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-hairline);">
+        <div>
+          <h3 class="text-base font-bold">إعدادات حسابي</h3>
+          <p id="acc-id-subtitle" class="text-[11px] font-mono-num" style="color: var(--text-muted);">ID: --</p>
+        </div>
+        <button type="button" id="acc-settings-close" class="tap-btn text-base cursor-pointer px-2 py-1" style="color: var(--text-muted);">✕</button>
+      </div>
+
+      <div class="space-y-1 text-xs">
+        <label class="block font-semibold" style="color: var(--text-muted);">تغيير الاسم</label>
+        <input id="acc-name-input" type="text" placeholder="أدخل الاسم بالكامل" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]" required />
+      </div>
+
+      <div class="space-y-1.5 text-xs">
+        <label class="block font-semibold" style="color: var(--text-muted);">تغيير الأفاتار</label>
+        <div class="grid grid-cols-2 gap-2.5">
+          <button type="button" data-acc-avatar="man" class="acc-avatar-btn tap-btn apple-subcard p-3 flex items-center justify-center gap-2 cursor-pointer border-2 border-transparent">
+            <span class="w-10 h-10 rounded-full bg-white/95 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+              <lottie-player src="https://mnu-sem9.vercel.app/man.json" background="transparent" speed="1" loop autoplay style="width:36px;height:36px;pointer-events:none;"></lottie-player>
+            </span>
+            <span class="font-bold">ولد</span>
+          </button>
+          <button type="button" data-acc-avatar="women" class="acc-avatar-btn tap-btn apple-subcard p-3 flex items-center justify-center gap-2 cursor-pointer border-2 border-transparent">
+            <span class="w-10 h-10 rounded-full bg-white/95 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+              <lottie-player src="https://mnu-sem9.vercel.app/women.json" background="transparent" speed="1" loop autoplay style="width:36px;height:36px;pointer-events:none;"></lottie-player>
+            </span>
+            <span class="font-bold">بنت</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-1 text-xs">
+        <label class="block font-semibold" style="color: var(--text-muted);">تغيير كلمة السر (اختياري)</label>
+        <input id="acc-pass-input" type="password" placeholder="اتركه فارغاً للإبقاء على كلمة السر الحالية" class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-[#0a84ff]" />
+      </div>
+
+      <label class="apple-subcard p-3.5 flex items-center justify-between gap-3 cursor-pointer">
+        <div>
+          <div class="text-xs font-bold">تشغيل الأنيميشنز والتأثيرات</div>
+          <div class="text-[11px]" style="color: var(--text-muted);">أوقفها للحصول على أداء أسرع وأخف</div>
+        </div>
+        <input id="acc-anim-toggle" type="checkbox" class="w-5 h-5 accent-[#0a84ff] cursor-pointer" checked />
+      </label>
+
+      <div id="acc-settings-error" class="hidden text-xs font-semibold text-rose-400 text-center"></div>
+
+      <div class="flex flex-col sm:flex-row gap-2 pt-1">
+        <button type="submit" id="acc-save-btn" class="tap-btn btn-grad-primary flex-1 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer">حفظ التعديلات</button>
+        <button type="button" id="acc-logout-btn" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تسجيل الخروج</button>
+      </div>
+    </form>
+  </div>
+
   <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
 
   <script>
@@ -1264,7 +1365,9 @@
       guestDismissed: false,
       modWarnings: 0,
       modMutedUntil: 0,
-      lastNotifReadAt: 0
+      lastNotifReadAt: 0,
+      animationsEnabled: true,
+      animationsPreferenceSet: false
     };
 
     let shared = {
@@ -1311,6 +1414,8 @@
           if (typeof state.dailyGoalHours !== 'number' || isNaN(state.dailyGoalHours)) state.dailyGoalHours = 4;
           if (typeof state.todayHoursLogged !== 'number' || isNaN(state.todayHoursLogged)) state.todayHoursLogged = 0;
           if (typeof state.bellEnabled !== 'boolean') state.bellEnabled = true;
+          if (typeof state.animationsEnabled !== 'boolean') state.animationsEnabled = true;
+          if (typeof state.animationsPreferenceSet !== 'boolean') state.animationsPreferenceSet = false;
         }
       } catch (e) {}
       ensureTodayReset();
@@ -2033,8 +2138,23 @@
         window.lucide.createIcons();
       }
     }
+    function applyAnimationsPreference() {
+      const enabled = state.animationsEnabled !== false;
+      document.body.classList.toggle('no-animations', !enabled);
+      const accChk = document.getElementById('acc-anim-toggle');
+      if (accChk) accChk.checked = enabled;
+      const qBtn = document.getElementById('btn-perf-quick-toggle');
+      if (qBtn) {
+        qBtn.style.opacity = enabled ? '1' : '0.65';
+        qBtn.title = enabled ? 'الأنيميشنز مفعّلة (اضغط للإيقاف)' : 'الوضع السريع مفعّل (اضغط لتشغيل الأنيميشنز)';
+      }
+      if (!enabled && timerPulseTween) {
+        timerPulseTween.kill();
+        timerPulseTween = null;
+      }
+    }
     function gsapStagger(selector, parent = document) {
-      if (!window.gsap) return;
+      if (!state.animationsEnabled || !window.gsap) return;
       const els = parent.querySelectorAll(selector);
       if (!els.length) return;
       window.gsap.killTweensOf(els);
@@ -2047,7 +2167,7 @@
       const m = document.getElementById(modalId);
       if (!m) return;
       m.classList.remove('hidden');
-      if (window.gsap) {
+      if (state.animationsEnabled && window.gsap) {
         const card = m.querySelector('.modal-pop');
         if (card) {
           window.gsap.fromTo(card,
@@ -2067,7 +2187,7 @@
         return;
       }
       countUpCache[elId] = target;
-      if (!window.gsap) {
+      if (!state.animationsEnabled || !window.gsap) {
         el.textContent = (decimals ? Number(target).toFixed(decimals) : Math.round(target)) + suffix;
         return;
       }
@@ -2085,6 +2205,7 @@
     function setTimerPulse(running) {
       const wrap = document.getElementById('pomo-ring-wrap');
       if (!wrap || !window.gsap) return;
+      if (!state.animationsEnabled) { if (timerPulseTween) { timerPulseTween.kill(); timerPulseTween = null; } return; }
       if (running && !timerPulseTween) {
         timerPulseTween = window.gsap.to(wrap, { scale: 1.035, duration: 1.15, repeat: -1, yoyo: true, ease: 'sine.inOut' });
       } else if (!running && timerPulseTween) {
@@ -2130,6 +2251,7 @@
     }
 
     function triggerConfetti() {
+      if (!state.animationsEnabled) return;
       if (typeof window.confetti === 'function') {
         window.confetti({
           particleCount: 55,
@@ -2603,13 +2725,16 @@
       switchTab(state.activeTab || 'home');
       window.addEventListener('beforeunload', () => saveLocalStudentState(true));
 
-      // Auto-open Student Auth Pop-up on first visit if not logged in
-      if (!state.studentProfile && !state.guestDismissed) {
+      applyAnimationsPreference();
+      if (!state.animationsPreferenceSet) {
+        setTimeout(() => gsapModalOpen('perf-prompt-modal'), 250);
+      } else if (!state.studentProfile && !state.guestDismissed) {
         setTimeout(() => openStudentAuthModal('login'), 450);
       }
 
       // Tap ripple feedback
       document.body.addEventListener('pointerdown', (e) => {
+        if (!state.animationsEnabled) return;
         const btn = e.target.closest('.tap-btn');
         if (!btn) return;
         const r = btn.getBoundingClientRect();
@@ -2639,16 +2764,102 @@
       };
 
       // Student Auth Modal Handlers
-      document.getElementById('btn-student-auth').onclick = (e) => {
-        if (state.studentProfile && state.studentProfile.studentId && e.target.closest('#header-student-avatar')) {
-          openAvatarPickerModal();
-          return;
+      // Performance Prompt & Quick Toggle
+      function choosePerfMode(enabled) {
+        state.animationsEnabled = enabled;
+        state.animationsPreferenceSet = true;
+        saveLocalStudentState();
+        applyAnimationsPreference();
+        document.getElementById('perf-prompt-modal').classList.add('hidden');
+        showToast(enabled ? 'تم تفعيل الأنيميشنز والشكل الكامل' : 'تم تفعيل وضع الأداء السريع والخفيف');
+        if (!state.studentProfile && !state.guestDismissed) {
+          setTimeout(() => openStudentAuthModal('login'), 300);
         }
+      }
+      document.getElementById('btn-perf-enable').onclick = () => choosePerfMode(true);
+      document.getElementById('btn-perf-disable').onclick = () => choosePerfMode(false);
+      document.getElementById('btn-perf-quick-toggle').onclick = () => {
+        state.animationsEnabled = !state.animationsEnabled;
+        state.animationsPreferenceSet = true;
+        saveLocalStudentState();
+        applyAnimationsPreference();
+        showToast(state.animationsEnabled ? 'تم تشغيل الأنيميشنز' : 'تم تفعيل وضع الأداء السريع');
+      };
+
+      // Account Settings Modal ("إعدادات حسابي")
+      let accSelectedAvatar = 'man';
+      function syncAccAvatarButtons() {
+        document.querySelectorAll('.acc-avatar-btn').forEach(b => {
+          const on = b.dataset.accAvatar === accSelectedAvatar;
+          b.classList.toggle('border-[#0a84ff]', on);
+          b.classList.toggle('bg-[#0a84ff]/15', on);
+          b.classList.toggle('border-transparent', !on);
+        });
+      }
+      function openAccountSettingsModal() {
+        if (!state.studentProfile || !state.studentProfile.studentId) { openStudentAuthModal('login'); return; }
+        document.getElementById('acc-id-subtitle').textContent = `ID: ${state.studentProfile.studentId}`;
+        document.getElementById('acc-name-input').value = state.studentProfile.name || '';
+        document.getElementById('acc-pass-input').value = '';
+        document.getElementById('acc-settings-error').classList.add('hidden');
+        document.getElementById('acc-anim-toggle').checked = state.animationsEnabled !== false;
+        accSelectedAvatar = state.studentProfile.avatarType || 'man';
+        syncAccAvatarButtons();
+        gsapModalOpen('account-settings-modal');
+      }
+      document.getElementById('btn-student-auth').onclick = () => {
         if (state.studentProfile && state.studentProfile.studentId) {
-          openAvatarPickerModal();
+          openAccountSettingsModal();
           return;
         }
         openStudentAuthModal('login');
+      };
+      document.getElementById('acc-settings-close').onclick = () => document.getElementById('account-settings-modal').classList.add('hidden');
+      document.querySelectorAll('.acc-avatar-btn').forEach(b => b.onclick = () => {
+        accSelectedAvatar = b.dataset.accAvatar;
+        syncAccAvatarButtons();
+      });
+      document.getElementById('acc-anim-toggle').onchange = (e) => {
+        state.animationsEnabled = e.target.checked;
+        state.animationsPreferenceSet = true;
+        saveLocalStudentState();
+        applyAnimationsPreference();
+      };
+      document.getElementById('acc-logout-btn').onclick = () => {
+        document.getElementById('account-settings-modal').classList.add('hidden');
+        document.getElementById('btn-student-logout').click();
+      };
+      document.getElementById('account-settings-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!state.studentProfile || !state.studentProfile.studentId) return;
+        const errEl = document.getElementById('acc-settings-error');
+        errEl.classList.add('hidden');
+        const newName = document.getElementById('acc-name-input').value.trim();
+        const newPass = document.getElementById('acc-pass-input').value;
+        if (!newName) { errEl.textContent = 'يرجى كتابة الاسم بالكامل.'; errEl.classList.remove('hidden'); return; }
+        if (newPass && newPass.length < 4) { errEl.textContent = 'كلمة السر الجديدة يجب أن لا تقل عن 4 أحرف/أرقام.'; errEl.classList.remove('hidden'); return; }
+
+        state.studentProfile.name = newName;
+        state.studentProfile.avatarType = accSelectedAvatar;
+        const updatePayload = {
+          name: newName,
+          avatarType: accSelectedAvatar,
+          lastActive: new Date().toISOString()
+        };
+        if (newPass) {
+          updatePayload.passwordHash = await hashPassword(newPass);
+        }
+        try {
+          if (fbDb) await fbDb.collection('students').doc(state.studentProfile.studentId).set(updatePayload, { merge: true });
+          saveLocalStudentState(false);
+          updateStudentHeaderUI();
+          renderChatMessages();
+          document.getElementById('account-settings-modal').classList.add('hidden');
+          showToast('تم حفظ إعدادات حسابك بنجاح!');
+        } catch (err) {
+          errEl.textContent = 'تعذر الحفظ: ' + err.message;
+          errEl.classList.remove('hidden');
+        }
       };
       document.getElementById('avatar-picker-close').onclick = () => document.getElementById('avatar-picker-modal').classList.add('hidden');
       document.querySelectorAll('.pick-avatar-card').forEach(card => card.onclick = () => {
