@@ -786,15 +786,26 @@
         <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
           <div>
             <h2 class="text-base font-bold">لوحة إحصائيات الطلبة (Firestore Live)</h2>
-            <p class="text-xs" style="color: var(--text-muted);">مرتبة تلقائياً حسب الأكثر مذاكرة، مع متابعة الجلسات وآخر نشاط.</p>
+            <p class="text-xs" style="color: var(--text-muted);">مرتبة حسب الأكثر مذاكرة، مع تتبع حالة النشاط الحقيقية.</p>
           </div>
-          <input id="admin-student-search" type="text" placeholder="بحث بالاسم أو الكود..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none w-full sm:w-56" />
+          <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <button type="button" id="admin-active-first-btn" class="tap-btn px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-emerald-400 text-[11px] font-bold cursor-pointer">النشطين أولاً ✓</button>
+            <button type="button" id="admin-active-only-btn" class="tap-btn px-3 py-2 rounded-xl apple-subcard text-[11px] font-bold cursor-pointer" style="color: var(--text-muted);">النشطين فقط</button>
+            <input id="admin-student-search" type="text" placeholder="بحث بالاسم أو الكود..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none flex-1 sm:w-48" />
+          </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="apple-subcard p-4">
             <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الطلبة المسجلين</div>
-            <div id="admin-stat-students" class="text-2xl font-extrabold font-mono-num text-[#0a84ff] mt-1">0</div>
+            <div class="flex items-baseline justify-between gap-2 mt-1">
+              <div id="admin-stat-students" class="text-2xl font-extrabold font-mono-num text-[#0a84ff]">0</div>
+              <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-400">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>نشط فعلياً:</span>
+                <span id="admin-stat-real-active" class="font-mono-num">0</span>
+              </div>
+            </div>
           </div>
           <div class="apple-subcard p-4">
             <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات مذاكرة الدفعة</div>
@@ -1400,7 +1411,9 @@
       customBannedWords: [],
       notifications: [],
       adminAvatar: '',
-      examScheduleImage: ''
+      examScheduleImage: '',
+      adminActiveFirst: true,
+      adminActiveOnly: false
     };
 
     let studentsUnsub = null;
@@ -1558,21 +1571,66 @@
       }, () => {});
     }
 
+    function getLastActiveMs(val) {
+      if (!val) return 0;
+      if (typeof val === 'number') return val;
+      const ms = Date.parse(val);
+      return isNaN(ms) ? 0 : ms;
+    }
+    function isStudentActiveNow(lastActive) {
+      const ms = getLastActiveMs(lastActive);
+      return ms > 0 && (Date.now() - ms) < 150000;
+    }
+    function formatArabicRelativeTime(lastActive) {
+      const ms = getLastActiveMs(lastActive);
+      if (!ms) return 'غير نشط';
+      const diffSec = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+      if (diffSec < 150) return 'نشط الآن';
+      const mins = Math.floor(diffSec / 60);
+      if (mins < 60) return `غير نشط • منذ ${mins === 1 ? 'دقيقة' : mins === 2 ? 'دقيقتين' : mins <= 10 ? mins + ' دقائق' : mins + ' دقيقة'}`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `غير نشط • منذ ${hrs === 1 ? 'ساعة' : hrs === 2 ? 'ساعتين' : hrs <= 10 ? hrs + ' ساعات' : hrs + ' ساعة'}`;
+      const days = Math.floor(hrs / 24);
+      return `غير نشط • منذ ${days === 1 ? 'يوم' : days === 2 ? 'يومين' : days <= 10 ? days + ' أيام' : days + ' يوم'}`;
+    }
+
+    async function sendStudentHeartbeat() {
+      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      try {
+        await fbDb.collection('students').doc(state.studentProfile.studentId).set({
+          lastActive: new Date().toISOString()
+        }, { merge: true });
+      } catch (e) {}
+    }
+
     function renderAdminStudentsStats() {
       const listEl = document.getElementById('admin-students-list');
       if (!listEl) return;
       const q = (document.getElementById('admin-student-search')?.value || '').trim().toLowerCase();
-      const sorted = [...shared.studentsList].sort((a, b) => (b.hoursLogged || 0) - (a.hoursLogged || 0));
+      const sorted = [...shared.studentsList].sort((a, b) => {
+        if (shared.adminActiveFirst) {
+          const aAct = isStudentActiveNow(a.lastActive) ? 1 : 0;
+          const bAct = isStudentActiveNow(b.lastActive) ? 1 : 0;
+          if (aAct !== bAct) return bAct - aAct;
+        }
+        return (b.hoursLogged || 0) - (a.hoursLogged || 0);
+      });
+      const realActiveCount = sorted.filter(s => isStudentActiveNow(s.lastActive)).length;
       const totalHours = sorted.reduce((acc, s) => acc + (s.hoursLogged || 0), 0);
       const totalSess = sorted.reduce((acc, s) => acc + (s.completedSessions || 0), 0);
 
       document.getElementById('admin-stat-students').textContent = sorted.length;
+      const realActEl = document.getElementById('admin-stat-real-active');
+      if (realActEl) realActEl.textContent = realActiveCount;
       document.getElementById('admin-stat-hours').textContent = totalHours.toFixed(1) + 'h';
       document.getElementById('admin-stat-sessions').textContent = totalSess;
 
-      const filtered = sorted.filter(s => !q || (s.name || '').toLowerCase().includes(q) || (s.studentId || '').toLowerCase().includes(q));
+      const filtered = sorted.filter(s => {
+        if (shared.adminActiveOnly && !isStudentActiveNow(s.lastActive)) return false;
+        return !q || (s.name || '').toLowerCase().includes(q) || (s.studentId || '').toLowerCase().includes(q);
+      });
       if (!filtered.length) {
-        listEl.innerHTML = `<div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">لا يوجد طلبة مسجلين مطابقين للبحث حالياً.</div>`;
+        listEl.innerHTML = `<div class="apple-subcard p-5 text-center text-xs" style="color: var(--text-muted);">لا يوجد طلبة مطابقين للتصفية الحالية.</div>`;
         return;
       }
 
@@ -1588,18 +1646,22 @@
           }));
         }
         const sylPct = totTopics ? Math.round(sumPct / totTopics) : 0;
-        let lastStr = '--';
-        if (s.lastActive) {
-          try { lastStr = new Date(s.lastActive).toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) {}
-        }
+        const activeNow = isStudentActiveNow(s.lastActive);
+        const statusText = formatArabicRelativeTime(s.lastActive);
+        const statusBadge = activeNow
+          ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/35 text-emerald-400 text-[10px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span><span>نشط الآن</span></span>`
+          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-500/15 text-slate-400 text-[10px] font-semibold">${statusText}</span>`;
         const rankColor = idx === 0 ? 'bg-amber-500/20 text-amber-400' : idx === 1 ? 'bg-slate-400/20 text-slate-300' : idx === 2 ? 'bg-orange-500/20 text-orange-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
         return `
-          <div class="apple-subcard p-3.5 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-[190px] flex-1">
+          <div class="apple-subcard p-3.5 flex flex-wrap items-center justify-between gap-3 ${activeNow ? 'border-emerald-500/35' : ''}">
+            <div class="flex items-center gap-3 min-w-[200px] flex-1">
               <span class="w-7 h-7 rounded-full ${rankColor} flex items-center justify-center font-mono-num text-xs font-extrabold shrink-0">${idx + 1}</span>
-              <div class="min-w-0">
-                <div class="text-xs sm:text-sm font-bold truncate">${s.name || 'طالب'}</div>
-                <div class="text-[11px] font-mono-num" style="color: var(--text-muted);">ID: ${s.studentId || '--'} • آخر نشاط: ${lastStr}</div>
+              <div class="min-w-0 space-y-0.5">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs sm:text-sm font-bold truncate">${escapeHtml(s.name || 'طالب')}</span>
+                  ${statusBadge}
+                </div>
+                <div class="text-[11px] font-mono-num" style="color: var(--text-muted);">ID: ${escapeHtml(s.studentId || '--')}</div>
               </div>
             </div>
             <div class="flex items-center gap-2 sm:gap-4 shrink-0 text-center">
@@ -2147,6 +2209,7 @@
           renderExamScheduleImage();
         }, () => {});
         loadStudentFromFirestoreOnBoot();
+        sendStudentHeartbeat();
         initChatListener();
 
         fbAuth.onAuthStateChanged(user => {
@@ -3219,6 +3282,36 @@
         switchTab('home'); showToast('تم تسجيل خروج الأدمن');
       };
       document.getElementById('admin-student-search').oninput = renderAdminStudentsStats;
+      document.getElementById('admin-active-first-btn').onclick = () => {
+        shared.adminActiveFirst = !shared.adminActiveFirst;
+        const btn = document.getElementById('admin-active-first-btn');
+        btn.className = shared.adminActiveFirst
+          ? 'tap-btn px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-emerald-400 text-[11px] font-bold cursor-pointer'
+          : 'tap-btn px-3 py-2 rounded-xl apple-subcard text-[11px] font-bold cursor-pointer';
+        btn.textContent = shared.adminActiveFirst ? 'النشطين أولاً ✓' : 'ترتيب بالساعات فقط';
+        renderAdminStudentsStats();
+      };
+      document.getElementById('admin-active-only-btn').onclick = () => {
+        shared.adminActiveOnly = !shared.adminActiveOnly;
+        const btn = document.getElementById('admin-active-only-btn');
+        btn.className = shared.adminActiveOnly
+          ? 'tap-btn px-3 py-2 rounded-xl bg-[#0a84ff] text-white text-[11px] font-bold cursor-pointer'
+          : 'tap-btn px-3 py-2 rounded-xl apple-subcard text-[11px] font-bold cursor-pointer';
+        btn.style.color = shared.adminActiveOnly ? '#fff' : 'var(--text-muted)';
+        renderAdminStudentsStats();
+      };
+
+      // Student 60s Visibility Heartbeat + Admin 30s Stats Refresh
+      setInterval(() => {
+        if (document.visibilityState === 'visible') sendStudentHeartbeat();
+        if (shared.isAdmin && state.activeTab === 'admin') renderAdminStudentsStats();
+      }, 60000);
+      setInterval(() => {
+        if (shared.isAdmin && state.activeTab === 'admin') renderAdminStudentsStats();
+      }, 30000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') sendStudentHeartbeat();
+      });
 
       // Official Exam Schedule Image + Zoomable Lightbox
       renderExamScheduleImage();
