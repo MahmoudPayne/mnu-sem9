@@ -1216,6 +1216,26 @@
 
       <!-- ADMIN SUB-TAB 5: SUBJECT RESOURCES, QUIZZES & CURRICULUM SYNC -->
       <div id="adm-panel-content" class="adm-sub-panel hidden space-y-5">
+        <!-- Gemini AI Admin Assistant -->
+        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-400">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i><span>المساعد الذكي للأدمن (Gemini AI)</span></h2>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted);">الصق أسئلة عشوائية، رابط ملف مع اسم المادة، أو فكرة تنبيه وسينسقها الذكاء الاصطناعي تلقائياً.</p>
+            </div>
+          </div>
+          <textarea id="admin-ai-prompt" rows="4" placeholder="الصق هنا أسئلة MCQ عشوائية، أو رابط ملف مع اسم المادة، أو فكرة إشعار للدفعة..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]"></textarea>
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="button" id="btn-admin-ai-run" class="tap-btn btn-grad-primary px-5 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer inline-flex items-center gap-1.5">
+              <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+              <span>تحليل وتنسيق بالذكاء الاصطناعي</span>
+            </button>
+            <span id="admin-ai-loading" class="hidden text-xs font-bold text-[#38bdf8] animate-pulse">⏳ جاري التحليل والتنسيق عبر Gemini AI...</span>
+          </div>
+          <div id="admin-ai-error" class="hidden p-3 rounded-xl bg-rose-500/15 border border-rose-500/35 text-xs font-semibold text-rose-300"></div>
+          <div id="admin-ai-preview" class="hidden apple-subcard p-4 space-y-3 border border-emerald-500/35"></div>
+        </div>
+
         <!-- Add Subject Resource -->
         <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
           <h2 class="text-base font-bold">إدارة الملفات والمصادر (shared/subject_resources)</h2>
@@ -4634,6 +4654,111 @@
         const target = document.getElementById(`adm-panel-${sub}`);
         if (target) target.classList.remove('hidden');
       });
+
+      // Gemini AI Admin Assistant (/api/ai-admin)
+      let lastAiResult = null;
+      document.getElementById('btn-admin-ai-run').onclick = async () => {
+        if (!shared.isAdmin || !fbAuth || !fbAuth.currentUser) {
+          showToast('يجب تسجيل دخول الأدمن أولاً');
+          return;
+        }
+        const promptText = (document.getElementById('admin-ai-prompt').value || '').trim();
+        const errEl = document.getElementById('admin-ai-error');
+        const loadEl = document.getElementById('admin-ai-loading');
+        const prevEl = document.getElementById('admin-ai-preview');
+        errEl.classList.add('hidden');
+        prevEl.classList.add('hidden');
+        if (!promptText) {
+          errEl.textContent = 'يرجى كتابة أو لصق النص المطلوب تحليله أولاً.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        loadEl.classList.remove('hidden');
+        try {
+          const idToken = await fbAuth.currentUser.getIdToken();
+          const res = await fetch('/api/ai-admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + idToken
+            },
+            body: JSON.stringify({ promptText })
+          });
+          if (!res.ok) throw new Error(`فشل الاتصال بالخادم (${res.status})`);
+          const data = await res.json();
+          lastAiResult = data;
+          if (data.action === 'quiz' && Array.isArray(data.questions)) {
+            const subj = data.subject || 'OPTH';
+            prevEl.innerHTML = `
+              <div class="text-xs font-bold text-purple-300">تم استخراج ${data.questions.length} سؤال لمادة (${escapeHtml(subj)})</div>
+              <div class="space-y-1 text-[11px]" style="color: var(--text-muted);">${data.questions.slice(0, 3).map((q, i) => `<div class="truncate">${i + 1}. ${escapeHtml(q.question)}</div>`).join('')}</div>
+              <button type="button" id="btn-ai-publish-quiz" class="tap-btn px-4 py-2 rounded-xl bg-purple-500 text-white text-xs font-bold cursor-pointer">نشر الأسئلة في بنك الأسئلة</button>`;
+          } else if (data.action === 'resource' && data.resource) {
+            const r = data.resource;
+            const subj = data.subject || r.subject || 'OPTH';
+            prevEl.innerHTML = `
+              <div class="text-xs font-bold text-[#38bdf8]">ملف مقترح لمادة (${escapeHtml(subj)})</div>
+              <div class="text-xs font-bold">${escapeHtml(r.title || '')}</div>
+              <div class="text-[11px] font-mono-num truncate" dir="ltr" style="color: var(--text-muted);">${escapeHtml(r.url || '')}</div>
+              ${r.desc ? `<div class="text-[11px]" style="color: var(--text-muted);">${escapeHtml(r.desc)}</div>` : ''}
+              <button type="button" id="btn-ai-publish-resource" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">إضافة الملف للمادة</button>`;
+          } else if (data.action === 'notification' && data.notification) {
+            const n = data.notification;
+            prevEl.innerHTML = `
+              <div class="text-xs font-bold text-emerald-400">إشعار مقترح للدفعة (${n.priority === 'urgent' ? 'هام جداً' : 'عادي'})</div>
+              <div class="text-xs font-bold">${escapeHtml(n.title || '')}</div>
+              <div class="text-xs" style="color: var(--text-muted);">${escapeHtml(n.body || '')}</div>
+              <button type="button" id="btn-ai-publish-notif" class="tap-btn px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إرسال الإشعار للدفعة</button>`;
+          } else {
+            throw new Error('لم يتمكن المساعد من تحديد نوع المحتوى، جرب توضيح النص أكثر.');
+          }
+          prevEl.classList.remove('hidden');
+        } catch (err) {
+          errEl.textContent = 'خطأ: ' + (err.message || 'تعذر الاتصال بخدمة الذكاء الاصطناعي');
+          errEl.classList.remove('hidden');
+        } finally {
+          loadEl.classList.add('hidden');
+        }
+      };
+
+      document.getElementById('admin-ai-preview').onclick = async (e) => {
+        if (!lastAiResult || !shared.isAdmin || !fbDb) return;
+        if (e.target.id === 'btn-ai-publish-quiz') {
+          const subj = lastAiResult.subject || 'OPTH';
+          const nextData = JSON.parse(JSON.stringify(shared.subjectQuizzes || {}));
+          if (!Array.isArray(nextData[subj])) nextData[subj] = [];
+          (lastAiResult.questions || []).forEach((q, idx) => {
+            nextData[subj].push({
+              id: 'ai-q-' + Date.now() + '-' + idx,
+              question: q.question,
+              options: q.options || [],
+              correct: Number(q.correct) || 0,
+              explanation: q.explanation || ''
+            });
+          });
+          await saveSharedToFirestore('subject_quizzes', { data: nextData });
+          document.getElementById('admin-ai-preview').classList.add('hidden');
+          document.getElementById('admin-ai-prompt').value = '';
+          showToast('تم نشر الأسئلة في بنك الأسئلة!');
+        } else if (e.target.id === 'btn-ai-publish-resource') {
+          const r = lastAiResult.resource || {};
+          const subj = lastAiResult.subject || r.subject || 'OPTH';
+          const nextData = JSON.parse(JSON.stringify(shared.subjectResources || {}));
+          if (!Array.isArray(nextData[subj])) nextData[subj] = [];
+          nextData[subj].unshift({ id: 'ai-res-' + Date.now(), title: r.title || 'ملف', url: r.url || '', desc: r.desc || '', createdAt: Date.now() });
+          await saveSharedToFirestore('subject_resources', { data: nextData });
+          document.getElementById('admin-ai-preview').classList.add('hidden');
+          document.getElementById('admin-ai-prompt').value = '';
+          showToast('تمت إضافة الملف للمادة بنجاح!');
+        } else if (e.target.id === 'btn-ai-publish-notif') {
+          const n = lastAiResult.notification || {};
+          const nextItems = [{ id: 'ai-n-' + Date.now(), title: n.title || 'تنبيه', body: n.body || '', priority: n.priority === 'urgent' ? 'urgent' : 'normal', createdAt: Date.now() }, ...(shared.notifications || [])].slice(0, 30);
+          await saveSharedToFirestore('notifications', { items: nextItems });
+          document.getElementById('admin-ai-preview').classList.add('hidden');
+          document.getElementById('admin-ai-prompt').value = '';
+          showToast('تم إرسال الإشعار للدفعة!');
+        }
+      };
 
       // Admin Resources & Quizzes Forms
       document.getElementById('admin-resource-form').onsubmit = async (e) => {
