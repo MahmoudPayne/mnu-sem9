@@ -14,7 +14,6 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: 'Missing admin token' });
     }
 
-    // التحقق من الأدمن
     const authRes = await fetch(
       'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyB40UfePbJ64NybvNLtR6I351fcAprc0KY',
       {
@@ -46,25 +45,36 @@ module.exports = async function handler(req, res) {
   "notification": { "title": "", "body": "", "priority": "normal" }
 }`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `${systemPrompt}\n\nطلب الأدمن:\n${promptText}` }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.2
-          }
-        })
-      }
-    );
+    const models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+    let rawText = null;
+    let lastErr = '';
 
-    const geminiData = await geminiRes.json();
-    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!geminiRes.ok || !rawText) {
-      return res.status(502).json({ error: geminiData?.error?.message || 'Gemini API error' });
+    for (const model of models) {
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `${systemPrompt}\n\nطلب الأدمن:\n${promptText}` }] }],
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: 0.2
+            }
+          })
+        }
+      );
+      const geminiData = await geminiRes.json();
+      const txt = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (geminiRes.ok && txt) {
+        rawText = txt;
+        break;
+      }
+      lastErr = geminiData?.error?.message || 'Gemini API error';
+    }
+
+    if (!rawText) {
+      return res.status(502).json({ error: lastErr });
     }
 
     const cleaned = rawText.replace(/```json\s*|```/gi, '').trim();
