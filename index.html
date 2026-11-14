@@ -4757,6 +4757,24 @@
               <div class="text-xs font-bold">${escapeHtml(n.title || '')}</div>
               <div class="text-xs" style="color: var(--text-muted);">${escapeHtml(n.body || '')}</div>
               <button type="button" id="btn-ai-publish-notif" class="tap-btn px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إرسال الإشعار للدفعة</button>`;
+          } else if (data.action === 'stream' && data.stream) {
+            const s = data.stream;
+            prevEl.innerHTML = `
+              <div class="text-xs font-bold text-rose-400">تفاصيل البث المباشر المقترحة</div>
+              ${s.matchTitle ? `<div class="text-xs font-bold">${escapeHtml(s.matchTitle)}</div>` : ''}
+              ${s.matchNote ? `<div class="text-[11px] text-amber-300">${escapeHtml(s.matchNote)}</div>` : ''}
+              <div class="text-[11px] flex flex-wrap gap-2" style="color: var(--text-muted);">
+                ${s.referee ? `<span>الحكم: ${escapeHtml(s.referee)}</span>` : ''}
+                ${s.stadium ? `<span>الملعب: ${escapeHtml(s.stadium)}</span>` : ''}
+                ${s.channel ? `<span>القناة: ${escapeHtml(s.channel)}</span>` : ''}
+              </div>
+              <button type="button" id="btn-ai-publish-stream" class="tap-btn px-4 py-2 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">تحديث تفاصيل البث المباشر</button>`;
+          } else if (data.action === 'notice' && data.notice) {
+            const nt = data.notice;
+            prevEl.innerHTML = `
+              <div class="text-xs font-bold text-amber-400">تنبيه الشريط العلوي المقترح (${escapeHtml(nt.level || 'info')})</div>
+              <div class="text-xs font-bold">${escapeHtml(nt.text || '')}</div>
+              <button type="button" id="btn-ai-publish-notice" class="tap-btn px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold cursor-pointer">نشر في الشريط العلوي</button>`;
           } else {
             throw new Error('لم يتمكن المساعد من تحديد نوع المحتوى، جرب توضيح النص أكثر.');
           }
@@ -4805,6 +4823,27 @@
           document.getElementById('admin-ai-preview').classList.add('hidden');
           document.getElementById('admin-ai-prompt').value = ''; clearAiPendingFile();
           showToast('تم إرسال الإشعار للدفعة!');
+        } else if (e.target.id === 'btn-ai-publish-stream') {
+          const s = lastAiResult.stream || {};
+          const nextUrl = (s.url && String(s.url).trim()) ? String(s.url).trim() : (shared.liveStream.url || '');
+          await saveSharedToFirestore('live_stream', {
+            url: nextUrl,
+            visible: shared.liveStream.visible !== false,
+            matchTitle: s.matchTitle || '',
+            matchNote: s.matchNote || '',
+            referee: s.referee || '',
+            stadium: s.stadium || '',
+            channel: s.channel || ''
+          });
+          document.getElementById('admin-ai-preview').classList.add('hidden');
+          document.getElementById('admin-ai-prompt').value = ''; clearAiPendingFile();
+          showToast('تم تحديث تفاصيل البث المباشر للجميع!');
+        } else if (e.target.id === 'btn-ai-publish-notice') {
+          const nt = lastAiResult.notice || {};
+          await saveSharedToFirestore('notice', { text: nt.text || '', level: nt.level || 'info' });
+          document.getElementById('admin-ai-preview').classList.add('hidden');
+          document.getElementById('admin-ai-prompt').value = ''; clearAiPendingFile();
+          showToast('تم نشر التنبيه في الشريط العلوي!');
         }
       };
 
