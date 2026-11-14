@@ -5,14 +5,10 @@ module.exports = async function handler(req, res) {
 
   try {
     const apiKey = (process.env.GEMINI_API_KEY || '').trim();
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY missing in Vercel' });
-    }
+    if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY missing in Vercel' });
 
     const idToken = (req.headers.authorization || '').replace('Bearer ', '').trim();
-    if (!idToken) {
-      return res.status(401).json({ error: 'Missing admin token' });
-    }
+    if (!idToken) return res.status(401).json({ error: 'Missing admin token' });
 
     const authRes = await fetch(
       'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyB40UfePbJ64NybvNLtR6I351fcAprc0KY',
@@ -29,11 +25,15 @@ module.exports = async function handler(req, res) {
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     const promptText = (body.promptText || '').trim();
-    if (!promptText) {
+    const fileBase64 = body.fileBase64 || '';
+    const fileMimeType = body.fileMimeType || '';
+
+    if (!promptText && !fileBase64) {
       return res.status(400).json({ error: 'Empty input' });
     }
 
     const systemPrompt = `أنت مساعد ذكي لإدارة منصة طبية (MNU Med Sem 9). المواد: OPTH, ENT, FMIMC, EBMR.
+إذا أُرفق ملف (PDF أو صورة)، اقرأ محتواه بعناية واستخرج منه أسئلة MCQ منظمة في questions (أو صُغ إشعاراً حسب طلب الأدمن).
 أعد JSON صافي فقط بهذا الشكل الدقيق:
 {
   "action": "quiz" | "resource" | "notification",
@@ -44,6 +44,11 @@ module.exports = async function handler(req, res) {
   ],
   "notification": { "title": "", "body": "", "priority": "normal" }
 }`;
+
+    const parts = [{ text: `${systemPrompt}\n\nطلب الأدمن:\n${promptText || 'استخرج الأسئلة من الملف المرفق وحدد المادة المناسبة.'}` }];
+    if (fileBase64 && fileMimeType) {
+      parts.push({ inlineData: { mimeType: fileMimeType, data: fileBase64 } });
+    }
 
     const models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
     let rawText = null;
@@ -56,7 +61,7 @@ module.exports = async function handler(req, res) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: `${systemPrompt}\n\nطلب الأدمن:\n${promptText}` }] }],
+            contents: [{ parts }],
             generationConfig: {
               responseMimeType: 'application/json',
               temperature: 0.2
@@ -73,13 +78,10 @@ module.exports = async function handler(req, res) {
       lastErr = geminiData?.error?.message || 'Gemini API error';
     }
 
-    if (!rawText) {
-      return res.status(502).json({ error: lastErr });
-    }
+    if (!rawText) return res.status(502).json({ error: lastErr });
 
     const cleaned = rawText.replace(/```json\s*|```/gi, '').trim();
-    const parsed = JSON.parse(cleaned);
-    return res.status(200).json(parsed);
+    return res.status(200).json(JSON.parse(cleaned));
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Server error' });
   }
