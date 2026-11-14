@@ -1224,6 +1224,18 @@
               <p class="text-xs mt-0.5" style="color: var(--text-muted);">الصق أسئلة عشوائية، رابط ملف مع اسم المادة، أو فكرة تنبيه وسينسقها الذكاء الاصطناعي تلقائياً.</p>
             </div>
           </div>
+          <!-- PDF / Image Upload Zone (<= 3.5MB) -->
+          <div id="admin-ai-dropzone" class="apple-subcard p-3 border border-dashed border-[#0a84ff]/40 flex flex-wrap items-center justify-between gap-2">
+            <input id="admin-ai-file-input" type="file" accept="application/pdf,image/*" class="hidden" />
+            <button type="button" id="admin-ai-file-btn" class="tap-btn px-3.5 py-2 rounded-xl apple-card text-xs font-bold text-[#38bdf8] cursor-pointer inline-flex items-center gap-1.5">
+              <i data-lucide="paperclip" class="w-3.5 h-3.5"></i>
+              <span>إرفاق ملف PDF أو صورة (بحد أقصى 3.5MB)</span>
+            </button>
+            <div id="admin-ai-file-badge" class="hidden flex items-center gap-2 text-xs">
+              <span id="admin-ai-file-name" class="font-bold text-emerald-400 truncate max-w-[180px]"></span>
+              <button type="button" id="admin-ai-file-cancel" class="tap-btn text-rose-400 font-bold px-1.5 cursor-pointer">✕</button>
+            </div>
+          </div>
           <textarea id="admin-ai-prompt" rows="4" placeholder="الصق هنا أسئلة MCQ عشوائية، أو رابط ملف مع اسم المادة، أو فكرة إشعار للدفعة..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]"></textarea>
           <div class="flex flex-wrap items-center gap-3">
             <button type="button" id="btn-admin-ai-run" class="tap-btn btn-grad-primary px-5 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer inline-flex items-center gap-1.5">
@@ -2565,8 +2577,6 @@
       document.getElementById('broadcast-toast-body').textContent = n.body || '';
       wrap.classList.remove('hidden');
       playSFX('check');
-      clearTimeout(broadcastToastTimer);
-      broadcastToastTimer = setTimeout(() => wrap.classList.add('hidden'), 6500);
     }
 
     function renderAdminAvatarPreview() {
@@ -3447,13 +3457,12 @@
         });
 
         fbDb.collection('shared').doc('notifications').onSnapshot(doc => {
-          const prevCount = (shared.notifications || []).length;
           const items = (doc.exists && Array.isArray(doc.data().items)) ? doc.data().items : [];
           shared.notifications = items;
           updateNotifBadgeAndList();
-          if (notifBooted && items.length > prevCount) {
-            const latest = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
-            if (latest && (latest.createdAt || 0) > (state.lastNotifReadAt || 0)) showBroadcastTopToast(latest);
+          const latest = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+          if (latest && (latest.createdAt || 0) > (state.lastNotifReadAt || 0)) {
+            showBroadcastTopToast(latest);
           }
           notifBooted = true;
         }, () => {});
@@ -4524,7 +4533,12 @@
 
       // Broadcast Notifications & Bell Modal Handlers
       updateNotifBadgeAndList();
-      document.getElementById('broadcast-toast-close').onclick = () => document.getElementById('broadcast-toast').classList.add('hidden');
+      document.getElementById('broadcast-toast-close').onclick = () => {
+        document.getElementById('broadcast-toast').classList.add('hidden');
+        state.lastNotifReadAt = Date.now();
+        saveLocalStudentState();
+        updateNotifBadgeAndList();
+      };
       document.getElementById('btn-notifications-bell').onclick = () => {
         state.lastNotifReadAt = Date.now();
         saveLocalStudentState();
@@ -4655,8 +4669,38 @@
         if (target) target.classList.remove('hidden');
       });
 
-      // Gemini AI Admin Assistant (/api/ai-admin)
+      // Gemini AI Admin Assistant (/api/ai-admin) with PDF/Image <= 3.5MB
       let lastAiResult = null;
+      let aiPendingFile = null;
+      function clearAiPendingFile() {
+        aiPendingFile = null;
+        document.getElementById('admin-ai-file-badge').classList.add('hidden');
+        document.getElementById('admin-ai-file-input').value = '';
+      }
+      function handleAiFileSelect(file) {
+        if (!file) return;
+        if (file.size > 3.5 * 1024 * 1024) {
+          showToast('حجم الملف يتجاوز 3.5 ميجابايت!');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const res = String(reader.result || '');
+          const base64 = res.includes(',') ? res.split(',')[1] : res;
+          aiPendingFile = { base64, mimeType: file.type || 'application/octet-stream', name: file.name };
+          document.getElementById('admin-ai-file-name').textContent = `${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)`;
+          document.getElementById('admin-ai-file-badge').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+      document.getElementById('admin-ai-file-btn').onclick = () => document.getElementById('admin-ai-file-input').click();
+      document.getElementById('admin-ai-file-input').onchange = (e) => handleAiFileSelect(e.target.files && e.target.files[0]);
+      document.getElementById('admin-ai-file-cancel').onclick = clearAiPendingFile;
+      const aiDrop = document.getElementById('admin-ai-dropzone');
+      aiDrop.ondragover = (e) => { e.preventDefault(); aiDrop.classList.add('border-[#0a84ff]'); };
+      aiDrop.ondragleave = () => aiDrop.classList.remove('border-[#0a84ff]');
+      aiDrop.ondrop = (e) => { e.preventDefault(); aiDrop.classList.remove('border-[#0a84ff]'); if (e.dataTransfer.files && e.dataTransfer.files[0]) handleAiFileSelect(e.dataTransfer.files[0]); };
+
       document.getElementById('btn-admin-ai-run').onclick = async () => {
         if (!shared.isAdmin || !fbAuth || !fbAuth.currentUser) {
           showToast('يجب تسجيل دخول الأدمن أولاً');
@@ -4668,8 +4712,8 @@
         const prevEl = document.getElementById('admin-ai-preview');
         errEl.classList.add('hidden');
         prevEl.classList.add('hidden');
-        if (!promptText) {
-          errEl.textContent = 'يرجى كتابة أو لصق النص المطلوب تحليله أولاً.';
+        if (!promptText && !aiPendingFile) {
+          errEl.textContent = 'يرجى كتابة نص أو إرفاق ملف PDF/صورة لتحليله أولاً.';
           errEl.classList.remove('hidden');
           return;
         }
@@ -4682,7 +4726,11 @@
               'Content-Type': 'application/json',
               'Authorization': 'Bearer ' + idToken
             },
-            body: JSON.stringify({ promptText })
+            body: JSON.stringify({
+              promptText,
+              fileBase64: aiPendingFile ? aiPendingFile.base64 : null,
+              fileMimeType: aiPendingFile ? aiPendingFile.mimeType : null
+            })
           });
           if (!res.ok) throw new Error(`فشل الاتصال بالخادم (${res.status})`);
           const data = await res.json();
@@ -4738,7 +4786,7 @@
           });
           await saveSharedToFirestore('subject_quizzes', { data: nextData });
           document.getElementById('admin-ai-preview').classList.add('hidden');
-          document.getElementById('admin-ai-prompt').value = '';
+          document.getElementById('admin-ai-prompt').value = ''; clearAiPendingFile();
           showToast('تم نشر الأسئلة في بنك الأسئلة!');
         } else if (e.target.id === 'btn-ai-publish-resource') {
           const r = lastAiResult.resource || {};
@@ -4748,14 +4796,14 @@
           nextData[subj].unshift({ id: 'ai-res-' + Date.now(), title: r.title || 'ملف', url: r.url || '', desc: r.desc || '', createdAt: Date.now() });
           await saveSharedToFirestore('subject_resources', { data: nextData });
           document.getElementById('admin-ai-preview').classList.add('hidden');
-          document.getElementById('admin-ai-prompt').value = '';
+          document.getElementById('admin-ai-prompt').value = ''; clearAiPendingFile();
           showToast('تمت إضافة الملف للمادة بنجاح!');
         } else if (e.target.id === 'btn-ai-publish-notif') {
           const n = lastAiResult.notification || {};
           const nextItems = [{ id: 'ai-n-' + Date.now(), title: n.title || 'تنبيه', body: n.body || '', priority: n.priority === 'urgent' ? 'urgent' : 'normal', createdAt: Date.now() }, ...(shared.notifications || [])].slice(0, 30);
           await saveSharedToFirestore('notifications', { items: nextItems });
           document.getElementById('admin-ai-preview').classList.add('hidden');
-          document.getElementById('admin-ai-prompt').value = '';
+          document.getElementById('admin-ai-prompt').value = ''; clearAiPendingFile();
           showToast('تم إرسال الإشعار للدفعة!');
         }
       };
