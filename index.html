@@ -10,8 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-  <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
-  <script src="https://cdn.lordicon.com/lordicon.js"></script>
   <!-- Firebase Web SDK v10.14.1 (Compat CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -2244,7 +2242,7 @@
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="font-extrabold ${m.isAdmin ? 'text-amber-400' : 'text-[#0a84ff]'}">${escapeHtml(m.senderName || 'طالب')}</span>
                   ${m.isAdmin ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[9px] font-extrabold">Admin</span>` : ''}
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold ${tagColors[m.tag] || tagColors['عام']}">${getModuleLottie(m.tag, 18)}<span>${escapeHtml(m.tag || 'عام')}</span></span>
+                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold ${tagColors[m.tag] || tagColors['عام']}">${SUBJECTS_META[m.tag] ? `<span class="w-2 h-2 rounded-full shrink-0" style="background:${SUBJECTS_META[m.tag].color};"></span>` : ''}<span>${escapeHtml(m.tag || 'عام')}</span></span>
                 </div>
                 <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
               </div>
@@ -3135,6 +3133,9 @@
       const ls = shared.liveStream || {};
       const isVisible = ls.visible !== false;
       const isLogged = canUserChat();
+      const hideStreamTab = !isVisible && !shared.isAdmin;
+      document.querySelectorAll('[data-tab="stream"]').forEach(btn => btn.classList.toggle('hidden', hideStreamTab));
+      if (hideStreamTab && state.activeTab === 'stream') switchTab('home');
 
       if (admUrl && document.activeElement !== admUrl) admUrl.value = ls.url || '';
       if (admChk) admChk.checked = isVisible;
@@ -3676,10 +3677,14 @@
       state.activeTaskId = taskId;
       pomoTotalSec = target.durationMins * 60;
       if (target.remainingSec === undefined) target.remainingSec = pomoTotalSec;
-      pomoLeftSec = target.remainingSec;
+      const initialRemaining = target.remainingSec;
+      const timerStartMs = Date.now();
+      pomoLeftSec = initialRemaining;
       pomoRunning = true; playSFX('click'); saveLocalStudentState(); syncTimerDisplay(); renderTimeline();
       pomoInterval = setInterval(() => {
-        pomoLeftSec = Math.max(0, pomoLeftSec - 1); target.remainingSec = pomoLeftSec;
+        const realElapsed = Math.floor((Date.now() - timerStartMs) / 1000);
+        pomoLeftSec = Math.max(0, initialRemaining - realElapsed);
+        target.remainingSec = pomoLeftSec;
         if (pomoLeftSec % 5 === 0) saveLocalStudentState();
         if (pomoTotalSec > 0 && pomoLeftSec > 0) {
           const elapsedSec = pomoTotalSec - pomoLeftSec;
@@ -3764,7 +3769,7 @@
       return `
         <div class="apple-subcard stagger-item p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}" style="--i:${Math.min(idx, 12)}">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2 flex-1 min-w-[200px]">${getModuleLottie(state.activeSubject, 18)}<span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
+            <div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${(SUBJECTS_META[state.activeSubject] && SUBJECTS_META[state.activeSubject].color) || '#0a84ff'};"></span><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
             <div class="flex items-center gap-2 shrink-0"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
           </div>
           <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
@@ -3778,7 +3783,7 @@
         </div>`;
     }
 
-    function renderSubjects() {
+    function renderSubjects(skipStagger = false) {
       let sumPct = 0, totCount = 0;
       Object.values(shared.topics).forEach(arr => arr.forEach(t => { totCount++; sumPct += getTopicPct(t.id); }));
       const overallPct = totCount ? Math.round(sumPct / totCount) : 0;
@@ -3807,7 +3812,7 @@
       document.getElementById('topics-sections-container').innerHTML = html;
       updateKPIs();
       refreshLucideIcons();
-      gsapStagger('#topics-sections-container .stagger-item');
+      if (!skipStagger) gsapStagger('#topics-sections-container .stagger-item');
     }
 
     function updateKPIs() {
@@ -5016,7 +5021,7 @@
         const st = getTopicStage(e.target.dataset.stId);
         st[e.target.dataset.stKey] = e.target.checked;
         if (e.target.checked) { playSFX('check'); if (getTopicPct(e.target.dataset.stId) === 100) triggerConfetti(); }
-        saveLocalStudentState(true); renderSubjects();
+        saveLocalStudentState(true); renderSubjects(true);
       };
       document.getElementById('topics-sections-container').oninput = (e) => {
         if (!e.target.classList.contains('topic-note-input')) return;
