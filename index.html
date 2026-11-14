@@ -647,8 +647,15 @@
 
       <div class="apple-card p-4 sm:p-6 space-y-5">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b pb-4" style="border-color: var(--border-hairline);">
-          <h3 id="active-subject-title" class="text-base font-bold text-[#0a84ff]">ENT</h3>
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-wrap items-center justify-between gap-3 w-full lg:w-auto">
+            <h3 id="active-subject-title" class="text-base font-bold text-[#0a84ff]">ENT</h3>
+            <div class="seg-control inline-flex text-xs font-bold">
+              <button type="button" data-syl-sub="lectures" class="syl-sub-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">المحاضرات</button>
+              <button type="button" data-syl-sub="resources" class="syl-sub-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">الملفات والمصادر</button>
+              <button type="button" data-syl-sub="quizzes" class="syl-sub-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">بنك الأسئلة</button>
+            </div>
+          </div>
+          <div id="syl-lectures-toolbar" class="flex flex-wrap items-center gap-2">
             <input id="topic-search-input" type="text" placeholder="بحث سريع في المحاضرات..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none w-full sm:w-auto" />
             <div class="seg-control inline-flex text-[11px] font-semibold">
               <button data-topic-filter="ALL" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
@@ -658,13 +665,29 @@
           </div>
         </div>
 
-        <form id="add-topic-form" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center pb-2">
-          <input id="new-topic-input" type="text" placeholder="إضافة محاضرة نظرية جديدة (تُحفظ في Firestore)..." class="sm:col-span-6 px-3 py-2.5 apple-subcard text-base sm:text-xs" required />
-          <select id="new-topic-type" class="sm:col-span-3 px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold"><option value="Post-Midterm">Post-Midterm (Final)</option><option value="Midterm">Midterm</option></select>
-          <button type="submit" class="tap-btn sm:col-span-3 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">+ إضافة محاضرة</button>
-        </form>
+        <!-- Sub-panel 1: Lectures (4-Stage Checklist) -->
+        <div id="syl-panel-lectures" class="space-y-4">
+          <form id="add-topic-form" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center pb-2">
+            <input id="new-topic-input" type="text" placeholder="إضافة محاضرة نظرية جديدة (تُحفظ في Firestore)..." class="sm:col-span-6 px-3 py-2.5 apple-subcard text-base sm:text-xs" required />
+            <select id="new-topic-type" class="sm:col-span-3 px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold"><option value="Post-Midterm">Post-Midterm (Final)</option><option value="Midterm">Midterm</option></select>
+            <button type="submit" class="tap-btn sm:col-span-3 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">+ إضافة محاضرة</button>
+          </form>
+          <div id="topics-sections-container" class="space-y-6"></div>
+        </div>
 
-        <div id="topics-sections-container" class="space-y-6"></div>
+        <!-- Sub-panel 2: Subject Files & Resources (shared/subject_resources) -->
+        <div id="syl-panel-resources" class="hidden space-y-3">
+          <div id="subject-resources-list" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Sub-panel 3: Subject MCQ Question Bank (shared/subject_quizzes) -->
+        <div id="syl-panel-quizzes" class="hidden space-y-4">
+          <div class="apple-subcard p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs sm:text-sm font-bold">النتيجة: <span id="quiz-score-label" class="font-mono-num text-emerald-400">0 / 0</span></div>
+            <button type="button" id="btn-quiz-reset" class="tap-btn px-3 py-1.5 rounded-xl apple-card text-xs font-bold text-[#38bdf8] cursor-pointer">إعادة المحاولة</button>
+          </div>
+          <div id="subject-quizzes-list" class="space-y-3"></div>
+        </div>
       </div>
     </section>
 
@@ -1002,193 +1025,256 @@
       </div>
     </section>
 
-    <!-- TAB 4: ADMIN TAB & STUDENT STATS -->
-    <section id="tab-admin" class="tab-panel hidden space-y-6 fade-in">
-      <!-- Admin Live Stream Management & Real Viewers Counter (shared/live_stream) -->
-      <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-rose-500">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 class="text-base font-bold">إدارة استراحة البث المباشر (Firestore Live)</h2>
-            <p class="text-xs" style="color: var(--text-muted);">تعديل رابط المشغّل أو كود iframe وتفاصيل المباراة والتحكم في إظهار البث.</p>
-          </div>
-          <label class="apple-subcard px-3 py-1.5 flex items-center gap-2 text-xs font-bold cursor-pointer">
-            <input id="admin-stream-visible-chk" type="checkbox" class="w-4 h-4 accent-rose-500" checked />
-            <span>إظهار البث للطلبة</span>
-          </label>
-        </div>
-
-        <!-- Real-Time Stream Viewers (Exclusive to Admin) -->
-        <div class="apple-subcard p-3.5 space-y-2 border border-rose-500/35 bg-rose-500/10">
-          <div id="admin-tab-viewers-count" class="text-xs sm:text-sm font-extrabold text-rose-400">🔴 يشاهدون البث الآن: 0 طالب</div>
-          <div id="admin-tab-viewers-names" class="flex flex-wrap gap-1.5"></div>
-        </div>
-
-        <form id="admin-stream-form" class="space-y-3 text-xs">
-          <input id="admin-stream-url-input" type="text" placeholder="رابط البث المباشر أو كود <iframe> كاملاً..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" dir="ltr" required />
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <input id="admin-stream-title" type="text" placeholder="عنوان المباراة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
-            <input id="admin-stream-note" type="text" placeholder="نبذة مميزة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-            <input id="admin-stream-referee" type="text" placeholder="الحكم (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
-            <input id="admin-stream-stadium" type="text" placeholder="الملعب (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
-            <input id="admin-stream-channel" type="text" placeholder="القناة الناقلة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
-          </div>
-          <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">حفظ وتحديث للجميع</button>
-        </form>
-      </div>
-
-      <!-- Admin Study Rooms Monitor -->
-      <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
-        <div>
-          <h2 class="text-base font-bold">مراقبة غرف الدراسة سوا (Admin Monitor)</h2>
-          <p class="text-xs" style="color: var(--text-muted);">اعرض جميع الغرف النشطة والمؤرشفة ورسائلها وملفاتها، أو احذف أي غرفة نهائياً.</p>
-        </div>
-        <div id="admin-rooms-list" class="space-y-2.5 max-h-80 overflow-y-auto custom-scroll"></div>
-      </div>
-
-      <!-- Admin Lock/Unlock Public Group Chat -->
-      <div class="apple-card p-5 sm:p-6 space-y-3 border-r-4 border-r-rose-500">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 class="text-base font-bold">التحكم في غرفة المذاكرة الجماعية</h2>
-            <p class="text-xs" style="color: var(--text-muted);">اقفل أو افتح الشات العام لجميع الطلبة مع إمكانية كتابة سبب اختياري.</p>
-          </div>
-          <button type="button" id="btn-admin-toggle-chat-lock" class="tap-btn px-4 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">قفل الغرفة 🔒</button>
-        </div>
-        <input id="admin-chat-lock-msg" type="text" placeholder="سبب الإغلاق أو رسالة للطلبة (اختياري)..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs" />
-      </div>
-
-      <!-- Admin Exclusive Avatar (shared/admin_profile) -->
-      <div class="apple-card p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4 border-r-4 border-r-amber-400">
-        <div class="flex items-center gap-3.5 min-w-0">
-          <div id="admin-avatar-preview-wrap" class="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center text-amber-400 text-lg font-extrabold overflow-hidden shrink-0">A</div>
-          <div class="min-w-0">
-            <h2 class="text-base font-bold">صورة الأدمن الشخصية (حصرية للأدمن)</h2>
-            <p class="text-xs" style="color: var(--text-muted);">تظهر بجانب رسائلك في الشات وبجانب إشعارات الدفعة لجميع الطلبة.</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <input id="admin-avatar-input" type="file" accept="image/*" class="hidden" />
-          <button type="button" id="admin-avatar-upload-btn" class="tap-btn px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer">رفع / تغيير الصورة</button>
-          <button type="button" id="admin-avatar-remove-btn" class="hidden tap-btn px-3 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">حذف</button>
+    <!-- TAB 4: ORGANIZED ADMIN PANEL (5 SUB-TABS) -->
+    <section id="tab-admin" class="tab-panel hidden space-y-5 fade-in">
+      <!-- Admin Horizontal Sub-Tabs -->
+      <div class="apple-card p-2.5 overflow-x-auto no-scrollbar">
+        <div class="inline-flex items-center gap-1.5 min-w-max">
+          <button type="button" data-adm-sub="students" class="adm-sub-btn tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer whitespace-nowrap">الطلبة</button>
+          <button type="button" data-adm-sub="alerts" class="adm-sub-btn tap-btn px-4 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">التنبيهات</button>
+          <button type="button" data-adm-sub="stream" class="adm-sub-btn tap-btn px-4 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">البث</button>
+          <button type="button" data-adm-sub="chat" class="adm-sub-btn tap-btn px-4 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">الشات والغرف</button>
+          <button type="button" data-adm-sub="content" class="adm-sub-btn tap-btn px-4 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap" style="color: var(--text-muted);">الملفات والأسئلة</button>
         </div>
       </div>
 
-      <!-- Admin Student Stats -->
-      <div class="apple-card p-5 sm:p-6 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
-          <div>
-            <h2 class="text-base font-bold">لوحة إحصائيات الطلبة (Firestore Live)</h2>
-            <p class="text-xs" style="color: var(--text-muted);">مرتبة حسب الأكثر مذاكرة، مع تتبع حالة النشاط الحقيقية.</p>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <button type="button" id="admin-active-first-btn" class="tap-btn px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-emerald-400 text-[11px] font-bold cursor-pointer">النشطين أولاً ✓</button>
-            <button type="button" id="admin-active-only-btn" class="tap-btn px-3 py-2 rounded-xl apple-subcard text-[11px] font-bold cursor-pointer" style="color: var(--text-muted);">النشطين فقط</button>
-            <input id="admin-student-search" type="text" placeholder="بحث بالاسم أو الكود..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none flex-1 sm:w-48" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="apple-subcard p-4">
-            <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الطلبة المسجلين</div>
-            <div class="flex items-baseline justify-between gap-2 mt-1">
-              <div id="admin-stat-students" class="text-2xl font-extrabold font-mono-num text-[#0a84ff]">0</div>
-              <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-400">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>نشط فعلياً:</span>
-                <span id="admin-stat-real-active" class="font-mono-num">0</span>
-              </div>
+      <!-- ADMIN SUB-TAB 1: STUDENTS & AVATAR -->
+      <div id="adm-panel-students" class="adm-sub-panel space-y-5">
+        <div class="apple-card p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4 border-r-4 border-r-amber-400">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div id="admin-avatar-preview-wrap" class="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center text-amber-400 text-lg font-extrabold overflow-hidden shrink-0">A</div>
+            <div class="min-w-0">
+              <h2 class="text-base font-bold">صورة الأدمن الشخصية (حصرية للأدمن)</h2>
+              <p class="text-xs" style="color: var(--text-muted);">تظهر بجانب رسائلك في الشات وبجانب إشعارات الدفعة لجميع الطلبة.</p>
             </div>
           </div>
-          <div class="apple-subcard p-4">
-            <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات مذاكرة الدفعة</div>
-            <div id="admin-stat-hours" class="text-2xl font-extrabold font-mono-num text-emerald-400 mt-1">0.0h</div>
-          </div>
-          <div class="apple-subcard p-4">
-            <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الجلسات المكتملة</div>
-            <div id="admin-stat-sessions" class="text-2xl font-extrabold font-mono-num text-purple-400 mt-1">0</div>
-          </div>
-        </div>
-
-        <div id="admin-students-list" class="space-y-2.5 max-h-[420px] overflow-y-auto custom-scroll pr-0.5"></div>
-      </div>
-
-      <!-- Admin Broadcast Notifications (shared/notifications) -->
-      <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-500">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 class="text-base font-bold">إرسال إشعار للدفعة (Notifications Live)</h2>
-            <p class="text-xs" style="color: var(--text-muted);">يصل فوراً للطلبة كإشعار منبثق أعلى الشاشة ويُحفظ في أيقونة الجرس.</p>
-          </div>
-          <button type="button" id="admin-clear-all-notifs" class="tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">حذف جميع الإشعارات</button>
-        </div>
-        <form id="admin-broadcast-form" class="space-y-3">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-            <input id="admin-notif-title" type="text" placeholder="عنوان الإشعار..." class="sm:col-span-2 px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
-            <select id="admin-notif-priority" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold">
-              <option value="normal">عادي</option>
-              <option value="urgent">هام جداً</option>
-            </select>
-          </div>
-          <div class="flex flex-wrap gap-2.5">
-            <input id="admin-notif-body" type="text" placeholder="نص الرسالة..." class="flex-1 min-w-[200px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
-            <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إرسال الإشعار الآن</button>
-          </div>
-        </form>
-        <div id="admin-notifications-list" class="space-y-2 max-h-60 overflow-y-auto custom-scroll"></div>
-      </div>
-
-      <!-- Smart Moderation Bot Settings (shared/moderation) -->
-      <div class="apple-card p-5 sm:p-6 space-y-4">
-        <div>
-          <h2 class="text-base font-bold">إعدادات بوت المراقبة (كلمات محظورة إضافية)</h2>
-          <p class="text-xs" style="color: var(--text-muted);">أضف كلمات جديدة لمنعها تلقائياً في غرفة المذاكرة الجماعية.</p>
-        </div>
-        <form id="admin-mod-form" class="flex flex-wrap gap-2.5">
-          <input id="admin-mod-word-input" type="text" placeholder="أضف كلمة محظورة..." class="flex-1 min-w-[180px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
-          <button type="submit" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">+ إضافة للفلتر</button>
-        </form>
-        <div id="admin-mod-words-list" class="flex flex-wrap gap-2"></div>
-      </div>
-
-      <!-- Batch Announcement -->
-      <div class="apple-card p-5 sm:p-6 space-y-4">
-        <div class="flex items-center justify-between">
-          <div><h2 class="text-base font-bold">شريط التنبيهات العلوي للدفعة (Firestore Live)</h2><p class="text-xs" style="color: var(--text-muted);">أي تنبيه تنشره يظهر فوراً لجميع الطلبة في الوقت الفعلي.</p></div>
-          <button type="button" id="admin-clear-notice" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-semibold text-rose-400 cursor-pointer">مسح التنبيه</button>
-        </div>
-        <form id="admin-notice-form" class="flex flex-wrap gap-2.5">
-          <input id="admin-notice-input" type="text" placeholder="اكتب تنبيه الدفعة هنا..." class="flex-1 min-w-[200px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
-          <select id="admin-notice-level" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold"><option value="info">عادي (أزرق)</option><option value="warn">مهم (برتقالي)</option><option value="urgent">عاجل (أحمر)</option></select>
-          <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">نشر للجميع</button>
-        </form>
-      </div>
-
-      <!-- Official Exam Schedule Image Management (shared/exam_schedule_image) -->
-      <div class="apple-card p-5 sm:p-6 space-y-3 border-r-4 border-r-[#0a84ff]">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 class="text-base font-bold">صورة جدول الامتحانات الرسمي (Firestore Live)</h3>
-            <p class="text-xs" style="color: var(--text-muted);">ارفع أو استبدل صورة الجدول ليظهر التحديث فوراً للجميع بدلاً من الصورة الافتراضية.</p>
-          </div>
           <div class="flex items-center gap-2 shrink-0">
-            <input id="admin-schedule-img-input" type="file" accept="image/*" class="hidden" />
-            <button type="button" id="admin-schedule-upload-btn" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">رفع / استبدال صورة الجدول</button>
-            <button type="button" id="admin-schedule-reset-btn" class="hidden tap-btn px-3 py-2 rounded-xl apple-subcard text-xs font-bold text-rose-400 cursor-pointer">استعادة الافتراضية</button>
+            <input id="admin-avatar-input" type="file" accept="image/*" class="hidden" />
+            <button type="button" id="admin-avatar-upload-btn" class="tap-btn px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer">رفع / تغيير الصورة</button>
+            <button type="button" id="admin-avatar-remove-btn" class="hidden tap-btn px-3 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">حذف</button>
+          </div>
+        </div>
+
+        <div class="apple-card p-5 sm:p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
+            <div>
+              <h2 class="text-base font-bold">لوحة إحصائيات الطلبة (Firestore Live)</h2>
+              <p class="text-xs" style="color: var(--text-muted);">مرتبة حسب الأكثر مذاكرة، مع تتبع حالة النشاط الحقيقية.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <button type="button" id="admin-active-first-btn" class="tap-btn px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-emerald-400 text-[11px] font-bold cursor-pointer">النشطين أولاً ✓</button>
+              <button type="button" id="admin-active-only-btn" class="tap-btn px-3 py-2 rounded-xl apple-subcard text-[11px] font-bold cursor-pointer" style="color: var(--text-muted);">النشطين فقط</button>
+              <input id="admin-student-search" type="text" placeholder="بحث بالاسم أو الكود..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none flex-1 sm:w-48" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="apple-subcard p-4">
+              <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الطلبة المسجلين</div>
+              <div class="flex items-baseline justify-between gap-2 mt-1">
+                <div id="admin-stat-students" class="text-2xl font-extrabold font-mono-num text-[#0a84ff]">0</div>
+                <div class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>نشط فعلياً:</span>
+                  <span id="admin-stat-real-active" class="font-mono-num">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="apple-subcard p-4">
+              <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات مذاكرة الدفعة</div>
+              <div id="admin-stat-hours" class="text-2xl font-extrabold font-mono-num text-emerald-400 mt-1">0.0h</div>
+            </div>
+            <div class="apple-subcard p-4">
+              <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الجلسات المكتملة</div>
+              <div id="admin-stat-sessions" class="text-2xl font-extrabold font-mono-num text-purple-400 mt-1">0</div>
+            </div>
+          </div>
+
+          <div id="admin-students-list" class="space-y-2.5 max-h-[420px] overflow-y-auto custom-scroll pr-0.5"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN SUB-TAB 2: ALERTS, NOTIFICATIONS & EXAM SCHEDULE IMAGE -->
+      <div id="adm-panel-alerts" class="adm-sub-panel hidden space-y-5">
+        <div class="apple-card p-5 sm:p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div><h2 class="text-base font-bold">شريط التنبيهات العلوي للدفعة (shared/notice)</h2><p class="text-xs" style="color: var(--text-muted);">أي تنبيه تنشره يظهر فوراً لجميع الطلبة في الوقت الفعلي.</p></div>
+            <button type="button" id="admin-clear-notice" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-semibold text-rose-400 cursor-pointer">مسح التنبيه</button>
+          </div>
+          <form id="admin-notice-form" class="flex flex-wrap gap-2.5">
+            <input id="admin-notice-input" type="text" placeholder="اكتب تنبيه الدفعة هنا..." class="flex-1 min-w-[200px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+            <select id="admin-notice-level" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold"><option value="info">عادي (أزرق)</option><option value="warn">مهم (برتقالي)</option><option value="urgent">عاجل (أحمر)</option></select>
+            <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">نشر للجميع</button>
+          </form>
+        </div>
+
+        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-500">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold">إرسال إشعار للدفعة (shared/notifications)</h2>
+              <p class="text-xs" style="color: var(--text-muted);">يصل فوراً للطلبة كإشعار منبثق أعلى الشاشة ويُحفظ في أيقونة الجرس.</p>
+            </div>
+            <button type="button" id="admin-clear-all-notifs" class="tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">حذف جميع الإشعارات</button>
+          </div>
+          <form id="admin-broadcast-form" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <input id="admin-notif-title" type="text" placeholder="عنوان الإشعار..." class="sm:col-span-2 px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+              <select id="admin-notif-priority" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold">
+                <option value="normal">عادي</option>
+                <option value="urgent">هام جداً</option>
+              </select>
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+              <input id="admin-notif-body" type="text" placeholder="نص الرسالة..." class="flex-1 min-w-[200px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+              <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إرسال الإشعار الآن</button>
+            </div>
+          </form>
+          <div id="admin-notifications-list" class="space-y-2 max-h-60 overflow-y-auto custom-scroll"></div>
+        </div>
+
+        <div class="apple-card p-5 sm:p-6 space-y-3 border-r-4 border-r-[#0a84ff]">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold">صورة جدول الامتحانات الرسمي (shared/exam_schedule_image)</h3>
+              <p class="text-xs" style="color: var(--text-muted);">ارفع أو استبدل صورة الجدول ليظهر التحديث فوراً للجميع.</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <input id="admin-schedule-img-input" type="file" accept="image/*" class="hidden" />
+              <button type="button" id="admin-schedule-upload-btn" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">رفع / استبدال صورة الجدول</button>
+              <button type="button" id="admin-schedule-reset-btn" class="hidden tap-btn px-3 py-2 rounded-xl apple-subcard text-xs font-bold text-rose-400 cursor-pointer">استعادة الافتراضية</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Firestore Controls -->
-      <div class="apple-card p-5 sm:p-6 space-y-3">
-        <h3 class="text-base font-bold">إدارة بيانات Cloud Firestore</h3>
-        <p class="text-xs" style="color: var(--text-muted);">مسجل الدخول: <span id="admin-email-display" class="font-mono-num text-[#0a84ff]">--</span></p>
-        <div class="flex flex-wrap gap-2">
-          <button id="btn-sync-new-curriculum" class="tap-btn px-4 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">مزامنة المنهج الجديد على Firestore (دون مسح التقدم)</button>
-          <button id="btn-seed-firestore" class="tap-btn px-4 py-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs font-bold cursor-pointer">رفع البيانات الافتراضية لـ Firestore</button>
-          <button id="btn-reset-exams" class="tap-btn px-4 py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">استعادة جدول الامتحانات</button>
-          <button id="btn-exit-admin" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تسجيل خروج الأدمن</button>
+      <!-- ADMIN SUB-TAB 3: LIVE STREAM MANAGEMENT -->
+      <div id="adm-panel-stream" class="adm-sub-panel hidden space-y-5">
+        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-rose-500">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold">إدارة استراحة البث المباشر (shared/live_stream)</h2>
+              <p class="text-xs" style="color: var(--text-muted);">تعديل رابط المشغّل أو كود iframe وتفاصيل المباراة والتحكم في إظهار البث.</p>
+            </div>
+            <label class="apple-subcard px-3 py-1.5 flex items-center gap-2 text-xs font-bold cursor-pointer">
+              <input id="admin-stream-visible-chk" type="checkbox" class="w-4 h-4 accent-rose-500" checked />
+              <span>إظهار البث للطلبة</span>
+            </label>
+          </div>
+          <div class="apple-subcard p-3.5 space-y-2 border border-rose-500/35 bg-rose-500/10">
+            <div id="admin-tab-viewers-count" class="text-xs sm:text-sm font-extrabold text-rose-400">🔴 يشاهدون البث الآن: 0 طالب</div>
+            <div id="admin-tab-viewers-names" class="flex flex-wrap gap-1.5"></div>
+          </div>
+          <form id="admin-stream-form" class="space-y-3 text-xs">
+            <input id="admin-stream-url-input" type="text" placeholder="رابط البث المباشر أو كود <iframe> كاملاً..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none" dir="ltr" required />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <input id="admin-stream-title" type="text" placeholder="عنوان المباراة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+              <input id="admin-stream-note" type="text" placeholder="نبذة مميزة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <input id="admin-stream-referee" type="text" placeholder="الحكم (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+              <input id="admin-stream-stadium" type="text" placeholder="الملعب (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+              <input id="admin-stream-channel" type="text" placeholder="القناة الناقلة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
+            </div>
+            <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">حفظ وتحديث للجميع</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ADMIN SUB-TAB 4: CHAT LOCK, MODERATION & STUDY ROOMS -->
+      <div id="adm-panel-chat" class="adm-sub-panel hidden space-y-5">
+        <div class="apple-card p-5 sm:p-6 space-y-3 border-r-4 border-r-rose-500">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold">التحكم في غرفة المذاكرة الجماعية</h2>
+              <p class="text-xs" style="color: var(--text-muted);">اقفل أو افتح الشات العام لجميع الطلبة مع إمكانية كتابة سبب اختياري.</p>
+            </div>
+            <button type="button" id="btn-admin-toggle-chat-lock" class="tap-btn px-4 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">قفل الغرفة 🔒</button>
+          </div>
+          <input id="admin-chat-lock-msg" type="text" placeholder="سبب الإغلاق أو رسالة للطلبة (اختياري)..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs" />
+        </div>
+
+        <div class="apple-card p-5 sm:p-6 space-y-4">
+          <div>
+            <h2 class="text-base font-bold">إعدادات بوت المراقبة (shared/moderation)</h2>
+            <p class="text-xs" style="color: var(--text-muted);">أضف كلمات جديدة لمنعها تلقائياً في غرفة المذاكرة الجماعية.</p>
+          </div>
+          <form id="admin-mod-form" class="flex flex-wrap gap-2.5">
+            <input id="admin-mod-word-input" type="text" placeholder="أضف كلمة محظورة..." class="flex-1 min-w-[180px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+            <button type="submit" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">+ إضافة للفلتر</button>
+          </form>
+          <div id="admin-mod-words-list" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
+          <div>
+            <h2 class="text-base font-bold">مراقبة غرف الدراسة سوا (study_rooms)</h2>
+            <p class="text-xs" style="color: var(--text-muted);">اعرض جميع الغرف النشطة والمؤرشفة ورسائلها وملفاتها، أو احذف أي غرفة نهائياً.</p>
+          </div>
+          <div id="admin-rooms-list" class="space-y-2.5 max-h-80 overflow-y-auto custom-scroll"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN SUB-TAB 5: SUBJECT RESOURCES, QUIZZES & CURRICULUM SYNC -->
+      <div id="adm-panel-content" class="adm-sub-panel hidden space-y-5">
+        <!-- Add Subject Resource -->
+        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
+          <h2 class="text-base font-bold">إدارة الملفات والمصادر (shared/subject_resources)</h2>
+          <form id="admin-resource-form" class="space-y-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <select id="admin-res-subj" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-bold">
+                <option value="OPTH">OPTH</option><option value="ENT">ENT</option><option value="FMIMC">FMIMC</option><option value="EBMR">EBMR</option>
+              </select>
+              <input id="admin-res-title" type="text" placeholder="عنوان الملف أو المصدر..." class="sm:col-span-2 px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+            </div>
+            <input id="admin-res-url" type="url" placeholder="رابط الملف (Google Drive / PDF / Telegram)..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num" dir="ltr" required />
+            <div class="flex flex-wrap gap-2.5">
+              <input id="admin-res-desc" type="text" placeholder="وصف اختياري..." class="flex-1 min-w-[200px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs" />
+              <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">+ إضافة ملف</button>
+            </div>
+          </form>
+          <div id="admin-resources-list" class="space-y-2 max-h-60 overflow-y-auto custom-scroll"></div>
+        </div>
+
+        <!-- Add Subject Quiz MCQ -->
+        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-purple-400">
+          <h2 class="text-base font-bold">إدارة بنك الأسئلة MCQ (shared/subject_quizzes)</h2>
+          <form id="admin-quiz-form" class="space-y-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <select id="admin-quiz-subj" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-bold">
+                <option value="OPTH">OPTH</option><option value="ENT">ENT</option><option value="FMIMC">FMIMC</option><option value="EBMR">EBMR</option>
+              </select>
+              <input id="admin-quiz-q" type="text" placeholder="نص السؤال..." class="sm:col-span-2 px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <input id="admin-quiz-opt0" type="text" placeholder="الاختيار الأول (A)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+              <input id="admin-quiz-opt1" type="text" placeholder="الاختيار الثاني (B)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+              <input id="admin-quiz-opt2" type="text" placeholder="الاختيار الثالث (C)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+              <input id="admin-quiz-opt3" type="text" placeholder="الاختيار الرابع (D)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs" required />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <select id="admin-quiz-correct" class="px-3 py-2.5 apple-subcard text-base sm:text-xs font-bold">
+                <option value="0">الإجابة الصحيحة: A (الأول)</option>
+                <option value="1">الإجابة الصحيحة: B (الثاني)</option>
+                <option value="2">الإجابة الصحيحة: C (الثالث)</option>
+                <option value="3">الإجابة الصحيحة: D (الرابع)</option>
+              </select>
+              <input id="admin-quiz-exp" type="text" placeholder="شرح الإجابة (اختياري)..." class="sm:col-span-2 px-3.5 py-2.5 apple-subcard text-base sm:text-xs" />
+            </div>
+            <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-purple-500 text-white text-xs font-bold cursor-pointer">+ إضافة سؤال للبنك</button>
+          </form>
+          <div id="admin-quizzes-list" class="space-y-2 max-h-60 overflow-y-auto custom-scroll"></div>
+        </div>
+
+        <!-- Firestore Sync & Admin Logout -->
+        <div class="apple-card p-5 sm:p-6 space-y-3">
+          <h3 class="text-base font-bold">إدارة بيانات Cloud Firestore</h3>
+          <p class="text-xs" style="color: var(--text-muted);">مسجل الدخول: <span id="admin-email-display" class="font-mono-num text-[#0a84ff]">--</span></p>
+          <div class="flex flex-wrap gap-2">
+            <button id="btn-sync-new-curriculum" class="tap-btn px-4 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">مزامنة المنهج الجديد على Firestore (دون مسح التقدم)</button>
+            <button id="btn-seed-firestore" class="tap-btn px-4 py-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 text-xs font-bold cursor-pointer">رفع البيانات الافتراضية لـ Firestore</button>
+            <button id="btn-reset-exams" class="tap-btn px-4 py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">استعادة جدول الامتحانات</button>
+            <button id="btn-exit-admin" class="tap-btn px-4 py-2.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تسجيل خروج الأدمن</button>
+          </div>
         </div>
       </div>
     </section>
@@ -1555,6 +1641,20 @@
     </div>
   </div>
 
+  <!-- One-Time Student Welcome Modal (mnu_sem9_welcomed_v1) -->
+  <div id="student-welcome-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 text-center border border-[#0a84ff]/35">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto">
+        <i data-lucide="sparkles" class="w-6 h-6"></i>
+      </div>
+      <h3 id="welcome-modal-title" class="text-base sm:text-lg font-extrabold">أهلاً بك في منصة الدفعة!</h3>
+      <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-muted);">
+        تصفح <strong class="text-[#38bdf8]">المنهج والتشيك ليست</strong> لمتابعة محاضراتك وملفاتك وبنك الأسئلة، ونظّم يومك من <strong class="text-emerald-400">المخطط والدراسة</strong>، وشارك زملاءك في <strong class="text-purple-400">غرف المذاكرة الجماعية والدراسة سوا</strong>.
+      </p>
+      <button type="button" id="welcome-modal-close" class="tap-btn btn-grad-primary w-full py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer">ابدأ الآن 🚀</button>
+    </div>
+  </div>
+
   <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
 
   <script>
@@ -1763,7 +1863,11 @@
       roomPendingImage: null,
       roomPendingFile: null,
       adminRoomsList: [],
-      liveStream: { url: 'https://912acsss8af382.sirtv.top/playerv5.php?match=4716606&key=9f39972b67d6ce22189507d008acwc26', visible: true, matchTitle: '', matchNote: '', referee: '', stadium: '', channel: '' }
+      liveStream: { url: 'https://912acsss8af382.sirtv.top/playerv5.php?match=4716606&key=9f39972b67d6ce22189507d008acwc26', visible: true, matchTitle: '', matchNote: '', referee: '', stadium: '', channel: '' },
+      subjectResources: {},
+      subjectQuizzes: {},
+      sylSubTab: 'lectures',
+      quizAnswers: {}
     };
 
     let studentsUnsub = null;
@@ -3189,6 +3293,106 @@
       }
     }
 
+    // =========================================================================
+    // Subject Resources (shared/subject_resources) & MCQ Quizzes (shared/subject_quizzes)
+    // =========================================================================
+    function renderSubjectResources() {
+      const wrap = document.getElementById('subject-resources-list');
+      if (!wrap) return;
+      const list = (shared.subjectResources && shared.subjectResources[state.activeSubject]) || [];
+      if (!list.length) {
+        wrap.innerHTML = `<div class="apple-subcard p-6 text-center text-xs" style="color: var(--text-muted);">لا توجد ملفات أو مصادر مضافة لهذه المادة حالياً.</div>`;
+        return;
+      }
+      wrap.innerHTML = list.map(r => {
+        const dStr = r.createdAt ? new Date(r.createdAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' }) : '';
+        return `
+          <div class="apple-subcard p-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0 flex-1 space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <i data-lucide="file-text" class="w-4 h-4 text-[#38bdf8] shrink-0"></i>
+                <span class="text-xs sm:text-sm font-bold">${escapeHtml(r.title)}</span>
+                ${dStr ? `<span class="text-[10px] font-mono-num" style="color: var(--text-muted);">${dStr}</span>` : ''}
+              </div>
+              ${r.desc ? `<p class="text-xs leading-relaxed" style="color: var(--text-muted);">${escapeHtml(r.desc)}</p>` : ''}
+            </div>
+            <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold shrink-0">فتح / تحميل</a>
+          </div>`;
+      }).join('');
+      refreshLucideIcons();
+    }
+
+    function renderSubjectQuizzes() {
+      const wrap = document.getElementById('subject-quizzes-list');
+      const scoreLbl = document.getElementById('quiz-score-label');
+      if (!wrap) return;
+      const list = (shared.subjectQuizzes && shared.subjectQuizzes[state.activeSubject]) || [];
+      let correctCount = 0;
+      list.forEach(q => {
+        if (shared.quizAnswers[q.id] !== undefined && Number(shared.quizAnswers[q.id]) === Number(q.correct)) correctCount++;
+      });
+      if (scoreLbl) scoreLbl.textContent = `${correctCount} / ${list.length}`;
+
+      if (!list.length) {
+        wrap.innerHTML = `<div class="apple-subcard p-6 text-center text-xs" style="color: var(--text-muted);">لا توجد أسئلة MCQ مضافة لهذه المادة بعد.</div>`;
+        return;
+      }
+      const letters = ['A', 'B', 'C', 'D'];
+      wrap.innerHTML = list.map((q, idx) => {
+        const picked = shared.quizAnswers[q.id];
+        const answered = picked !== undefined;
+        const optsHtml = (q.options || []).map((opt, oi) => {
+          let cls = 'apple-card hover:border-[#0a84ff]/50';
+          if (answered) {
+            if (oi === Number(q.correct)) cls = 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold';
+            else if (oi === Number(picked)) cls = 'bg-rose-500/20 border-rose-500 text-rose-300 font-bold';
+            else cls = 'apple-card opacity-60';
+          }
+          return `<button type="button" data-quiz-id="${q.id}" data-quiz-opt="${oi}" class="quiz-opt-btn tap-btn w-full text-right px-3.5 py-2.5 rounded-xl border text-xs flex items-center gap-2 cursor-pointer ${cls}"><span class="font-mono-num font-extrabold text-[11px]">${letters[oi]}</span><span>${escapeHtml(opt)}</span></button>`;
+        }).join('');
+        const expHtml = (answered && q.explanation) ? `<div class="p-3 rounded-xl bg-[#0a84ff]/10 border border-[#0a84ff]/30 text-xs text-[#38bdf8]"><strong>الشرح:</strong> ${escapeHtml(q.explanation)}</div>` : '';
+        return `
+          <div class="apple-subcard p-4 space-y-3">
+            <div class="text-xs sm:text-sm font-bold leading-relaxed"><span class="font-mono-num text-[#38bdf8] ml-1.5">Q${idx + 1}.</span>${escapeHtml(q.question)}</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${optsHtml}</div>
+            ${expHtml}
+          </div>`;
+      }).join('');
+    }
+
+    function renderAdminContentLists() {
+      const resWrap = document.getElementById('admin-resources-list');
+      const quizWrap = document.getElementById('admin-quizzes-list');
+      if (resWrap) {
+        const allRes = [];
+        Object.entries(shared.subjectResources || {}).forEach(([subj, arr]) => (arr || []).forEach(r => allRes.push({ ...r, subj })));
+        resWrap.innerHTML = allRes.length ? allRes.map(r => `
+          <div class="apple-subcard p-3 flex items-center justify-between gap-2 text-xs">
+            <div class="min-w-0 truncate"><span class="px-1.5 py-0.5 rounded bg-[#0a84ff]/20 text-[#38bdf8] font-bold ml-1.5">${r.subj}</span><span class="font-bold">${escapeHtml(r.title)}</span></div>
+            <button type="button" data-adm-del-res="${r.id}" data-adm-res-subj="${r.subj}" class="adm-del-res-btn tap-btn text-rose-400 font-bold px-2 py-1 cursor-pointer">🗑️</button>
+          </div>`).join('') : '<div class="text-xs" style="color: var(--text-muted);">لا توجد ملفات مضافة بعد.</div>';
+      }
+      if (quizWrap) {
+        const allQ = [];
+        Object.entries(shared.subjectQuizzes || {}).forEach(([subj, arr]) => (arr || []).forEach(q => allQ.push({ ...q, subj })));
+        quizWrap.innerHTML = allQ.length ? allQ.map(q => `
+          <div class="apple-subcard p-3 flex items-center justify-between gap-2 text-xs">
+            <div class="min-w-0 truncate"><span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 font-bold ml-1.5">${q.subj}</span><span class="font-bold">${escapeHtml(q.question)}</span></div>
+            <button type="button" data-adm-del-q="${q.id}" data-adm-q-subj="${q.subj}" class="adm-del-q-btn tap-btn text-rose-400 font-bold px-2 py-1 cursor-pointer">🗑️</button>
+          </div>`).join('') : '<div class="text-xs" style="color: var(--text-muted);">لا توجد أسئلة مضافة بعد.</div>';
+      }
+    }
+
+    function showOneTimeWelcomeIfNeeded(name) {
+      try {
+        if (localStorage.getItem('mnu_sem9_welcomed_v1')) return;
+        localStorage.setItem('mnu_sem9_welcomed_v1', '1');
+      } catch (e) {}
+      const ttl = document.getElementById('welcome-modal-title');
+      if (ttl) ttl.textContent = `أهلاً بك يا دكتور ${(name || '').split(' ')[0] || ''} في منصة الدفعة!`;
+      gsapModalOpen('student-welcome-modal');
+    }
+
     function initFirebaseSync() {
       const badge = document.getElementById('cloud-sync-badge');
       if (!isFirebaseReady()) {
@@ -3257,6 +3461,16 @@
             };
             applyLiveStreamUI();
           }
+        }, () => {});
+        fbDb.collection('shared').doc('subject_resources').onSnapshot(doc => {
+          shared.subjectResources = (doc.exists && doc.data().data) ? doc.data().data : {};
+          renderSubjectResources();
+          renderAdminContentLists();
+        }, () => {});
+        fbDb.collection('shared').doc('subject_quizzes').onSnapshot(doc => {
+          shared.subjectQuizzes = (doc.exists && doc.data().data) ? doc.data().data : {};
+          renderSubjectQuizzes();
+          renderAdminContentLists();
         }, () => {});
         loadStudentFromFirestoreOnBoot();
         initStudyRoomsListener();
@@ -3813,6 +4027,8 @@
       updateKPIs();
       refreshLucideIcons();
       if (!skipStagger) gsapStagger('#topics-sections-container .stagger-item');
+      renderSubjectResources();
+      renderSubjectQuizzes();
     }
 
     function updateKPIs() {
@@ -4142,6 +4358,7 @@
           saveLocalStudentState(false);
           renderTimeline(); renderSubjects(); syncTimerDisplay(); updateKPIs();
           if (state.studentProfile && !state.studentProfile.avatarType) openAvatarPickerModal();
+          if (state.studentProfile) showOneTimeWelcomeIfNeeded(state.studentProfile.name);
         } catch (err) {
           errEl.textContent = 'حدث خطأ: ' + err.message;
           errEl.classList.remove('hidden');
@@ -4374,6 +4591,106 @@
         if (!url) return;
         await saveSharedToFirestore('live_stream', { url, visible, matchTitle, matchNote, referee, stadium, channel });
         showToast('تم حفظ وتحديث البث وتفاصيل المباراة للجميع!');
+      };
+
+      // Syllabus 3 Sub-Tabs (Lectures | Resources | Quizzes)
+      document.querySelectorAll('.syl-sub-btn').forEach(b => b.onclick = () => {
+        shared.sylSubTab = b.dataset.sylSub;
+        document.querySelectorAll('.syl-sub-btn').forEach(x => {
+          const on = x.dataset.sylSub === shared.sylSubTab;
+          x.className = on ? 'syl-sub-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'syl-sub-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer';
+          x.style.color = on ? '#fff' : 'var(--text-muted)';
+        });
+        document.getElementById('syl-panel-lectures').classList.toggle('hidden', shared.sylSubTab !== 'lectures');
+        document.getElementById('syl-lectures-toolbar').classList.toggle('hidden', shared.sylSubTab !== 'lectures');
+        document.getElementById('syl-panel-resources').classList.toggle('hidden', shared.sylSubTab !== 'resources');
+        document.getElementById('syl-panel-quizzes').classList.toggle('hidden', shared.sylSubTab !== 'quizzes');
+      });
+      document.getElementById('subject-quizzes-list').onclick = (e) => {
+        const btn = e.target.closest('.quiz-opt-btn');
+        if (!btn) return;
+        const qid = btn.dataset.quizId;
+        if (shared.quizAnswers[qid] !== undefined) return;
+        shared.quizAnswers[qid] = parseInt(btn.dataset.quizOpt, 10);
+        playSFX('click');
+        renderSubjectQuizzes();
+      };
+      document.getElementById('btn-quiz-reset').onclick = () => {
+        const list = (shared.subjectQuizzes && shared.subjectQuizzes[state.activeSubject]) || [];
+        list.forEach(q => delete shared.quizAnswers[q.id]);
+        renderSubjectQuizzes();
+      };
+      document.getElementById('welcome-modal-close').onclick = () => document.getElementById('student-welcome-modal').classList.add('hidden');
+
+      // Admin 5 Sub-Tabs
+      document.querySelectorAll('.adm-sub-btn').forEach(b => b.onclick = () => {
+        const sub = b.dataset.admSub;
+        document.querySelectorAll('.adm-sub-btn').forEach(x => {
+          const on = x.dataset.admSub === sub;
+          x.className = on ? 'adm-sub-btn tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer whitespace-nowrap' : 'adm-sub-btn tap-btn px-4 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap';
+          x.style.color = on ? '#fff' : 'var(--text-muted)';
+        });
+        document.querySelectorAll('.adm-sub-panel').forEach(p => p.classList.add('hidden'));
+        const target = document.getElementById(`adm-panel-${sub}`);
+        if (target) target.classList.remove('hidden');
+      });
+
+      // Admin Resources & Quizzes Forms
+      document.getElementById('admin-resource-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!shared.isAdmin || !fbDb) return;
+        const subj = document.getElementById('admin-res-subj').value;
+        const title = document.getElementById('admin-res-title').value.trim();
+        const url = document.getElementById('admin-res-url').value.trim();
+        const desc = document.getElementById('admin-res-desc').value.trim();
+        if (!title || !url) return;
+        const nextData = JSON.parse(JSON.stringify(shared.subjectResources || {}));
+        if (!Array.isArray(nextData[subj])) nextData[subj] = [];
+        nextData[subj].unshift({ id: 'res-' + Date.now(), title, url, desc, createdAt: Date.now() });
+        document.getElementById('admin-res-title').value = '';
+        document.getElementById('admin-res-url').value = '';
+        document.getElementById('admin-res-desc').value = '';
+        await saveSharedToFirestore('subject_resources', { data: nextData });
+        showToast('تمت إضافة الملف بنجاح!');
+      };
+      document.getElementById('admin-resources-list').onclick = async (e) => {
+        const btn = e.target.closest('.adm-del-res-btn');
+        if (!btn || !shared.isAdmin || !fbDb) return;
+        const nextData = JSON.parse(JSON.stringify(shared.subjectResources || {}));
+        const subj = btn.dataset.admResSubj;
+        nextData[subj] = (nextData[subj] || []).filter(r => r.id !== btn.dataset.admDelRes);
+        await saveSharedToFirestore('subject_resources', { data: nextData });
+        showToast('تم حذف الملف');
+      };
+      document.getElementById('admin-quiz-form').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!shared.isAdmin || !fbDb) return;
+        const subj = document.getElementById('admin-quiz-subj').value;
+        const question = document.getElementById('admin-quiz-q').value.trim();
+        const options = [
+          document.getElementById('admin-quiz-opt0').value.trim(),
+          document.getElementById('admin-quiz-opt1').value.trim(),
+          document.getElementById('admin-quiz-opt2').value.trim(),
+          document.getElementById('admin-quiz-opt3').value.trim()
+        ];
+        const correct = parseInt(document.getElementById('admin-quiz-correct').value, 10) || 0;
+        const explanation = document.getElementById('admin-quiz-exp').value.trim();
+        if (!question) return;
+        const nextData = JSON.parse(JSON.stringify(shared.subjectQuizzes || {}));
+        if (!Array.isArray(nextData[subj])) nextData[subj] = [];
+        nextData[subj].push({ id: 'q-' + Date.now(), question, options, correct, explanation });
+        ['admin-quiz-q', 'admin-quiz-opt0', 'admin-quiz-opt1', 'admin-quiz-opt2', 'admin-quiz-opt3', 'admin-quiz-exp'].forEach(id => document.getElementById(id).value = '');
+        await saveSharedToFirestore('subject_quizzes', { data: nextData });
+        showToast('تمت إضافة السؤال لبنك الأسئلة!');
+      };
+      document.getElementById('admin-quizzes-list').onclick = async (e) => {
+        const btn = e.target.closest('.adm-del-q-btn');
+        if (!btn || !shared.isAdmin || !fbDb) return;
+        const nextData = JSON.parse(JSON.stringify(shared.subjectQuizzes || {}));
+        const subj = btn.dataset.admQSubj;
+        nextData[subj] = (nextData[subj] || []).filter(q => q.id !== btn.dataset.admDelQ);
+        await saveSharedToFirestore('subject_quizzes', { data: nextData });
+        showToast('تم حذف السؤال');
       };
 
       // Admin Lock / Unlock Group Chat
