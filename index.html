@@ -684,8 +684,9 @@
       <div id="subjects-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
 
       <div class="apple-card p-4 sm:p-6 space-y-5">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b pb-4" style="border-color: var(--border-hairline);">
-          <div class="flex flex-wrap items-center justify-between gap-3 w-full lg:w-auto">
+        <div class="space-y-3 border-b pb-4" style="border-color: var(--border-hairline);">
+          <!-- Row 1: Subject Title (Right) + 3 Sub-Tabs Capsule (Left) -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
             <h3 id="active-subject-title" class="text-base font-bold text-[#0a84ff]">ENT</h3>
             <div class="seg-control inline-flex text-xs font-bold">
               <button type="button" data-syl-sub="lectures" class="syl-sub-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">المحاضرات</button>
@@ -693,12 +694,14 @@
               <button type="button" data-syl-sub="quizzes" class="syl-sub-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">بنك الأسئلة</button>
             </div>
           </div>
-          <div id="syl-lectures-toolbar" class="flex flex-wrap items-center gap-2">
-            <input id="topic-search-input" type="text" placeholder="بحث سريع في المحاضرات..." class="px-3 py-2 apple-subcard text-base sm:text-xs focus:outline-none w-full sm:w-auto" />
+
+          <!-- Row 2 (Lectures Tab Only): Quick Search (Right) + Filter Pills (Left) -->
+          <div id="syl-lectures-toolbar" class="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t" style="border-color: var(--border-hairline);">
+            <input id="topic-search-input" type="text" placeholder="بحث سريع في المحاضرات..." class="px-3.5 py-2 apple-subcard text-base sm:text-xs focus:outline-none w-full sm:w-64" />
             <div class="seg-control inline-flex text-[11px] font-semibold">
               <button data-topic-filter="ALL" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
-              <button data-topic-filter="Post-Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">فاينل (Post-Midterm)</button>
-              <button data-topic-filter="Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">ميدتيرم (Midterm)</button>
+              <button data-topic-filter="Post-Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">فاينل</button>
+              <button data-topic-filter="Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">ميدتيرم</button>
             </div>
           </div>
         </div>
@@ -4423,7 +4426,10 @@
 
     // 4-Stage Syllabus Checklist
     function renderTopicRow(t, idx) {
-      const st = getTopicStage(t.id), pct = getTopicPct(t.id), noteVal = (state.notes[t.id] || '').replace(/"/g, '&quot;');
+      const st = getTopicStage(t.id), pct = getTopicPct(t.id);
+      const rawNote = (state.notes[t.id] || '').trim();
+      const noteVal = (state.notes[t.id] || '').replace(/"/g, '&quot;');
+      const hasNote = rawNote.length > 0;
       const badgeCls = t.kind === 'Midterm' ? 'bg-amber-500/15 text-amber-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
       return `
         <div class="apple-subcard stagger-item p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}" style="--i:${Math.min(idx, 12)}">
@@ -4433,6 +4439,7 @@
             const vidBtn = vids.length
               ? `<button type="button" data-acc-vid="${t.id}" class="topic-vid-acc-btn tap-btn px-2 py-0.5 rounded-lg bg-[#0a84ff]/15 border border-[#0a84ff]/30 text-[#38bdf8] text-[10px] font-bold cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>فيديوهات الشرح (${vids.length})</span></button>`
               : '';
+            const noteBtn = `<button type="button" data-toggle-note="${t.id}" class="topic-note-toggle-btn tap-btn px-2 py-0.5 rounded-lg border text-[10px] font-bold cursor-pointer ${hasNote ? 'bg-amber-500/15 border-amber-400/45 text-amber-300' : 'apple-card border-transparent opacity-80 hover:opacity-100'}">${hasNote ? '📝 ملاحظة ✓' : '📝 ملاحظة'}</button>`;
             const shimiVids = vids.filter(v => v.doc !== 'mosaad');
             const mosaadVids = vids.filter(v => v.doc === 'mosaad');
             const renderBtn = (v, isMosaad) => {
@@ -4449,18 +4456,21 @@
             return `
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${(SUBJECTS_META[state.activeSubject] && SUBJECTS_META[state.activeSubject].color) || '#0a84ff'};"></span><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
-                <div class="flex items-center gap-1.5 flex-wrap shrink-0">${vidBtn}<span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
+                <div class="flex items-center gap-1.5 flex-wrap shrink-0">${vidBtn}${noteBtn}<span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
               </div>
+              ${hasNote ? `<div class="text-[11px] text-amber-300/85 truncate pr-4">📝 ${escapeHtml(rawNote)}</div>` : ''}
               ${accHtml}`;
           })()}
           <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
-          <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="videos" class="stage-check accent-[#0a84ff]" ${st.videos ? 'checked' : ''} /><span>شوفت الفيديوهات</span></label>
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="studied" class="stage-check accent-[#0a84ff]" ${st.studied ? 'checked' : ''} /><span>ذاكرتها</span></label>
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="reviewed" class="stage-check accent-amber-400" ${st.reviewed ? 'checked' : ''} /><span>راجعتها</span></label>
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="solved" class="stage-check accent-emerald-400" ${st.solved ? 'checked' : ''} /><span>حليت عليها</span></label>
+          <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold">
+            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="videos" class="stage-check accent-[#0a84ff]" ${st.videos ? 'checked' : ''} /><span>شوفت الفيديوهات</span></label>
+            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="studied" class="stage-check accent-[#0a84ff]" ${st.studied ? 'checked' : ''} /><span>ذاكرتها</span></label>
+            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="reviewed" class="stage-check accent-amber-400" ${st.reviewed ? 'checked' : ''} /><span>راجعتها</span></label>
+            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="solved" class="stage-check accent-emerald-400" ${st.solved ? 'checked' : ''} /><span>حليت عليها</span></label>
           </div>
-          <input type="text" data-note-id="${t.id}" value="${noteVal}" placeholder="ملاحظة سريعة..." class="topic-note-input w-full px-3 py-1.5 rounded-lg apple-card text-base sm:text-[11px] focus:outline-none focus:border-[#0a84ff]/50" />
+          <div id="note-box-${t.id}" class="hidden pt-1">
+            <input type="text" data-note-id="${t.id}" value="${noteVal}" placeholder="اكتب ملاحظتك السريعة هنا..." class="topic-note-input w-full px-3 py-1.5 rounded-xl apple-card text-base sm:text-[11px] focus:outline-none focus:border-[#0a84ff]/50" />
+          </div>
         </div>`;
     }
 
@@ -6096,6 +6106,15 @@
       document.getElementById('video-player-modal').onclick = (e) => { if (e.target.id === 'video-player-modal') closeVideoModal(); };
 
       document.getElementById('topics-sections-container').onclick = async (e) => {
+        const noteBtn = e.target.closest('.topic-note-toggle-btn');
+        if (noteBtn) {
+          const box = document.getElementById(`note-box-${noteBtn.dataset.toggleNote}`);
+          if (box) {
+            const isHidden = box.classList.toggle('hidden');
+            if (!isHidden) { const inp = box.querySelector('input'); if (inp) inp.focus(); }
+          }
+          return;
+        }
         const accBtn = e.target.closest('.topic-vid-acc-btn');
         if (accBtn) {
           const box = document.getElementById(`vid-acc-${accBtn.dataset.accVid}`);
