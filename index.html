@@ -1049,6 +1049,9 @@
           </button>
         </div>
 
+        <!-- Multi-Stream Switcher Bar (Shown when streams.length > 1) -->
+        <div id="stream-switcher-bar" class="hidden flex flex-wrap items-center gap-2"></div>
+
         <!-- 16:9 Responsive Player Container (Loaded ONLY for logged-in members) -->
         <div id="live-stream-container" class="hidden min-h-[300px] sm:min-h-[420px] aspect-video w-full rounded-2xl overflow-hidden bg-black/85 border border-white/10">
           <iframe id="live-stream-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms" class="w-full h-full border-0" allowfullscreen scrolling="no"></iframe>
@@ -1241,8 +1244,12 @@
               <input id="admin-stream-stadium" type="text" placeholder="الملعب (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
               <input id="admin-stream-channel" type="text" placeholder="القناة الناقلة (اختياري)..." class="px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none" />
             </div>
-            <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">حفظ وتحديث للجميع</button>
+            <button type="submit" class="tap-btn px-5 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold cursor-pointer">+ إضافة البث للقائمة</button>
           </form>
+          <div class="pt-3 border-t space-y-2.5" style="border-color: var(--border-hairline);">
+            <h3 class="text-xs sm:text-sm font-bold">البثوث / المباريات المضافة حالياً</h3>
+            <div id="admin-streams-list" class="space-y-2"></div>
+          </div>
         </div>
       </div>
 
@@ -2014,7 +2021,8 @@
       roomPendingImage: null,
       roomPendingFile: null,
       adminRoomsList: [],
-      liveStream: { url: 'https://912acsss8af382.sirtv.top/playerv5.php?match=4716606&key=9f39972b67d6ce22189507d008acwc26', visible: true, matchTitle: '', matchNote: '', referee: '', stadium: '', channel: '' },
+      liveStream: { visible: true, streams: [{ id: 'stream-default', url: 'https://912acsss8af382.sirtv.top/playerv5.php?match=4716606&key=9f39972b67d6ce22189507d008acwc26', matchTitle: 'البث الرئيسي', matchNote: '', referee: '', stadium: '', channel: '' }] },
+      activeStreamIndex: 0,
       subjectResources: {},
       subjectQuizzes: {},
       sylSubTab: 'lectures',
@@ -3408,47 +3416,82 @@
       if (aNames) aNames.innerHTML = pillsHtml;
     }
 
+    function renderAdminStreamsList() {
+      const wrap = document.getElementById('admin-streams-list');
+      if (!wrap) return;
+      const streams = (shared.liveStream && Array.isArray(shared.liveStream.streams)) ? shared.liveStream.streams : [];
+      if (!streams.length) {
+        wrap.innerHTML = `<div class="apple-subcard p-3.5 text-center text-xs" style="color: var(--text-muted);">لا توجد بثوث مضافة حالياً.</div>`;
+        return;
+      }
+      wrap.innerHTML = streams.map((s, idx) => `
+        <div class="apple-subcard p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="min-w-0 flex-1 space-y-0.5">
+            <div class="flex items-center gap-2 flex-wrap">
+              ${idx === 0 ? '<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[10px] font-bold">افتراضي</span>' : ''}
+              <span class="font-bold truncate">${escapeHtml(s.matchTitle || s.channel || ('بث ' + (idx + 1)))}</span>
+            </div>
+            <div class="text-[11px] font-mono-num truncate" dir="ltr" style="color: var(--text-muted);">${escapeHtml(s.url || '')}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            ${idx > 0 ? `<button type="button" data-promote-stream="${idx}" class="promote-stream-btn tap-btn px-2.5 py-1 rounded-lg apple-card text-[11px] font-bold text-[#38bdf8] cursor-pointer">رفع للأعلى ↑</button>` : ''}
+            <button type="button" data-del-stream="${idx}" class="del-stream-btn tap-btn px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-400 text-[11px] font-bold cursor-pointer">حذف 🗑️</button>
+          </div>
+        </div>`).join('');
+    }
+
     function applyLiveStreamUI() {
       const cont = document.getElementById('live-stream-container');
       const ifr = document.getElementById('live-stream-iframe');
       const guestLock = document.getElementById('stream-guest-lock');
       const ctrls = document.getElementById('stream-player-controls');
+      const switcher = document.getElementById('stream-switcher-bar');
       const admHiddenMsg = document.getElementById('stream-admin-hidden-msg');
       const detailsBox = document.getElementById('stream-match-details');
-      const admUrl = document.getElementById('admin-stream-url-input');
       const admChk = document.getElementById('admin-stream-visible-chk');
 
-      const ls = shared.liveStream || {};
-      const isVisible = ls.visible !== false;
+      const ls = shared.liveStream || { visible: true, streams: [] };
+      const streams = Array.isArray(ls.streams) ? ls.streams : [];
+      if (shared.activeStreamIndex >= streams.length) shared.activeStreamIndex = 0;
+      const curStream = streams[shared.activeStreamIndex] || null;
+
+      const isVisible = (ls.visible !== false) && streams.length > 0;
       const isLogged = canUserChat();
       const hideStreamTab = !isVisible && !shared.isAdmin;
       document.querySelectorAll('[data-tab="stream"]').forEach(btn => btn.classList.toggle('hidden', hideStreamTab));
       if (hideStreamTab && state.activeTab === 'stream') switchTab('home');
 
-      if (admUrl && document.activeElement !== admUrl) admUrl.value = ls.url || '';
-      if (admChk) admChk.checked = isVisible;
-      const fMap = [['admin-stream-title', 'matchTitle'], ['admin-stream-note', 'matchNote'], ['admin-stream-referee', 'referee'], ['admin-stream-stadium', 'stadium'], ['admin-stream-channel', 'channel']];
-      fMap.forEach(([id, key]) => {
-        const el = document.getElementById(id);
-        if (el && document.activeElement !== el) el.value = ls[key] || '';
-      });
+      if (admChk) admChk.checked = ls.visible !== false;
+      renderAdminStreamsList();
+      renderAdminStreamViewers();
 
-      // Match details display
-      const hasDetails = !!(ls.matchTitle || ls.matchNote || ls.referee || ls.stadium || ls.channel);
-      if (detailsBox) {
-        detailsBox.classList.toggle('hidden', !hasDetails || (!isVisible && !shared.isAdmin));
-        if (hasDetails) {
-          document.getElementById('stream-match-title-out').textContent = ls.matchTitle || '';
-          document.getElementById('stream-match-note-out').textContent = ls.matchNote || '';
-          const metaParts = [];
-          if (ls.referee) metaParts.push(`<span>الحكم: <strong>${escapeHtml(ls.referee)}</strong></span>`);
-          if (ls.stadium) metaParts.push(`<span>الملعب: <strong>${escapeHtml(ls.stadium)}</strong></span>`);
-          if (ls.channel) metaParts.push(`<span>القناة: <strong>${escapeHtml(ls.channel)}</strong></span>`);
-          document.getElementById('stream-match-meta-out').innerHTML = metaParts.join('<span class="opacity-40">•</span>');
+      // Switcher pills when > 1 stream
+      if (switcher) {
+        const showSwitcher = streams.length > 1 && isLogged && (ls.visible !== false || shared.isAdmin);
+        switcher.classList.toggle('hidden', !showSwitcher);
+        if (showSwitcher) {
+          switcher.innerHTML = streams.map((s, idx) => {
+            const on = idx === shared.activeStreamIndex;
+            const lbl = s.matchTitle || s.channel || `بث ${idx + 1}`;
+            return `<button type="button" data-select-stream="${idx}" class="stream-switch-btn tap-btn px-3.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${on ? 'bg-rose-500 text-white shadow-md' : 'apple-subcard'}" style="${on ? '' : 'color: var(--text-muted);'}">${escapeHtml(lbl)}</button>`;
+          }).join('');
         }
       }
 
-      renderAdminStreamViewers();
+      // Match details display for selected stream
+      const hasDetails = !!(curStream && (curStream.matchTitle || curStream.matchNote || curStream.referee || curStream.stadium || curStream.channel));
+      if (detailsBox) {
+        detailsBox.classList.toggle('hidden', !hasDetails || (!isVisible && !shared.isAdmin) || !isLogged);
+        if (hasDetails) {
+          document.getElementById('stream-match-title-out').textContent = curStream.matchTitle || '';
+          document.getElementById('stream-match-note-out').textContent = curStream.matchNote || '';
+          const metaParts = [];
+          if (curStream.referee) metaParts.push(`<span>الحكم: <strong>${escapeHtml(curStream.referee)}</strong></span>`);
+          if (curStream.stadium) metaParts.push(`<span>الملعب: <strong>${escapeHtml(curStream.stadium)}</strong></span>`);
+          if (curStream.channel) metaParts.push(`<span>القناة: <strong>${escapeHtml(curStream.channel)}</strong></span>`);
+          document.getElementById('stream-match-meta-out').innerHTML = metaParts.join('<span class="opacity-40">•</span>');
+        }
+      }
 
       if (!isVisible && !shared.isAdmin) {
         if (cont) cont.classList.add('hidden');
@@ -3468,11 +3511,12 @@
       } else {
         if (guestLock) guestLock.classList.add('hidden');
         if (ctrls) ctrls.classList.remove('hidden');
-        if (cont) cont.classList.remove('hidden');
+        if (cont) cont.classList.toggle('hidden', !curStream);
         if (ifr) {
           if (state.streamSafeMode) ifr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-forms');
           else ifr.removeAttribute('sandbox');
-          if (ls.url && ifr.src !== ls.url) ifr.src = ls.url;
+          const targetUrl = (curStream && curStream.url) ? curStream.url : 'about:blank';
+          if (ifr.src !== targetUrl) ifr.src = targetUrl;
         }
       }
     }
@@ -3738,14 +3782,23 @@
         fbDb.collection('shared').doc('live_stream').onSnapshot(doc => {
           if (doc.exists) {
             const d = doc.data();
+            let streamsArr = [];
+            if (Array.isArray(d.streams)) {
+              streamsArr = d.streams;
+            } else if (d.url) {
+              streamsArr = [{
+                id: 'stream-legacy',
+                url: d.url,
+                matchTitle: d.matchTitle || '',
+                matchNote: d.matchNote || '',
+                referee: d.referee || '',
+                stadium: d.stadium || '',
+                channel: d.channel || ''
+              }];
+            }
             shared.liveStream = {
-              url: d.url || shared.liveStream.url,
               visible: d.visible !== false,
-              matchTitle: d.matchTitle || '',
-              matchNote: d.matchNote || '',
-              referee: d.referee || '',
-              stadium: d.stadium || '',
-              channel: d.channel || ''
+              streams: streamsArr
             };
             applyLiveStreamUI();
           }
@@ -4864,9 +4917,10 @@
         if (ifr) {
           if (state.streamSafeMode) ifr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-forms');
           else ifr.removeAttribute('sandbox');
-          if (shared.liveStream.url) {
+          const cur = (shared.liveStream.streams || [])[shared.activeStreamIndex];
+          if (cur && cur.url) {
             ifr.src = 'about:blank';
-            setTimeout(() => { ifr.src = shared.liveStream.url; }, 60);
+            setTimeout(() => { ifr.src = cur.url; }, 60);
           }
         }
         showToast(state.streamSafeMode ? 'تم تفعيل Safe Mode لمنع النوافذ المنبثقة' : 'تم إيقاف Safe Mode وإعادة تحميل المشغّل');
@@ -4884,6 +4938,38 @@
         else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
         else showToast('اضغط على زر التكبير داخل المشغّل');
       };
+      document.getElementById('stream-switcher-bar').onclick = (e) => {
+        const btn = e.target.closest('.stream-switch-btn');
+        if (!btn) return;
+        shared.activeStreamIndex = parseInt(btn.dataset.selectStream, 10) || 0;
+        applyLiveStreamUI();
+      };
+      document.getElementById('admin-stream-visible-chk').onchange = async (e) => {
+        if (!shared.isAdmin || !fbDb) return;
+        const streams = (shared.liveStream && shared.liveStream.streams) || [];
+        await saveSharedToFirestore('live_stream', { visible: e.target.checked, streams });
+        showToast(e.target.checked ? 'تم إظهار البث للطلبة' : 'تم إخفاء البث عن الطلبة');
+      };
+      document.getElementById('admin-streams-list').onclick = async (e) => {
+        if (!shared.isAdmin || !fbDb) return;
+        const streams = [...((shared.liveStream && shared.liveStream.streams) || [])];
+        const delBtn = e.target.closest('.del-stream-btn');
+        if (delBtn) {
+          const idx = parseInt(delBtn.dataset.delStream, 10);
+          streams.splice(idx, 1);
+          await saveSharedToFirestore('live_stream', { visible: shared.liveStream.visible !== false, streams });
+          showToast('تم حذف البث من القائمة');
+          return;
+        }
+        const promBtn = e.target.closest('.promote-stream-btn');
+        if (promBtn) {
+          const idx = parseInt(promBtn.dataset.promoteStream, 10);
+          const [picked] = streams.splice(idx, 1);
+          if (picked) streams.unshift(picked);
+          await saveSharedToFirestore('live_stream', { visible: shared.liveStream.visible !== false, streams });
+          showToast('تم تعيين البث كافتراضي أول');
+        }
+      };
       document.getElementById('admin-stream-form').onsubmit = async (e) => {
         e.preventDefault();
         if (!shared.isAdmin || !fbDb) return;
@@ -4896,8 +4982,12 @@
         const stadium = document.getElementById('admin-stream-stadium').value.trim();
         const channel = document.getElementById('admin-stream-channel').value.trim();
         if (!url) return;
-        await saveSharedToFirestore('live_stream', { url, visible, matchTitle, matchNote, referee, stadium, channel });
-        showToast('تم حفظ وتحديث البث وتفاصيل المباراة للجميع!');
+        const nextStreams = [...((shared.liveStream && shared.liveStream.streams) || []), {
+          id: 'stream-' + Date.now(), url, matchTitle, matchNote, referee, stadium, channel
+        }];
+        ['admin-stream-url-input', 'admin-stream-title', 'admin-stream-note', 'admin-stream-referee', 'admin-stream-stadium', 'admin-stream-channel'].forEach(id => document.getElementById(id).value = '');
+        await saveSharedToFirestore('live_stream', { visible, streams: nextStreams });
+        showToast('تمت إضافة البث الجديد للقائمة بنجاح!');
       };
 
       // Syllabus 3 Sub-Tabs (Lectures | Resources | Quizzes)
@@ -5098,16 +5188,12 @@
           showToast('تم إرسال الإشعار للدفعة!');
         } else if (e.target.id === 'btn-ai-publish-stream') {
           const s = lastAiResult.stream || {};
-          const nextUrl = (s.url && String(s.url).trim()) ? String(s.url).trim() : (shared.liveStream.url || '');
-          await saveSharedToFirestore('live_stream', {
-            url: nextUrl,
-            visible: shared.liveStream.visible !== false,
-            matchTitle: s.matchTitle || '',
-            matchNote: s.matchNote || '',
-            referee: s.referee || '',
-            stadium: s.stadium || '',
-            channel: s.channel || ''
-          });
+          const curStreams = [...((shared.liveStream && shared.liveStream.streams) || [])];
+          const base = curStreams[0] || { id: 'stream-' + Date.now(), url: '' };
+          const nextUrl = (s.url && String(s.url).trim()) ? String(s.url).trim() : (base.url || '');
+          const updated = { ...base, url: nextUrl, matchTitle: s.matchTitle || base.matchTitle || '', matchNote: s.matchNote || '', referee: s.referee || '', stadium: s.stadium || '', channel: s.channel || '' };
+          if (curStreams.length) curStreams[0] = updated; else curStreams.push(updated);
+          await saveSharedToFirestore('live_stream', { visible: shared.liveStream.visible !== false, streams: curStreams });
           document.getElementById('admin-ai-preview').classList.add('hidden');
           document.getElementById('admin-ai-prompt').value = ''; clearAiPendingFile();
           showToast('تم تحديث تفاصيل البث المباشر للجميع!');
