@@ -84,14 +84,35 @@
     }
     .bell-anim-svg { transform-origin: 12px 3px; animation: bellSwing 2.8s ease-in-out infinite; }
     .bell-anim-svg.bell-urgent { animation-duration: 1.5s; }
-    .gold-vip-ring { box-shadow: 0 0 0 2px #fbbf24, 0 0 14px rgba(251, 191, 36, 0.45); }
+    @keyframes goldShimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+    .gold-shimmer-text {
+      background: linear-gradient(90deg, #fde047 0%, #f59e0b 35%, #fef08a 50%, #f59e0b 65%, #fde047 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent !important;
+      -webkit-text-fill-color: transparent;
+      animation: goldShimmer 3.2s linear infinite;
+    }
+    body.no-animations .gold-shimmer-text {
+      animation: none !important;
+      background: none !important;
+      color: #fbbf24 !important;
+      -webkit-text-fill-color: #fbbf24 !important;
+    }
+    .gold-vip-ring, .gold-frame-classic { box-shadow: 0 0 0 2px #fbbf24, 0 0 14px rgba(251, 191, 36, 0.45); }
+    .gold-frame-royal { box-shadow: 0 0 0 2px #fde047, 0 0 16px rgba(168, 85, 247, 0.65); }
+    .gold-frame-fire { box-shadow: 0 0 0 2px #fb923c, 0 0 16px rgba(239, 68, 68, 0.65); }
     .gold-vip-badge { background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%); color: #1c1917; font-weight: 800; }
     .gold-vip-card {
       border-color: rgba(251, 191, 36, 0.55) !important;
       background: linear-gradient(135deg, rgba(251, 191, 36, 0.13), rgba(245, 158, 11, 0.04)) !important;
       box-shadow: 0 10px 28px -10px rgba(245, 158, 11, 0.28);
     }
-    body.no-animations .gold-vip-ring { box-shadow: 0 0 0 2px #fbbf24; }
+    body.no-animations .gold-vip-ring,
+    body.no-animations .gold-frame-classic { box-shadow: 0 0 0 2px #fbbf24; }
+    body.no-animations .gold-frame-royal { box-shadow: 0 0 0 2px #a855f7; }
+    body.no-animations .gold-frame-fire { box-shadow: 0 0 0 2px #f97316; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -383,6 +404,14 @@
 
     <!-- TAB 1: HOME & EXAMS (BALANCED BENTO GRID) -->
     <section id="tab-home" class="tab-panel space-y-4 sm:space-y-5 fade-in">
+      <!-- VIP Gold Member Mini Welcome Card (Visible ONLY to Gold Members) -->
+      <div id="home-vip-card" class="hidden apple-card gold-vip-card px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="home-vip-badge" class="gold-vip-badge px-2.5 py-0.5 rounded-full text-[11px] shrink-0">👑 VIP</span>
+          <span id="home-vip-name" class="text-xs sm:text-sm font-extrabold gold-shimmer-text truncate">أهلاً بك</span>
+        </div>
+        <span id="home-vip-status" class="text-[11px] font-bold text-amber-200">🟢 متصل الآن</span>
+      </div>
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <!-- Hero Next-Exam Card (Clean, Balanced, Zero White Circle) -->
         <div class="lg:col-span-8 rounded-2xl overflow-hidden relative shadow-xl bg-gradient-to-br from-[#071428] via-[#0b223f] to-[#062729] text-white border border-sky-400/20 flex flex-col justify-between">
@@ -1067,9 +1096,12 @@
             <h2 class="text-base font-extrabold text-amber-300 flex items-center gap-2"><span>👑</span><span>منح العضوية الذهبية (VIP Gold)</span></h2>
             <p class="text-xs mt-0.5" style="color: var(--text-muted);">أدخل الكود الجامعي للطالب لتفعيل المظهر الذهبي وامتيازات VIP له فوراً.</p>
           </div>
-          <form id="admin-grant-gold-form" class="flex flex-wrap gap-2.5">
-            <input id="admin-gold-id-input" type="text" inputmode="numeric" placeholder="أدخل الكود الجامعي للطالب (ID)..." class="flex-1 min-w-[180px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-amber-400" required />
-            <button type="submit" class="tap-btn gold-vip-badge px-5 py-2.5 rounded-xl text-xs cursor-pointer shadow-lg">تفعيل العضوية الذهبية 👑</button>
+          <form id="admin-grant-gold-form" class="space-y-2.5">
+            <div class="flex flex-wrap gap-2.5">
+              <input id="admin-gold-id-input" type="text" inputmode="numeric" placeholder="أدخل الكود الجامعي للطالب (ID)..." class="flex-1 min-w-[180px] px-3.5 py-2.5 apple-subcard text-base sm:text-xs font-mono-num focus:outline-none focus:border-amber-400" required />
+              <button type="submit" class="tap-btn gold-vip-badge px-5 py-2.5 rounded-xl text-xs cursor-pointer shadow-lg">تفعيل العضوية الذهبية 👑</button>
+            </div>
+            <input id="admin-gold-msg-input" type="text" value="مبروك يا دكتور! تم تفعيل عضويتك الذهبية VIP تقديراً لاجتهادك، استمتع بكل المميزات الملكية 👑✨" placeholder="رسالة تهنئة للعضو الذهبي (اختياري)..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs focus:outline-none focus:border-amber-400" />
           </form>
           <div id="admin-gold-members-list" class="flex flex-wrap gap-2"></div>
         </div>
@@ -1643,14 +1675,36 @@
       </div>
 
       <!-- VIP Gold Privileges Section (Only for Gold Members) -->
-      <div id="acc-gold-section" class="hidden gold-vip-card apple-subcard p-3.5 space-y-2.5">
+      <div id="acc-gold-section" class="hidden gold-vip-card apple-subcard p-3.5 space-y-3">
         <div class="text-xs font-extrabold text-amber-300">امتيازات العضوية الذهبية 👑</div>
-        <div class="text-[11px]" style="color: var(--text-muted);">اختر حالتك الظاهرة للجميع في شريط VIP والغرف:</div>
-        <select id="acc-gold-status-select" class="w-full px-3 py-2 apple-card text-base sm:text-xs font-bold focus:outline-none">
-          <option value="online">متصل الآن 🟢 (تلقائي)</option>
-          <option value="studying">يذاكر بتركيز 🔥</option>
-          <option value="invisible">وضع التخفي 👻 (إخفاء الحالة)</option>
-        </select>
+        <div class="space-y-1">
+          <label class="block text-[11px]" style="color: var(--text-muted);">حالتك الظاهرة للجميع:</label>
+          <select id="acc-gold-status-select" class="w-full px-3 py-2 apple-card text-base sm:text-xs font-bold focus:outline-none">
+            <option value="online">متصل الآن 🟢 (تلقائي)</option>
+            <option value="studying">يذاكر بتركيز 🔥</option>
+            <option value="invisible">وضع التخفي 👻 (إخفاء الحالة)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div class="space-y-1">
+            <label class="block text-[11px]" style="color: var(--text-muted);">اللقب المخصص:</label>
+            <select id="acc-gold-badge-select" class="w-full px-2.5 py-2 apple-card text-base sm:text-xs font-bold focus:outline-none">
+              <option value="👑 VIP">👑 VIP</option>
+              <option value="🩺 Chief">🩺 Chief</option>
+              <option value="🔥 Focus King">🔥 Focus King</option>
+              <option value="✨ Legend">✨ Legend</option>
+              <option value="💎 Elite">💎 Elite</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-[11px]" style="color: var(--text-muted);">ستايل الإطار:</label>
+            <select id="acc-gold-frame-select" class="w-full px-2.5 py-2 apple-card text-base sm:text-xs font-bold focus:outline-none">
+              <option value="classic">ذهبي كلاسيك</option>
+              <option value="royal">ملكي متوهج</option>
+              <option value="fire">ناري متقد</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <!-- Shared Preferences Section (Student, Admin & Guest) -->
@@ -1729,6 +1783,25 @@
         تصفح <strong class="text-[#38bdf8]">المنهج والتشيك ليست</strong> لمتابعة محاضراتك وملفاتك وبنك الأسئلة، ونظّم يومك من <strong class="text-emerald-400">المخطط والدراسة</strong>، وشارك زملاءك في <strong class="text-purple-400">غرف المذاكرة الجماعية والدراسة سوا</strong>.
       </p>
       <button type="button" id="welcome-modal-close" class="tap-btn btn-grad-primary w-full py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer">ابدأ الآن 🚀</button>
+    </div>
+  </div>
+
+  <!-- VIP Gold Welcome Celebration Modal (mnu_sem9_vip_welcomed_v1) -->
+  <div id="vip-welcome-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card gold-vip-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 text-center">
+      <div class="w-14 h-14 rounded-full gold-vip-badge flex items-center justify-center mx-auto text-2xl shadow-xl">👑</div>
+      <h3 class="text-lg sm:text-xl font-extrabold gold-shimmer-text">أنت الآن عضو VIP ذهبي 👑</h3>
+      <p id="vip-welcome-admin-msg" class="text-xs sm:text-sm leading-relaxed font-semibold text-amber-100">
+        مبروك يا دكتور! تم تفعيل عضويتك الذهبية VIP تقديراً لاجتهادك، استمتع بكل المميزات الملكية 👑✨
+      </p>
+      <div class="apple-subcard p-3.5 text-right text-xs space-y-1.5 border border-amber-400/30">
+        <div class="font-bold text-amber-300 mb-1">امتيازاتك الملكية الجديدة:</div>
+        <div>✨ اسم ذهبي متلألئ في الهيدر والشات والغرف</div>
+        <div>🏷️ ألقاب مخصصة (VIP / Chief / Focus King / Legend / Elite)</div>
+        <div>🖼️ 3 إطارات ذهبية فخمة لصورتك الرمزية</div>
+        <div>👑 تفاعلات شات حصرية (👑 و 🔥) + Confetti ذهبي</div>
+      </div>
+      <button type="button" id="vip-welcome-close" class="tap-btn gold-vip-badge w-full py-3 rounded-xl text-xs sm:text-sm cursor-pointer shadow-lg">استمتع بالعضوية الذهبية 👑</button>
     </div>
   </div>
 
@@ -2060,9 +2133,27 @@
       const goldBadge = document.getElementById('header-gold-badge');
       const hint = document.getElementById('kpi-sync-hint');
       const isStuGold = !!(state.studentProfile && state.studentProfile.studentId && state.studentProfile.isGold);
-      if (goldBadge) goldBadge.classList.toggle('hidden', !isStuGold);
-      if (avSlot) avSlot.classList.toggle('gold-vip-ring', isStuGold);
-      if (avSlot) avSlot.classList.toggle('rounded-full', isStuGold);
+      const badgeTitle = (state.studentProfile && state.studentProfile.goldBadgeTitle) || '👑 VIP';
+      const frameCls = getGoldFrameClass(state.studentProfile && state.studentProfile.goldFrameStyle);
+      if (goldBadge) {
+        goldBadge.textContent = badgeTitle;
+        goldBadge.classList.toggle('hidden', !isStuGold);
+      }
+      label.classList.toggle('gold-shimmer-text', isStuGold);
+      if (avSlot) {
+        avSlot.classList.remove('gold-vip-ring', 'gold-frame-classic', 'gold-frame-royal', 'gold-frame-fire', 'rounded-full');
+        if (isStuGold) avSlot.classList.add(frameCls, 'rounded-full');
+      }
+      const homeVip = document.getElementById('home-vip-card');
+      if (homeVip) {
+        homeVip.classList.toggle('hidden', !isStuGold);
+        if (isStuGold) {
+          document.getElementById('home-vip-badge').textContent = badgeTitle;
+          document.getElementById('home-vip-name').textContent = state.studentProfile.name || '';
+          const stMap = { online: '🟢 متصل الآن', studying: '🔥 يذاكر بتركيز', invisible: '👻 وضع التخفي' };
+          document.getElementById('home-vip-status').textContent = stMap[state.studentProfile.goldStatus || 'online'] || '🟢 متصل الآن';
+        }
+      }
       if (state.studentProfile && state.studentProfile.studentId) {
         label.textContent = `أهلاً، ${state.studentProfile.name.split(' ')[0]}`;
         if (avSlot) {
@@ -2298,7 +2389,7 @@
         return { id: 'admin_' + (shared.adminEmail || 'mnu'), name: (state.studentProfile && state.studentProfile.name) ? state.studentProfile.name : 'Admin', isAdmin: true };
       }
       if (state.studentProfile && state.studentProfile.studentId) {
-        return { id: state.studentProfile.studentId, name: state.studentProfile.name, isAdmin: false, avatarType: state.studentProfile.avatarType || null, isGold: !!state.studentProfile.isGold, goldStatus: state.studentProfile.goldStatus || 'online' };
+        return { id: state.studentProfile.studentId, name: state.studentProfile.name, isAdmin: false, avatarType: state.studentProfile.avatarType || null, isGold: !!state.studentProfile.isGold, goldStatus: state.studentProfile.goldStatus || 'online', goldBadgeTitle: state.studentProfile.goldBadgeTitle || '👑 VIP', goldFrameStyle: state.studentProfile.goldFrameStyle || 'classic' };
       }
       return null;
     }
@@ -2399,7 +2490,7 @@
         const isMine = actor && m.senderId === actor.id;
         const tStr = m.createdAt ? new Date(m.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
         const reactions = m.reactions || {};
-        const emojis = ['👍', '💡', '❤️'];
+        const emojis = ['👍', '💡', '❤️', '👑', '🔥'];
         const reactHtml = emojis.map(em => {
           const arr = Array.isArray(reactions[em]) ? reactions[em] : [];
           const active = actor && arr.includes(actor.id);
@@ -2422,17 +2513,17 @@
         const avatarHtml = (m.isAdmin && shared.adminAvatar)
           ? `<img src="${shared.adminAvatar}" alt="Admin" class="w-8 h-8 rounded-full object-cover ring-2 ring-amber-400/70 shrink-0 shadow-md" />`
           : (m.avatarType && STUDENT_AVATAR_URLS[m.avatarType])
-            ? getStudentAvatarHtml(m.avatarType, 30)
-            : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 shadow-md" style="background:${avColor};">${escapeHtml(initial)}</div>`;
+            ? `<span class="${m.isGold ? getGoldFrameClass(m.goldFrameStyle) + ' rounded-full' : ''}">${getStudentAvatarHtml(m.avatarType, 30)}</span>`
+            : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 shadow-md ${m.isGold ? getGoldFrameClass(m.goldFrameStyle) : ''}" style="background:${avColor};">${escapeHtml(initial)}</div>`;
         return `
           <div class="stagger-item flex items-end gap-2 ${isMine ? 'flex-row' : 'flex-row-reverse'}" style="--i:${Math.min(idx, 10)}">
             ${avatarHtml}
             <div class="max-w-[82%] sm:max-w-[70%] apple-subcard p-3 sm:p-3.5 space-y-1.5 ${bubbleStyle}">
               <div class="flex items-center justify-between gap-2 flex-wrap text-[11px]">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="font-extrabold ${m.isAdmin ? 'text-amber-400' : 'text-[#0a84ff]'}">${escapeHtml(m.senderName || 'طالب')}</span>
+                  <span class="font-extrabold ${m.isAdmin ? 'text-amber-400' : m.isGold ? 'gold-shimmer-text' : 'text-[#0a84ff]'}">${escapeHtml(m.senderName || 'طالب')}</span>
                   ${m.isAdmin ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[9px] font-extrabold">Admin</span>` : ''}
-                  ${m.isGold && !m.isAdmin ? `<span class="gold-vip-badge px-1.5 py-0.5 rounded-full text-[9px]">👑 VIP</span>` : ''}
+                  ${m.isGold && !m.isAdmin ? `<span class="gold-vip-badge px-1.5 py-0.5 rounded-full text-[9px]">${escapeHtml(m.goldBadgeTitle || '👑 VIP')}</span>` : ''}
                   <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold ${tagColors[m.tag] || tagColors['عام']}">${SUBJECTS_META[m.tag] ? `<span class="w-2 h-2 rounded-full shrink-0" style="background:${SUBJECTS_META[m.tag].color};"></span>` : ''}<span>${escapeHtml(m.tag || 'عام')}</span></span>
                 </div>
                 <span class="font-mono-num text-[10px]" style="color: var(--text-muted);">${tStr}</span>
@@ -2527,6 +2618,10 @@
       }
       if (!fbDb) return;
       const actor = getCurrentChatActor();
+      if ((emoji === '👑' || emoji === '🔥') && !(actor && (actor.isGold || actor.isAdmin))) {
+        showToast('👑 هذا التفاعل حصري لأعضاء VIP الذهبيين!');
+        return;
+      }
       const m = shared.chatMessages.find(x => x.id === msgId);
       if (!m || !actor) return;
       const reactions = m.reactions ? JSON.parse(JSON.stringify(m.reactions)) : {};
@@ -3064,8 +3159,8 @@
               <span class="${isPeerGold ? 'gold-vip-ring rounded-full' : ''}">${avHtml}</span>
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-xs sm:text-sm font-bold truncate">${escapeHtml(name)}</span>
-                  ${isPeerGold ? '<span class="gold-vip-badge px-1.5 py-0.2 rounded-full text-[9px]">👑 VIP</span>' : ''}
+                  <span class="text-xs sm:text-sm font-bold truncate ${isPeerGold ? 'gold-shimmer-text' : ''}">${escapeHtml(name)}</span>
+                  ${isPeerGold ? `<span class="gold-vip-badge px-1.5 py-0.2 rounded-full text-[9px]">${escapeHtml(prof.goldBadgeTitle || '👑 VIP')}</span>` : ''}
                 </div>
                 <div class="text-[10px] font-mono-num" style="color: var(--text-muted);">ID: ${escapeHtml(pid)}</div>
               </div>
@@ -3495,15 +3590,28 @@
         const prevGold = !!state.studentProfile.isGold;
         state.studentProfile.isGold = !!d.isGold;
         state.studentProfile.goldStatus = d.goldStatus || 'online';
+        state.studentProfile.goldBadgeTitle = d.goldBadgeTitle || '👑 VIP';
+        state.studentProfile.goldFrameStyle = d.goldFrameStyle || 'classic';
         if (d.name) state.studentProfile.name = d.name;
         if (d.avatarType) state.studentProfile.avatarType = d.avatarType;
 
-        if (state.studentProfile.isGold && (!prevGold || !state.goldWelcomed)) {
+        if (state.studentProfile.isGold) {
+          let vipSeen = false;
+          try { vipSeen = !!localStorage.getItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
+          if (!vipSeen) {
+            try { localStorage.setItem('mnu_sem9_vip_welcomed_v1', '1'); } catch (e) {}
+            const msgEl = document.getElementById('vip-welcome-admin-msg');
+            if (msgEl) msgEl.textContent = d.goldMessage || 'مبروك يا دكتور! تم تفعيل عضويتك الذهبية VIP تقديراً لاجتهادك، استمتع بكل المميزات الملكية 👑✨';
+            triggerConfetti();
+            gsapModalOpen('vip-welcome-modal');
+          } else if (!prevGold) {
+            triggerConfetti();
+            showToast('👑 مبروك! تم تفعيل العضوية الذهبية (VIP Gold) لحسابك!');
+          }
           state.goldWelcomed = true;
-          triggerConfetti();
-          showToast('👑 مبروك! تم تفعيل العضوية الذهبية (VIP Gold) لحسابك!');
-        } else if (!state.studentProfile.isGold) {
+        } else {
           state.goldWelcomed = false;
+          try { localStorage.removeItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
         }
         saveLocalStudentState(false);
         updateStudentHeaderUI();
@@ -3521,6 +3629,11 @@
       }, () => {});
     }
 
+    function getGoldFrameClass(styleName) {
+      if (styleName === 'royal') return 'gold-frame-royal';
+      if (styleName === 'fire') return 'gold-frame-fire';
+      return 'gold-frame-classic';
+    }
     function getGoldDisplayStatus(s) {
       const now = Date.now();
       if (typeof s.watchingStreamAt === 'number' && s.watchingStreamAt > 0 && (now - s.watchingStreamAt) < 90000) {
@@ -4371,7 +4484,11 @@
         document.getElementById('acc-admin-section').classList.toggle('hidden', !isAdm);
         const isStuGold = !!(hasStu && state.studentProfile.isGold);
         document.getElementById('acc-gold-section').classList.toggle('hidden', !isStuGold);
-        if (isStuGold) document.getElementById('acc-gold-status-select').value = state.studentProfile.goldStatus || 'online';
+        if (isStuGold) {
+          document.getElementById('acc-gold-status-select').value = state.studentProfile.goldStatus || 'online';
+          document.getElementById('acc-gold-badge-select').value = state.studentProfile.goldBadgeTitle || '👑 VIP';
+          document.getElementById('acc-gold-frame-select').value = state.studentProfile.goldFrameStyle || 'classic';
+        }
         document.getElementById('acc-logout-btn').classList.toggle('hidden', !hasStu);
         document.getElementById('acc-admin-logout-btn').classList.toggle('hidden', !isAdm);
 
@@ -4668,6 +4785,8 @@
           avatarType: actor.avatarType || null,
           isGold: !!actor.isGold,
           goldStatus: actor.goldStatus || 'online',
+          goldBadgeTitle: actor.goldBadgeTitle || '👑 VIP',
+          goldFrameStyle: actor.goldFrameStyle || 'classic',
           tag,
           text,
           imageData,
@@ -5068,7 +5187,8 @@
         const ref = fbDb.collection('students').doc(sid);
         const snap = await ref.get();
         if (!snap.exists) { showToast('الكود الجامعي غير مسجل في الطلبة'); return; }
-        await ref.set({ isGold: true, goldGrantedAt: Date.now() }, { merge: true });
+        const goldMessage = (document.getElementById('admin-gold-msg-input').value || '').trim();
+        await ref.set({ isGold: true, goldGrantedAt: Date.now(), goldMessage }, { merge: true });
         document.getElementById('admin-gold-id-input').value = '';
         showToast(`👑 تم تفعيل العضوية الذهبية للطالب (${sid})`);
       };
@@ -5077,6 +5197,23 @@
         if (!btn || !shared.isAdmin || !fbDb) return;
         await fbDb.collection('students').doc(btn.dataset.revokeGold).set({ isGold: false }, { merge: true });
         showToast('تم سحب العضوية الذهبية');
+      };
+      document.getElementById('vip-welcome-close').onclick = () => document.getElementById('vip-welcome-modal').classList.add('hidden');
+      document.getElementById('acc-gold-badge-select').onchange = async (e) => {
+        if (!state.studentProfile || !state.studentProfile.studentId || !state.studentProfile.isGold) return;
+        state.studentProfile.goldBadgeTitle = e.target.value;
+        saveLocalStudentState(false);
+        updateStudentHeaderUI();
+        if (fbDb) await fbDb.collection('students').doc(state.studentProfile.studentId).set({ goldBadgeTitle: e.target.value }, { merge: true });
+        showToast('تم تحديث لقبك الذهبي');
+      };
+      document.getElementById('acc-gold-frame-select').onchange = async (e) => {
+        if (!state.studentProfile || !state.studentProfile.studentId || !state.studentProfile.isGold) return;
+        state.studentProfile.goldFrameStyle = e.target.value;
+        saveLocalStudentState(false);
+        updateStudentHeaderUI();
+        if (fbDb) await fbDb.collection('students').doc(state.studentProfile.studentId).set({ goldFrameStyle: e.target.value }, { merge: true });
+        showToast('تم تحديث إطارك الذهبي');
       };
       document.getElementById('acc-gold-status-select').onchange = async (e) => {
         if (!state.studentProfile || !state.studentProfile.studentId || !state.studentProfile.isGold) return;
