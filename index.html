@@ -1812,6 +1812,19 @@
     </div>
   </div>
 
+  <!-- ENT Lecture Video Player Modal (16:9) -->
+  <div id="video-player-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-3xl w-full p-4 sm:p-5 space-y-3">
+      <div class="flex items-center justify-between gap-3 border-b pb-2.5" style="border-color: var(--border-hairline);">
+        <h3 id="video-modal-title" class="text-xs sm:text-base font-bold truncate">شرح المحاضرة</h3>
+        <button type="button" id="video-modal-close" class="tap-btn px-2.5 py-1 rounded-lg apple-subcard text-sm font-bold text-rose-400 cursor-pointer shrink-0">✕</button>
+      </div>
+      <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10">
+        <iframe id="video-modal-iframe" src="about:blank" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:max-w-sm z-50 hidden px-4 py-2.5 rounded-xl apple-card border border-[#0a84ff]/40 text-xs font-semibold shadow-2xl text-center sm:text-right"></div>
 
   <script>
@@ -1958,6 +1971,85 @@
         { id: 'fm-m13', title: '[Obstetrics & Gynecology] Obs/Gyn L2: Menopause', kind: 'Midterm' },
         { id: 'fm-m14', title: '[Obstetrics & Gynecology] Obs/Gyn L3: Preconceptional & Antenatal Care (Dr. Mohamed Galal)', kind: 'Midterm' },
         { id: 'fm-m17', title: '[Psychiatry] Abuse, Neglect, and Violence in Special Populations', kind: 'Midterm' }
+      ]
+    };
+
+    const ENT_LECTURE_VIDEOS = {
+      "ent-m1": [
+        { title: "Intro to ENT", id: "HeyQ19ZPmtQ" }, { title: "Anatomy of the Ear", id: "G6QKHqEcgdU" }, { title: "Physiology of the Ear", id: "GxYEr_FMtNs" },
+        { title: "د. مسعد: Anatomy & Physiology of the Ear", id: "28JDsCKbkc8", doc: "mosaad" }
+      ],
+      "ent-m2": [
+        { title: "External Ear Diseases", id: "fCXvkvz7vb4" },
+        { title: "د. مسعد: External Ear (Ear 2)", id: "Rde7zbUvS0U", doc: "mosaad" }
+      ],
+      "ent-m3": [
+        { title: "Middle Ear Diseases - Part 1", id: "SwqSPyDLUZ0" },
+        { title: "د. مسعد: Trauma, Tumors & Otosclerosis", id: "jG9iLdXmKYU", doc: "mosaad" }
+      ],
+      "ent-m4": [
+        { title: "Middle Ear Diseases - Part 2", id: "D9olkXtUkL8" }, { title: "Secretory Otitis Media", id: "niC42qhB9H0" }, { title: "Cranial Complications of OM", id: "iflsf49PMEA" }, { title: "Intracranial Complications of OM", id: "J9k0QuuYsN8" },
+        { title: "د. مسعد: AOM & OME (Ear 3)", id: "cryGSL2yxLY", doc: "mosaad" }
+      ],
+      "ent-m5": [
+        { title: "Middle Ear Diseases - Part 2 (CSOM)", id: "D9olkXtUkL8" }, { title: "Cranial Complications", id: "iflsf49PMEA" }, { title: "Intracranial Complications", id: "J9k0QuuYsN8" },
+        { title: "د. مسعد: CSOM (Ear 4)", id: "7Lgbo3j8Gic", doc: "mosaad" }, { title: "د. مسعد: Complications of OM (Ear 5)", id: "FM-lbCewaRg", doc: "mosaad" }
+      ],
+      "ent-m6": [
+        { title: "Facial Nerve Paralysis", id: "TOes27HvG5o" },
+        { title: "د. مسعد: The Facial Nerve (Ear 8)", id: "dOk0hOaJiJE", doc: "mosaad" }
+      ],
+      "ent-m7": [
+        { title: "Ear Symptomatology", id: "ubjFlzvPulg" }, { title: "Inner Ear Diseases", id: "9X5lvXqVvEA" },
+        { title: "د. مسعد: Ear Symptomatology (Ear 9)", id: "Xb1PAdJek5g", doc: "mosaad" }, { title: "د. مسعد: Inner Ear & CN VIII (Ear 7)", id: "NOUKL6y9DZc", doc: "mosaad" }, { title: "د. مسعد: Audiology & Operations", id: "Nj40LkPtGQA", doc: "mosaad" }
+      ],
+      "ent-m8": [
+        { title: "Anatomy & Physiology of Nose & PNS", id: "6Y4QCQtppP8" }, { title: "Congenital Anomalies & Trauma of Nose", id: "1liejqaFWAo" },
+        { title: "د. مسعد: Nose Anatomy & Physiology", id: "jBeqPt1Xpsg", doc: "mosaad" }
+      ],
+      "ent-p9": [
+        { title: "Nose Symptomatology", id: "X0Ypx5lkkEk" },
+        { title: "د. مسعد: Nose Symptomatology & Operations", id: "Uj4Bw5NT_I0", doc: "mosaad" }
+      ],
+      "ent-p10": [
+        { title: "Rhinosinusitis & Fungal Sinusitis", id: "Ag29gsONI7A" }, { title: "Complications of Sinusitis", id: "q-VJI70OGoc" },
+        { title: "د. مسعد: Rhinosinusitis & Complications", id: "tdUESowV52I", doc: "mosaad" }
+      ],
+      "ent-p11": [
+        { title: "Allergic Rhinitis & Nasal Polyps", id: "q-VJI70OGoc" },
+        { title: "د. مسعد: Allergic Rhinitis & Polyps", id: "qxEawS9Uhe0", doc: "mosaad" }, { title: "د. مسعد: Inflammatory Diseases (Nose 2)", id: "rL_ZEwYfliI", doc: "mosaad" }
+      ],
+      "ent-p12": [
+        { title: "Neoplasm of the Nose & Septum", id: "ye8x9MGUxz0" },
+        { title: "د. مسعد: Nasal Tumors & Cysts", id: "qxEawS9Uhe0", doc: "mosaad" }
+      ],
+      "ent-p12b": [
+        { title: "Septum Diseases & Deviation", id: "ye8x9MGUxz0" },
+        { title: "د. مسعد: Nasal Septum (Nose 2)", id: "rL_ZEwYfliI", doc: "mosaad" }
+      ],
+      "ent-p13": [
+        { title: "Anatomy of Pharynx, Adenoid & Tonsillitis", id: "ZxaErVXGzww" }, { title: "Pharyngitis", id: "neKsoSRh2Fs" }, { title: "Suppuration of the Pharynx", id: "Fsqnjt-_qNk" }, { title: "Ludwig's Angina, Pouch & OSAS", id: "4uqFRAkCKCk" },
+        { title: "د. مسعد: Pharynx 1 (Anatomy & Tonsillitis)", id: "8YrHUpSkRaQ", doc: "mosaad" }, { title: "د. مسعد: Pharynx 2 (Inflammation & Pouch)", id: "x0nxlffCI_8", doc: "mosaad" }, { title: "د. مسعد: Pharynx 3 (Suppuration)", id: "VfSECcItQrs", doc: "mosaad" }, { title: "د. مسعد: Pharynx 4 (Tumours & Tonsillectomy)", id: "B_5zsDZcCl4", doc: "mosaad" }, { title: "د. مسعد: Pharynx 5 (Oesophagus & Palate)", id: "4yY2SsFfLAM", doc: "mosaad" }
+      ],
+      "ent-s1": [
+        { title: "Anatomy of the Ear", id: "G6QKHqEcgdU" },
+        { title: "د. مسعد: Ear Anatomy & Physiology", id: "28JDsCKbkc8", doc: "mosaad" }
+      ],
+      "ent-s2": [
+        { title: "Facial Nerve Paralysis", id: "TOes27HvG5o" }, { title: "Ear Symptomatology", id: "ubjFlzvPulg" },
+        { title: "د. مسعد: Facial Nerve", id: "dOk0hOaJiJE", doc: "mosaad" }, { title: "د. مسعد: Ear Symptomatology", id: "Xb1PAdJek5g", doc: "mosaad" }
+      ],
+      "ent-s3": [
+        { title: "Anatomy of Nose & PNS", id: "6Y4QCQtppP8" },
+        { title: "د. مسعد: Nose Anatomy & Physiology", id: "jBeqPt1Xpsg", doc: "mosaad" }
+      ],
+      "ent-s4": [
+        { title: "Nose Symptomatology", id: "X0Ypx5lkkEk" },
+        { title: "د. مسعد: Nose Symptomatology", id: "Uj4Bw5NT_I0", doc: "mosaad" }
+      ],
+      "ent-s5": [
+        { title: "Anatomy of the Larynx", id: "kJFf8E-B1jI" }, { title: "Laryngitis", id: "41miUqaGwrs" }, { title: "Larynx Benign & Congenital", id: "DxCDfSaY9Qs" }, { title: "Vocal Cord Paralysis & Stridor", id: "EsudHnoc6GU" }, { title: "Tracheostomy", id: "siYEDq-Shn4" }, { title: "Tumors of Larynx & Pharynx", id: "m7LWL0gJkRg" },
+        { title: "د. مسعد: Larynx 1 (Anatomy)", id: "sW4k7wLxFmw", doc: "mosaad" }, { title: "د. مسعد: Larynx 2 (Congenital & Inflammatory)", id: "lMzsf0cX9yQ", doc: "mosaad" }, { title: "د. مسعد: Larynx 3 (Tumors)", id: "U5tZ4LK5Axw", doc: "mosaad" }, { title: "د. مسعد: Larynx 4 (Vocal Cord Paralysis)", id: "WBpbXES1fTs", doc: "mosaad" }, { title: "د. مسعد: Larynx 5 (Tracheostomy & LASER)", id: "X7bDbGgxytg", doc: "mosaad" }, { title: "د. مسعد: Neck Swellings & Phoniatrics", id: "njD-Hdqi7MI", doc: "mosaad" }
       ]
     };
 
@@ -2188,6 +2280,7 @@
       refreshLucideIcons();
       updateChatAuthUI();
       if (typeof applyLiveStreamUI === 'function') applyLiveStreamUI();
+      if (typeof renderSubjects === 'function') renderSubjects(true);
     }
 
     async function saveSharedToFirestore(docName, payload) {
@@ -4329,6 +4422,18 @@
             <div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${(SUBJECTS_META[state.activeSubject] && SUBJECTS_META[state.activeSubject].color) || '#0a84ff'};"></span><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
             <div class="flex items-center gap-2 shrink-0"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
           </div>
+          ${(() => {
+            const vids = (Array.isArray(t.videos) && t.videos.length) ? t.videos : (ENT_LECTURE_VIDEOS[t.id] || []);
+            if (!vids.length) return '';
+            const locked = !canUserChat();
+            return `<div class="flex flex-wrap items-center gap-1.5 pt-0.5">${vids.map(v => {
+              const isMosaad = v.doc === 'mosaad';
+              const cls = isMosaad
+                ? (locked ? 'border-emerald-500/25 bg-emerald-500/5 text-slate-300 opacity-85' : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:border-emerald-400/75')
+                : (locked ? 'border-[#0a84ff]/25 text-slate-300 opacity-85' : 'border-[#0a84ff]/25 text-[#38bdf8] hover:border-[#0a84ff]/60');
+              return `<button type="button" data-vid-id="${escapeHtml(v.id)}" data-vid-title="${escapeHtml(v.title)}" class="topic-video-btn tap-btn px-2.5 py-1 rounded-lg apple-card border text-[11px] font-bold ${cls} cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>${isMosaad ? escapeHtml(v.title) : 'فيديو: ' + escapeHtml(v.title)}</span></button>`;
+            }).join('')}</div>`;
+          })()}
           <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
           <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
             <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="videos" class="stage-check accent-[#0a84ff]" ${st.videos ? 'checked' : ''} /><span>شوفت الفيديوهات</span></label>
@@ -5962,7 +6067,26 @@
         if (!e.target.classList.contains('topic-note-input')) return;
         state.notes[e.target.dataset.noteId] = e.target.value; saveLocalStudentState();
       };
+      function closeVideoModal() {
+        document.getElementById('video-player-modal').classList.add('hidden');
+        document.getElementById('video-modal-iframe').src = 'about:blank';
+      }
+      document.getElementById('video-modal-close').onclick = closeVideoModal;
+      document.getElementById('video-player-modal').onclick = (e) => { if (e.target.id === 'video-player-modal') closeVideoModal(); };
+
       document.getElementById('topics-sections-container').onclick = async (e) => {
+        const vidBtn = e.target.closest('.topic-video-btn');
+        if (vidBtn) {
+          if (!canUserChat()) {
+            showToast('سجّل دخولك بحسابك الجامعي أولاً لمشاهدة فيديوهات الشرح');
+            openStudentAuthModal('login');
+            return;
+          }
+          document.getElementById('video-modal-title').textContent = vidBtn.dataset.vidTitle || 'شرح المحاضرة';
+          document.getElementById('video-modal-iframe').src = `https://www.youtube.com/embed/${vidBtn.dataset.vidId}?rel=0`;
+          gsapModalOpen('video-player-modal');
+          return;
+        }
         if (e.target.classList.contains('del-topic-btn') && shared.isAdmin) {
           shared.topics[state.activeSubject] = shared.topics[state.activeSubject].filter(t => t.id !== e.target.dataset.delTopic);
           await saveSharedToFirestore('topics', { data: shared.topics });
