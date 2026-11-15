@@ -4107,19 +4107,26 @@
     function getHourlyStudyingBounds() {
       const now = new Date();
       const mins = now.getHours() * 60 + now.getMinutes();
-      if (mins >= 60 && mins < 600) return { min: 0, max: 0 };           // 01:00 AM - 09:59 AM -> 0
-      if (mins >= 600 && mins < 840) {                                   // 10:00 AM - 02:00 PM -> 25..70
-        const t = (mins - 600) / 240;
-        const mid = Math.round(28 + t * 38);
-        return { min: Math.max(25, mid - 12), max: Math.min(70, mid + 12) };
+      if (mins >= 90 && mins < 540) return { min: 0, max: 0 };           // 01:30 AM - 08:59 AM -> 0
+      if (mins >= 540 && mins < 720) {                                   // 09:00 AM - 11:59 AM -> 20..55
+        const t = (mins - 540) / 180;
+        const mid = Math.round(24 + t * 27);
+        return { min: Math.max(20, mid - 8), max: Math.min(55, mid + 8) };
       }
-      if (mins >= 840 && mins < 1260) return { min: 95, max: 125 };      // 02:00 PM - 09:00 PM (Peak) -> 95..125
-      if (mins >= 1260 && mins < 1410) {                                 // 09:00 PM - 11:30 PM -> 75..25
-        const t = (mins - 1260) / 150;
-        const mid = Math.round(70 - t * 42);
-        return { min: Math.max(25, mid - 10), max: Math.min(75, mid + 10) };
+      if (mins >= 720 && mins < 960) {                                   // 12:00 PM - 03:59 PM -> 55..95
+        const t = (mins - 720) / 240;
+        const mid = Math.round(58 + t * 33);
+        return { min: Math.max(55, mid - 8), max: Math.min(95, mid + 8) };
       }
-      return { min: 4, max: 12 };                                        // 11:30 PM - 01:00 AM -> 4..12
+      if (mins >= 960 && mins < 1320) return { min: 105, max: 150 };     // 04:00 PM - 09:59 PM (Peak) -> 105..150
+      if (mins >= 1320 && mins < 1440) {                                 // 10:00 PM - 11:59 PM -> 95..30
+        const t = (mins - 1320) / 120;
+        const mid = Math.round(90 - t * 55);
+        return { min: Math.max(30, mid - 10), max: Math.min(95, mid + 10) };
+      }
+      const t = mins / 90;                                               // 12:00 AM - 01:29 AM -> 25..5
+      const mid = Math.round(23 - t * 16);
+      return { min: Math.max(5, mid - 4), max: Math.min(25, mid + 4) };
     }
     let liveStudyingVal = (() => {
       const b = getHourlyStudyingBounds();
