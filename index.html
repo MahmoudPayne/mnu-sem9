@@ -1008,12 +1008,6 @@
 
     <!-- TAB: LIVE STREAM BREAK (MEMBERS ONLY) -->
     <section id="tab-stream" class="tab-panel hidden space-y-5 fade-in">
-      <!-- Live Gold VIP Members Bar -->
-      <div id="stream-gold-live-bar" class="hidden gold-vip-card apple-card px-4 py-2.5 flex flex-wrap items-center gap-2 text-xs">
-        <span class="gold-vip-badge px-2 py-0.5 rounded-full text-[10px]">👑 أعضاء VIP متصلون</span>
-        <div id="stream-gold-live-list" class="flex flex-wrap items-center gap-2"></div>
-      </div>
-
       <div id="live-stream-card" class="apple-card p-4 sm:p-6 space-y-4 border border-rose-500/30 shadow-[0_12px_36px_-12px_rgba(244,63,94,0.28)]">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2.5 flex-wrap">
@@ -1023,15 +1017,15 @@
             </span>
             <h2 class="text-base sm:text-lg font-bold">استراحة البث المباشر ⚽🔴</h2>
           </div>
-          <div id="stream-player-controls" class="flex flex-wrap items-center gap-1.5 shrink-0">
-            <button type="button" id="btn-stream-safemode" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1" title="منع النوافذ المنبثقة الإعلانية">
-              <span>🛡️ منع النوافذ المنبقة (Safe Mode)</span>
+          <div id="stream-player-controls" class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+            <button type="button" id="btn-stream-safemode" class="tap-btn px-2.5 py-1.5 rounded-xl apple-subcard text-[11px] sm:text-xs font-bold cursor-pointer inline-flex items-center gap-1" title="منع النوافذ المنبثقة الإعلانية">
+              <span>🛡️ منع النوافذ المنبثقة (Safe Mode)</span>
             </button>
-            <button type="button" id="btn-stream-fullscreen" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1">
+            <button type="button" id="btn-stream-fullscreen" class="tap-btn px-2.5 py-1.5 rounded-xl apple-subcard text-[11px] sm:text-xs font-bold cursor-pointer inline-flex items-center gap-1">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[#38bdf8]"></i>
               <span>ملء الشاشة</span>
             </button>
-            <button type="button" id="btn-stream-toggle" class="tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">
+            <button type="button" id="btn-stream-toggle" class="tap-btn px-2.5 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-[11px] sm:text-xs font-bold cursor-pointer">
               إخفاء المشغّل
             </button>
           </div>
@@ -1053,7 +1047,7 @@
         <div id="stream-switcher-bar" class="hidden flex flex-wrap items-center gap-2"></div>
 
         <!-- 16:9 Responsive Player Container (Loaded ONLY for logged-in members) -->
-        <div id="live-stream-container" class="hidden min-h-[300px] sm:min-h-[420px] aspect-video w-full rounded-2xl overflow-hidden bg-black/85 border border-white/10">
+        <div id="live-stream-container" class="hidden w-full aspect-video min-h-[240px] sm:min-h-[420px] rounded-2xl overflow-hidden bg-black/85 border border-white/10">
           <iframe id="live-stream-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms" class="w-full h-full border-0" allowfullscreen scrolling="no"></iframe>
         </div>
 
@@ -3617,9 +3611,19 @@
     // =========================================================================
     // Subject Resources (shared/subject_resources) & MCQ Quizzes (shared/subject_quizzes)
     // =========================================================================
+    function getMembersOnlySylLockHtml() {
+      return `
+        <div class="apple-subcard p-7 text-center space-y-3 border border-[#0a84ff]/25">
+          <div class="text-2xl">🔒</div>
+          <div class="text-xs sm:text-sm font-bold">🔒 الملفات والمصادر وبنك الأسئلة متاحة فقط لأعضاء المنصة المسجلين</div>
+          <button type="button" class="open-auth-from-syl tap-btn btn-grad-primary px-5 py-2 rounded-full text-white text-xs font-bold cursor-pointer">تسجيل الدخول</button>
+        </div>`;
+    }
+
     function renderSubjectResources() {
       const wrap = document.getElementById('subject-resources-list');
       if (!wrap) return;
+      if (!canUserChat()) { wrap.innerHTML = getMembersOnlySylLockHtml(); return; }
       const list = (shared.subjectResources && shared.subjectResources[state.activeSubject]) || [];
       if (!list.length) {
         wrap.innerHTML = `<div class="apple-subcard p-6 text-center text-xs" style="color: var(--text-muted);">لا توجد ملفات أو مصادر مضافة لهذه المادة حالياً.</div>`;
@@ -3647,6 +3651,11 @@
       const wrap = document.getElementById('subject-quizzes-list');
       const scoreLbl = document.getElementById('quiz-score-label');
       if (!wrap) return;
+      if (!canUserChat()) {
+        if (scoreLbl) scoreLbl.textContent = '--';
+        wrap.innerHTML = getMembersOnlySylLockHtml();
+        return;
+      }
       const list = (shared.subjectQuizzes && shared.subjectQuizzes[state.activeSubject]) || [];
       let correctCount = 0;
       list.forEach(q => {
@@ -3794,7 +3803,7 @@
         return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-subcard border border-amber-400/40 text-[11px] font-bold">${av}<span class="text-amber-300">👑 ${escapeHtml((s.name || 'عضو').split(' ')[0])}</span><span class="text-[10px]" style="color: var(--text-muted);">${getGoldDisplayStatus(s)}</span></span>`;
       }).join('');
 
-      [['chat-gold-live-bar', 'chat-gold-live-list'], ['stream-gold-live-bar', 'stream-gold-live-list']].forEach(([barId, listId]) => {
+      [['chat-gold-live-bar', 'chat-gold-live-list']].forEach(([barId, listId]) => {
         const bar = document.getElementById(barId);
         const lst = document.getElementById(listId);
         if (!bar || !lst) return;
@@ -4418,21 +4427,31 @@
       const badgeCls = t.kind === 'Midterm' ? 'bg-amber-500/15 text-amber-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
       return `
         <div class="apple-subcard stagger-item p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}" style="--i:${Math.min(idx, 12)}">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${(SUBJECTS_META[state.activeSubject] && SUBJECTS_META[state.activeSubject].color) || '#0a84ff'};"></span><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
-            <div class="flex items-center gap-2 shrink-0"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
-          </div>
           ${(() => {
             const vids = (Array.isArray(t.videos) && t.videos.length) ? t.videos : (ENT_LECTURE_VIDEOS[t.id] || []);
-            if (!vids.length) return '';
             const locked = !canUserChat();
-            return `<div class="flex flex-wrap items-center gap-1.5 pt-0.5">${vids.map(v => {
-              const isMosaad = v.doc === 'mosaad';
+            const vidBtn = vids.length
+              ? `<button type="button" data-acc-vid="${t.id}" class="topic-vid-acc-btn tap-btn px-2 py-0.5 rounded-lg bg-[#0a84ff]/15 border border-[#0a84ff]/30 text-[#38bdf8] text-[10px] font-bold cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>فيديوهات الشرح (${vids.length})</span></button>`
+              : '';
+            const shimiVids = vids.filter(v => v.doc !== 'mosaad');
+            const mosaadVids = vids.filter(v => v.doc === 'mosaad');
+            const renderBtn = (v, isMosaad) => {
               const cls = isMosaad
                 ? (locked ? 'border-emerald-500/25 bg-emerald-500/5 text-slate-300 opacity-85' : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:border-emerald-400/75')
                 : (locked ? 'border-[#0a84ff]/25 text-slate-300 opacity-85' : 'border-[#0a84ff]/25 text-[#38bdf8] hover:border-[#0a84ff]/60');
-              return `<button type="button" data-vid-id="${escapeHtml(v.id)}" data-vid-title="${escapeHtml(v.title)}" class="topic-video-btn tap-btn px-2.5 py-1 rounded-lg apple-card border text-[11px] font-bold ${cls} cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>${isMosaad ? escapeHtml(v.title) : 'فيديو: ' + escapeHtml(v.title)}</span></button>`;
-            }).join('')}</div>`;
+              return `<button type="button" data-vid-id="${escapeHtml(v.id)}" data-vid-title="${escapeHtml(v.title)}" class="topic-video-btn tap-btn px-2.5 py-1 rounded-lg apple-card border text-[11px] font-bold ${cls} cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>${escapeHtml(v.title)}</span></button>`;
+            };
+            const accHtml = vids.length ? `
+              <div id="vid-acc-${t.id}" class="hidden apple-card p-3 space-y-2.5 border border-[#0a84ff]/20">
+                ${shimiVids.length ? `<div class="space-y-1.5"><div class="text-[10px] font-extrabold text-[#38bdf8]">د. أحمد الشيمي</div><div class="flex flex-wrap gap-1.5">${shimiVids.map(v => renderBtn(v, false)).join('')}</div></div>` : ''}
+                ${mosaadVids.length ? `<div class="space-y-1.5"><div class="text-[10px] font-extrabold text-emerald-400">د. مسعد عبد العزيز</div><div class="flex flex-wrap gap-1.5">${mosaadVids.map(v => renderBtn(v, true)).join('')}</div></div>` : ''}
+              </div>` : '';
+            return `
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${(SUBJECTS_META[state.activeSubject] && SUBJECTS_META[state.activeSubject].color) || '#0a84ff'};"></span><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
+                <div class="flex items-center gap-1.5 flex-wrap shrink-0">${vidBtn}<span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
+              </div>
+              ${accHtml}`;
           })()}
           <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
           <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
@@ -5009,8 +5028,8 @@
         if (!b) return;
         const on = !!state.streamSafeMode;
         b.className = on
-          ? 'tap-btn px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/45 text-emerald-400 text-xs font-bold cursor-pointer inline-flex items-center gap-1'
-          : 'tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1';
+          ? 'tap-btn px-2.5 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/45 text-emerald-400 text-[11px] sm:text-xs font-bold cursor-pointer inline-flex items-center gap-1'
+          : 'tap-btn px-2.5 py-1.5 rounded-xl apple-subcard text-[11px] sm:text-xs font-bold cursor-pointer inline-flex items-center gap-1';
         b.textContent = on ? '🛡️ Safe Mode: مفعّل ✓' : '🛡️ منع النوافذ المنبثقة (Safe Mode)';
       }
       syncSafeModeBtnUI();
@@ -5108,7 +5127,9 @@
         document.getElementById('syl-panel-resources').classList.toggle('hidden', shared.sylSubTab !== 'resources');
         document.getElementById('syl-panel-quizzes').classList.toggle('hidden', shared.sylSubTab !== 'quizzes');
       });
+      document.getElementById('syl-panel-resources').onclick = (e) => { if (e.target.closest('.open-auth-from-syl')) openStudentAuthModal('login'); };
       document.getElementById('subject-quizzes-list').onclick = (e) => {
+        if (e.target.closest('.open-auth-from-syl')) { openStudentAuthModal('login'); return; }
         const btn = e.target.closest('.quiz-opt-btn');
         if (!btn) return;
         const qid = btn.dataset.quizId;
@@ -6075,6 +6096,12 @@
       document.getElementById('video-player-modal').onclick = (e) => { if (e.target.id === 'video-player-modal') closeVideoModal(); };
 
       document.getElementById('topics-sections-container').onclick = async (e) => {
+        const accBtn = e.target.closest('.topic-vid-acc-btn');
+        if (accBtn) {
+          const box = document.getElementById(`vid-acc-${accBtn.dataset.accVid}`);
+          if (box) box.classList.toggle('hidden');
+          return;
+        }
         const vidBtn = e.target.closest('.topic-video-btn');
         if (vidBtn) {
           if (!canUserChat()) {
