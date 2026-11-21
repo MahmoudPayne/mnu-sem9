@@ -876,6 +876,7 @@
                     <span id="pomo-active-mode-badge" class="hidden px-2 py-0.5 rounded-md bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-bold"></span>
                     <div id="pomo-active-lecture" class="text-xs sm:text-sm font-bold text-[#0a84ff] truncate">اختر محاضرة من الجدول أو اضغط تشغيل</div>
                   </div>
+                  <button type="button" id="btn-edit-active-session" class="hidden tap-btn px-2.5 py-1 rounded-lg apple-card border border-[#0a84ff]/30 text-[#38bdf8] text-[10px] font-bold cursor-pointer inline-flex items-center gap-1">✏️ تعديل الصفحات/الوقت</button>
                   <div class="flex gap-2">
                     <button id="pomo-start-btn" class="tap-btn flex-1 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تشغيل</button>
                     <button id="pomo-finish-early" class="tap-btn px-3.5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إنهاء / تم</button>
@@ -1805,6 +1806,74 @@
         <div class="flex-1"></div>
         <button type="button" id="wiz-next-btn" class="tap-btn px-5 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">التالي</button>
         <button type="button" id="wiz-submit-btn" class="hidden tap-btn px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إضافة لجدول اليوم</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Edit Session Pages & Time Modal -->
+  <div id="edit-session-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="apple-card modal-pop max-w-md w-full p-5 sm:p-6 space-y-4 max-h-[90dvh] overflow-y-auto custom-scroll">
+      <div class="flex items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
+        <div class="min-w-0">
+          <h3 class="text-sm sm:text-base font-bold">✏️ تعديل الصفحات ووقت الجلسة</h3>
+          <p id="edit-sess-title" class="text-[11px] font-semibold text-[#38bdf8] truncate mt-0.5">--</p>
+        </div>
+        <button type="button" id="edit-sess-close" class="tap-btn text-base cursor-pointer px-2 py-1 shrink-0" style="color: var(--text-muted);">✕</button>
+      </div>
+
+      <div class="space-y-2.5">
+        <div class="seg-control grid grid-cols-2 gap-1 text-xs font-bold">
+          <button type="button" data-edit-pmode="count" class="edit-pmode-btn tap-btn py-2 rounded-lg bg-[#0a84ff] text-white cursor-pointer">عدد الصفحات مباشرة</button>
+          <button type="button" data-edit-pmode="range" class="edit-pmode-btn tap-btn py-2 rounded-lg cursor-pointer" style="color: var(--text-muted);">من صفحة ← إلى صفحة</button>
+        </div>
+        <div id="edit-sess-direct-wrap">
+          <label class="block text-[11px] font-semibold mb-1" style="color: var(--text-muted);">عدد الصفحات:</label>
+          <input id="edit-sess-pages" type="number" min="0" max="500" value="15" class="w-full px-4 py-2.5 apple-subcard text-base font-mono-num font-bold text-center focus:outline-none focus:border-[#0a84ff]" />
+        </div>
+        <div id="edit-sess-range-wrap" class="hidden space-y-2">
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-semibold mb-1" style="color: var(--text-muted);">من صفحة:</label>
+              <input id="edit-sess-from" type="number" min="1" max="9999" value="1" class="w-full px-3 py-2.5 apple-subcard text-base font-mono-num font-bold text-center focus:outline-none focus:border-[#0a84ff]" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold mb-1" style="color: var(--text-muted);">إلى صفحة:</label>
+              <input id="edit-sess-to" type="number" min="1" max="9999" value="15" class="w-full px-3 py-2.5 apple-subcard text-base font-mono-num font-bold text-center focus:outline-none focus:border-[#0a84ff]" />
+            </div>
+          </div>
+          <div id="edit-sess-range-out" class="apple-subcard rounded-xl px-3 py-1.5 text-xs font-bold text-center text-[#38bdf8] font-mono-num">الإجمالي: 15 صفحة</div>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-1 border-t" style="border-color: var(--border-hairline);">
+        <div class="text-xs font-bold" style="color: var(--text-muted);">مستوى صعوبة الورق:</div>
+        <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+          <button type="button" data-edit-diff="easy" class="edit-diff-btn tap-btn py-2 px-2 rounded-xl apple-subcard cursor-pointer text-center">
+            <div>سهل 🟢</div>
+            <div class="text-[10px] font-mono-num opacity-75 mt-0.5">0.75x</div>
+          </button>
+          <button type="button" data-edit-diff="medium" class="edit-diff-btn tap-btn py-2 px-2 rounded-xl bg-[#0a84ff] text-white cursor-pointer text-center">
+            <div>متوسط 🟡</div>
+            <div class="text-[10px] font-mono-num opacity-90 mt-0.5">1.0x</div>
+          </button>
+          <button type="button" data-edit-diff="hard" class="edit-diff-btn tap-btn py-2 px-2 rounded-xl apple-subcard cursor-pointer text-center">
+            <div>صعب 🔴</div>
+            <div class="text-[10px] font-mono-num opacity-75 mt-0.5">1.4x</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="apple-subcard rounded-xl p-3.5 space-y-1 text-xs border border-[#0a84ff]/30">
+        <div class="flex items-center justify-between gap-2">
+          <span style="color: var(--text-muted);">معاينة وقت الجلسة:</span>
+          <strong id="edit-sess-preview" class="font-mono-num text-[#38bdf8]">--</strong>
+        </div>
+        <div id="edit-sess-breakdown" class="text-[11px] font-mono-num" style="color: var(--text-muted);">--</div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button type="button" id="btn-edit-sess-cancel" class="tap-btn px-4 py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">إلغاء</button>
+        <button type="button" id="btn-edit-sess-save" class="tap-btn px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">حفظ وتحديث التايمر</button>
       </div>
     </div>
   </div>
@@ -5020,6 +5089,7 @@
         document.getElementById('pomo-display').textContent = '00:00'; document.getElementById('pomo-ring').style.strokeDashoffset = 0;
         const pIcon = document.getElementById('pomo-active-icon'); if (pIcon) pIcon.classList.add('hidden');
         badgeEl.classList.add('hidden'); titleEl.textContent = 'اختر محاضرة من الجدول أو اضغط تشغيل';
+        const editActBtn = document.getElementById('btn-edit-active-session'); if (editActBtn) editActBtn.classList.add('hidden');
         document.getElementById('pause-stopwatch-display').textContent = '00:00'; document.getElementById('pause-count-badge').textContent = '(0 توقف)';
         document.getElementById('pomo-start-btn').textContent = 'تشغيل';
         document.title = BASE_PAGE_TITLE;
@@ -5033,6 +5103,7 @@
       const pIcon = document.getElementById('pomo-active-icon'); if (pIcon) { pIcon.innerHTML = getModuleLottie(task.subject, 24); pIcon.classList.remove('hidden'); }
       badgeEl.textContent = MODE_LABELS[task.mode] || 'مذاكرة'; badgeEl.classList.remove('hidden');
       titleEl.textContent = `[${task.subject}] ${task.title}`;
+      const editActBtn2 = document.getElementById('btn-edit-active-session'); if (editActBtn2) editActBtn2.classList.remove('hidden');
       document.getElementById('pause-stopwatch-display').textContent = `${pad2(Math.floor((task.pauseSec || 0) / 60))}:${pad2((task.pauseSec || 0) % 60)}`;
       document.getElementById('pause-count-badge').textContent = `(${task.pauseCount || 0} توقف)`;
       document.getElementById('pomo-start-btn').textContent = pomoRunning ? 'إيقاف مؤقت' : (pomoLeftSec < pomoTotalSec ? 'استئناف' : 'تشغيل');
@@ -5609,7 +5680,7 @@
               <div class="flex items-center gap-2 min-w-0">${getModuleLottie(item.subject, 24)}<div class="min-w-0"><div class="text-[11px] font-mono-num text-[#0a84ff] font-bold">${item.durationMins} دقيقة • ${MODE_LABELS[item.mode] || ''}${pInfo}</div><div class="text-xs sm:text-sm font-bold flex items-center gap-1.5 min-w-0 ${item.done ? 'line-through' : ''}"><span class="truncate">[${item.subject}] ${item.title}</span>${item.pageRange ? `<span class="px-1.5 py-0.5 rounded-md bg-sky-500/15 text-[#38bdf8] text-[10px] font-mono-num font-bold shrink-0">${escapeHtml(item.pageRange)}</span>` : ''}</div></div></div>
             </label>
             <div class="flex gap-1.5 shrink-0">
-              ${!item.done ? `<button type="button" data-q-start="${item.id}" class="q-start-btn tap-btn px-3 py-1.5 rounded-lg ${isActive && pomoRunning ? 'bg-amber-500' : 'bg-[#0a84ff]'} text-white text-[11px] font-bold cursor-pointer">${isActive && pomoRunning ? 'شغال الآن' : 'ابدأ'}</button>` : ''}
+              ${!item.done ? `<button type="button" data-q-start="${item.id}" class="q-start-btn tap-btn px-3 py-1.5 rounded-lg ${isActive && pomoRunning ? 'bg-amber-500' : 'bg-[#0a84ff]'} text-white text-[11px] font-bold cursor-pointer">${isActive && pomoRunning ? 'شغال الآن' : 'ابدأ'}</button><button type="button" data-q-edit="${item.id}" class="q-edit-btn tap-btn px-2 py-1.5 rounded-lg apple-card text-[11px] font-bold cursor-pointer" title="تعديل الصفحات والوقت">✏️</button>` : ''}
               <button type="button" data-q-del="${item.id}" class="q-del-btn tap-btn text-xs px-2 py-1 cursor-pointer hover:text-rose-400">✕</button>
             </div>
           </div>`;
@@ -7283,8 +7354,10 @@
           hasVideo: wizData.hasVideo,
           videos: selectedVideos,
           videoSpeed,
+          pagesCount: Math.max(0, parseInt(document.getElementById('wiz-pages-input').value, 10) || 0),
           pageRange: wizData.pageMode === 'range' ? (wizData.pageRange || '') : '',
           difficulty: wizData.difficulty || 'medium',
+          videoWatchMins: est.watch || 0,
           mode: wizData.mode,
           durationMins: est.total,
           pauseSec: 0,
@@ -7337,6 +7410,135 @@
         if (task) openPlannerVideoForTask(task, idx);
       };
 
+      // Quick Edit Session Pages & Time Modal Logic
+      let editSessState = { taskId: null, pageMode: 'count', pageRange: '', difficulty: 'medium' };
+
+      function calcEditSessionEstimate(task) {
+        if (!task) return { pages: 0, watch: 0, read: 0, brk: 0, total: 15, pageRange: '' };
+        let pages = Math.max(0, parseInt(document.getElementById('edit-sess-pages').value, 10) || 0);
+        let pageRange = '';
+        if (editSessState.pageMode === 'range') {
+          const from = Math.max(1, parseInt(document.getElementById('edit-sess-from').value, 10) || 1);
+          const to = Math.max(1, parseInt(document.getElementById('edit-sess-to').value, 10) || from);
+          const outEl = document.getElementById('edit-sess-range-out');
+          if (to < from) {
+            pages = 0;
+            if (outEl) { outEl.textContent = 'تنبيه: صفحة النهاية أقل من البداية'; outEl.className = 'apple-subcard rounded-xl px-3 py-1.5 text-xs font-bold text-center text-rose-400 font-mono-num'; }
+          } else {
+            pages = to - from + 1;
+            pageRange = `ص ${from} ← ${to}`;
+            document.getElementById('edit-sess-pages').value = String(pages);
+            if (outEl) { outEl.textContent = `الإجمالي: ${pages} صفحة (${pageRange})`; outEl.className = 'apple-subcard rounded-xl px-3 py-1.5 text-xs font-bold text-center text-[#38bdf8] font-mono-num'; }
+          }
+        }
+        const watch = Math.max(0, Number(task.videoWatchMins) || 0);
+        const mult = task.mode === 'review' ? 2.5 : task.mode === 'solve' ? 2.0 : task.mode === 'video' ? 0 : 4.5;
+        const diffMult = editSessState.difficulty === 'easy' ? 0.75 : editSessState.difficulty === 'hard' ? 1.4 : 1.0;
+        const read = Math.round(pages * mult * diffMult);
+        const brk = Math.floor((watch + read) / 50) * 10;
+        const total = Math.max(15, watch + read + brk);
+        return { pages, watch, read, brk, total, pageRange };
+      }
+
+      function syncEditSessionModalUI() {
+        const task = state.todayQueue.find(t => t.id === editSessState.taskId);
+        if (!task) return;
+        document.querySelectorAll('.edit-pmode-btn').forEach(b => {
+          const on = b.dataset.editPmode === editSessState.pageMode;
+          b.className = on ? 'edit-pmode-btn tap-btn py-2 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'edit-pmode-btn tap-btn py-2 rounded-lg cursor-pointer';
+          b.style.color = on ? '#fff' : 'var(--text-muted)';
+        });
+        document.getElementById('edit-sess-direct-wrap').classList.toggle('hidden', editSessState.pageMode !== 'count');
+        document.getElementById('edit-sess-range-wrap').classList.toggle('hidden', editSessState.pageMode !== 'range');
+        document.querySelectorAll('.edit-diff-btn').forEach(b => {
+          const on = b.dataset.editDiff === editSessState.difficulty;
+          const activeCls = editSessState.difficulty === 'easy'
+            ? 'bg-emerald-500 text-white border border-emerald-400'
+            : editSessState.difficulty === 'hard'
+              ? 'bg-rose-500 text-white border border-rose-400'
+              : 'bg-[#0a84ff] text-white border border-[#0a84ff]';
+          b.className = on
+            ? `edit-diff-btn tap-btn py-2 px-2 rounded-xl ${activeCls} cursor-pointer text-center`
+            : 'edit-diff-btn tap-btn py-2 px-2 rounded-xl apple-subcard cursor-pointer text-center';
+        });
+        const est = calcEditSessionEstimate(task);
+        const oldMins = Number(task.durationMins) || 15;
+        const diff = est.total - oldMins;
+        const diffTxt = diff === 0 ? 'بدون تغيير' : (diff > 0 ? `+${diff} د` : `${diff} د`);
+        document.getElementById('edit-sess-preview').textContent = `${oldMins} د ← ${est.total} د (${diffTxt})`;
+        document.getElementById('edit-sess-breakdown').textContent = `مشاهدة: ${est.watch}د • ورق: ${est.read}د (${est.pages} ص) • راحة: ${est.brk}د`;
+      }
+
+      function openEditSessionModal(taskId) {
+        const task = state.todayQueue.find(t => t.id === taskId && !t.done);
+        if (!task) return;
+        editSessState.taskId = task.id;
+        editSessState.difficulty = task.difficulty || 'medium';
+        document.getElementById('edit-sess-title').textContent = `[${task.subject}] ${task.title}`;
+        const rangeMatch = typeof task.pageRange === 'string' && task.pageRange.match(/(\d+)\D+(\d+)/);
+        if (rangeMatch) {
+          editSessState.pageMode = 'range';
+          document.getElementById('edit-sess-from').value = rangeMatch[1];
+          document.getElementById('edit-sess-to').value = rangeMatch[2];
+          document.getElementById('edit-sess-pages').value = String(Math.max(1, parseInt(rangeMatch[2], 10) - parseInt(rangeMatch[1], 10) + 1));
+        } else {
+          editSessState.pageMode = 'count';
+          const estPages = task.pagesCount !== undefined ? task.pagesCount : 15;
+          document.getElementById('edit-sess-pages').value = String(estPages);
+          document.getElementById('edit-sess-from').value = '1';
+          document.getElementById('edit-sess-to').value = String(Math.max(1, estPages || 15));
+        }
+        syncEditSessionModalUI();
+        gsapModalOpen('edit-session-modal');
+      }
+
+      function closeEditSessionModal() {
+        document.getElementById('edit-session-modal').classList.add('hidden');
+        editSessState.taskId = null;
+      }
+
+      document.getElementById('edit-sess-close').onclick = closeEditSessionModal;
+      document.getElementById('btn-edit-sess-cancel').onclick = closeEditSessionModal;
+      document.getElementById('edit-session-modal').onclick = (e) => { if (e.target.id === 'edit-session-modal') closeEditSessionModal(); };
+      document.querySelectorAll('.edit-pmode-btn').forEach(b => b.onclick = () => { editSessState.pageMode = b.dataset.editPmode; syncEditSessionModalUI(); });
+      document.querySelectorAll('.edit-diff-btn').forEach(b => b.onclick = () => { editSessState.difficulty = b.dataset.editDiff; syncEditSessionModalUI(); });
+      document.getElementById('edit-sess-pages').oninput = syncEditSessionModalUI;
+      document.getElementById('edit-sess-from').oninput = syncEditSessionModalUI;
+      document.getElementById('edit-sess-to').oninput = syncEditSessionModalUI;
+      document.getElementById('btn-edit-active-session').onclick = () => {
+        if (state.activeTaskId) openEditSessionModal(state.activeTaskId);
+      };
+      document.getElementById('btn-edit-sess-save').onclick = () => {
+        const task = state.todayQueue.find(t => t.id === editSessState.taskId && !t.done);
+        if (!task) { closeEditSessionModal(); return; }
+        const oldDurationMins = Number(task.durationMins) || 15;
+        const est = calcEditSessionEstimate(task);
+        const diffSec = (est.total - oldDurationMins) * 60;
+        const baseRem = task.remainingSec !== undefined ? task.remainingSec : oldDurationMins * 60;
+        const newRem = Math.max(60, baseRem + diffSec);
+
+        task.pagesCount = est.pages;
+        task.pageRange = editSessState.pageMode === 'range' ? est.pageRange : '';
+        task.difficulty = editSessState.difficulty;
+        task.durationMins = est.total;
+        task.remainingSec = newRem;
+
+        if (state.activeTaskId === task.id) {
+          pomoTotalSec = est.total * 60;
+          pomoLeftSec = newRem;
+          if (pomoRunning) {
+            pomoAnchorRemaining = newRem;
+            pomoAnchorStartMs = Date.now();
+          }
+        }
+        saveLocalStudentState(true);
+        renderTimeline();
+        syncTimerDisplay();
+        closeEditSessionModal();
+        playSFX('check');
+        showToast('تم تحديث عدد الصفحات ووقت التايمر بنجاح!');
+      };
+
       // Unified Timer Controls
       document.getElementById('pomo-start-btn').onclick = () => {
         if (pomoRunning) { pauseActiveTask(); return; }
@@ -7383,6 +7585,8 @@
           saveLocalStudentState(true); renderTimeline(); updateKPIs();
           return;
         }
+        const editBtn = e.target.closest('.q-edit-btn');
+        if (editBtn) { openEditSessionModal(editBtn.dataset.qEdit); return; }
         const startBtn = e.target.closest('.q-start-btn');
         if (startBtn) startTaskInTimer(startBtn.dataset.qStart, { openBanner: true, fromUserGesture: true });
       };
