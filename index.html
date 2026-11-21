@@ -1703,7 +1703,49 @@
           <div class="apple-subcard p-2.5 text-xs font-mono-num flex justify-between"><span>صافي وقت المشاهدة:</span><strong id="wiz-vid-watch-out" class="text-[#0a84ff]">0 د</strong></div>
         </div>
       </div>
-      <div id="wiz-step-4" class="wiz-step hidden space-y-3"><div class="text-sm font-bold">4. عدد الورق / الصفحات المطلوب مذاكرتها:</div><input id="wiz-pages-input" type="number" min="0" max="250" value="15" class="w-full px-4 py-3 apple-subcard text-base font-mono-num font-bold text-center" /></div>
+      <div id="wiz-step-4" class="wiz-step hidden space-y-4">
+        <div class="space-y-2.5">
+          <div class="text-sm font-bold">4. عدد الورق / الصفحات المطلوب مذاكرتها:</div>
+          <div class="seg-control grid grid-cols-2 gap-1 text-xs font-bold">
+            <button type="button" data-page-mode="count" class="wiz-page-mode-btn tap-btn py-2 rounded-lg bg-[#0a84ff] text-white cursor-pointer">عدد الصفحات مباشرة</button>
+            <button type="button" data-page-mode="range" class="wiz-page-mode-btn tap-btn py-2 rounded-lg cursor-pointer" style="color: var(--text-muted);">من صفحة ← إلى صفحة</button>
+          </div>
+          <div id="wiz-pages-direct-wrap">
+            <input id="wiz-pages-input" type="number" min="0" max="250" value="15" class="w-full px-4 py-3 apple-subcard text-base font-mono-num font-bold text-center focus:outline-none focus:border-[#0a84ff]" />
+          </div>
+          <div id="wiz-pages-range-wrap" class="hidden space-y-2.5">
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-[11px] font-semibold mb-1" style="color: var(--text-muted);">من صفحة:</label>
+                <input id="wiz-page-from" type="number" min="1" max="9999" value="1" class="w-full px-3 py-2.5 apple-subcard text-base font-mono-num font-bold text-center focus:outline-none focus:border-[#0a84ff]" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold mb-1" style="color: var(--text-muted);">إلى صفحة:</label>
+                <input id="wiz-page-to" type="number" min="1" max="9999" value="15" class="w-full px-3 py-2.5 apple-subcard text-base font-mono-num font-bold text-center focus:outline-none focus:border-[#0a84ff]" />
+              </div>
+            </div>
+            <div id="wiz-page-range-out" class="apple-subcard rounded-xl px-3 py-2 text-xs font-bold text-center text-[#38bdf8] font-mono-num">الإجمالي: 15 صفحة (ص 1 ← 15)</div>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-1 border-t" style="border-color: var(--border-hairline);">
+          <div class="text-xs font-bold" style="color: var(--text-muted);">مستوى صعوبة الورق:</div>
+          <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+            <button type="button" data-wiz-diff="easy" class="wiz-diff-btn tap-btn py-2.5 px-2 rounded-xl apple-subcard cursor-pointer text-center">
+              <div>سهل 🟢</div>
+              <div class="text-[10px] font-mono-num opacity-75 mt-0.5">0.75x</div>
+            </button>
+            <button type="button" data-wiz-diff="medium" class="wiz-diff-btn tap-btn py-2.5 px-2 rounded-xl bg-[#0a84ff] text-white cursor-pointer text-center">
+              <div>متوسط 🟡</div>
+              <div class="text-[10px] font-mono-num opacity-90 mt-0.5">1.0x</div>
+            </button>
+            <button type="button" data-wiz-diff="hard" class="wiz-diff-btn tap-btn py-2.5 px-2 rounded-xl apple-subcard cursor-pointer text-center">
+              <div>صعب / دسم 🔴</div>
+              <div class="text-[10px] font-mono-num opacity-75 mt-0.5">1.4x</div>
+            </button>
+          </div>
+        </div>
+      </div>
       <div id="wiz-step-5" class="wiz-step hidden space-y-3">
         <div class="text-sm font-bold">5. اختار وضع المذاكرة:</div>
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -4579,12 +4621,60 @@
     }
 
     // Study Wizard Modal
-    let wizStep = 1, wizData = { subj: 'ENT', topicId: '', title: '', hasVideo: true, videoSource: 'manual', speed: 1.5, pages: 15, mode: 'first' };
+    let wizStep = 1, wizData = { subj: 'ENT', topicId: '', title: '', hasVideo: true, videoSource: 'manual', speed: 1.5, pages: 15, pageMode: 'count', pageRange: '', difficulty: 'medium', mode: 'first' };
+    function updateWizPageRangeCalc() {
+      const fromEl = document.getElementById('wiz-page-from');
+      const toEl = document.getElementById('wiz-page-to');
+      const outEl = document.getElementById('wiz-page-range-out');
+      const pagesEl = document.getElementById('wiz-pages-input');
+      if (!fromEl || !toEl || !outEl || !pagesEl) return;
+      const from = Math.max(1, parseInt(fromEl.value, 10) || 1);
+      const to = Math.max(1, parseInt(toEl.value, 10) || from);
+      if (to < from) {
+        outEl.textContent = 'تنبيه: صفحة النهاية أقل من صفحة البداية';
+        outEl.className = 'apple-subcard rounded-xl px-3 py-2 text-xs font-bold text-center text-rose-400 font-mono-num';
+        pagesEl.value = '0';
+        wizData.pageRange = '';
+        return;
+      }
+      const totalPages = to - from + 1;
+      pagesEl.value = String(totalPages);
+      wizData.pageRange = `ص ${from} ← ${to}`;
+      outEl.textContent = `الإجمالي: ${totalPages} صفحة (${wizData.pageRange})`;
+      outEl.className = 'apple-subcard rounded-xl px-3 py-2 text-xs font-bold text-center text-[#38bdf8] font-mono-num';
+    }
+    function syncWizStep4UI() {
+      document.querySelectorAll('.wiz-page-mode-btn').forEach(b => {
+        const on = b.dataset.pageMode === wizData.pageMode;
+        b.className = on ? 'wiz-page-mode-btn tap-btn py-2 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'wiz-page-mode-btn tap-btn py-2 rounded-lg cursor-pointer';
+        b.style.color = on ? '#fff' : 'var(--text-muted)';
+      });
+      const directWrap = document.getElementById('wiz-pages-direct-wrap');
+      const rangeWrap = document.getElementById('wiz-pages-range-wrap');
+      if (directWrap) directWrap.classList.toggle('hidden', wizData.pageMode !== 'count');
+      if (rangeWrap) rangeWrap.classList.toggle('hidden', wizData.pageMode !== 'range');
+      if (wizData.pageMode === 'range') updateWizPageRangeCalc();
+      else wizData.pageRange = '';
+      document.querySelectorAll('.wiz-diff-btn').forEach(b => {
+        const on = b.dataset.wizDiff === wizData.difficulty;
+        const activeCls = wizData.difficulty === 'easy'
+          ? 'bg-emerald-500 text-white border border-emerald-400'
+          : wizData.difficulty === 'hard'
+            ? 'bg-rose-500 text-white border border-rose-400'
+            : 'bg-[#0a84ff] text-white border border-[#0a84ff]';
+        b.className = on
+          ? `wiz-diff-btn tap-btn py-2.5 px-2 rounded-xl ${activeCls} cursor-pointer text-center`
+          : 'wiz-diff-btn tap-btn py-2.5 px-2 rounded-xl apple-subcard cursor-pointer text-center';
+      });
+    }
     function openStudyWizard() {
       wizStep = 1;
       wizData.topicId = '';
       wizData.title = '';
       wizData.videoSource = 'manual';
+      wizData.pageMode = 'count';
+      wizData.pageRange = '';
+      wizData.difficulty = 'medium';
       renderWizardStep();
       gsapModalOpen('study-wizard-modal');
     }
@@ -4677,10 +4767,13 @@
         } else {
           updateWizWatchOut();
         }
+      } else if (wizStep === 4) {
+        syncWizStep4UI();
       } else if (wizStep === 5) {
         const est = calcWizardTotal();
         document.getElementById('wiz-final-total').textContent = `${Math.floor(est.total / 60)}س ${pad2(est.total % 60)}د`;
-        document.getElementById('wiz-final-breakdown').textContent = `مشاهدة: ${est.watch}د • ورق: ${est.read}د • راحة: ${est.brk}د`;
+        const rangeTxt = wizData.pageMode === 'range' && wizData.pageRange ? ` • ${wizData.pageRange}` : '';
+        document.getElementById('wiz-final-breakdown').textContent = `مشاهدة: ${est.watch}د • ورق: ${est.read}د (${est.diffLabel})${rangeTxt} • راحة: ${est.brk}د`;
       }
     }
     function buildWizSpeedOptions(selVal) {
@@ -4750,10 +4843,13 @@
       return watch;
     }
     function calcWizardTotal() {
+      if (wizData.pageMode === 'range') updateWizPageRangeCalc();
       const watch = updateWizWatchOut(), pages = parseFloat(document.getElementById('wiz-pages-input').value) || 0;
       const mult = wizData.mode === 'review' ? 2.5 : wizData.mode === 'solve' ? 2.0 : wizData.mode === 'video' ? 0 : 4.5;
-      const read = Math.round(pages * mult), brk = Math.floor((watch + read) / 50) * 10;
-      return { watch, read, brk, total: Math.max(15, watch + read + brk) };
+      const diffMult = wizData.difficulty === 'easy' ? 0.75 : wizData.difficulty === 'hard' ? 1.4 : 1.0;
+      const diffLabel = wizData.difficulty === 'easy' ? 'سهل 🟢 0.75x' : wizData.difficulty === 'hard' ? 'صعب / دسم 🔴 1.4x' : 'متوسط 🟡 1.0x';
+      const read = Math.round(pages * mult * diffMult), brk = Math.floor((watch + read) / 50) * 10;
+      return { watch, read, brk, diffLabel, total: Math.max(15, watch + read + brk) };
     }
 
     // Unified Task-Linked Timer
@@ -5159,7 +5255,7 @@
           <div class="apple-subcard stagger-item p-3.5 flex flex-wrap items-center justify-between gap-2 transition ${item.done ? 'opacity-55' : isActive ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/20' : ''}" style="--i:${i}">
             <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-[180px]">
               <input type="checkbox" data-q-check="${item.id}" class="q-check w-4 h-4 accent-[#0a84ff] shrink-0" ${item.done ? 'checked' : ''} />
-              <div class="flex items-center gap-2 min-w-0">${getModuleLottie(item.subject, 24)}<div class="min-w-0"><div class="text-[11px] font-mono-num text-[#0a84ff] font-bold">${item.durationMins} دقيقة • ${MODE_LABELS[item.mode] || ''}${pInfo}</div><div class="text-xs sm:text-sm font-bold truncate ${item.done ? 'line-through' : ''}">[${item.subject}] ${item.title}</div></div></div>
+              <div class="flex items-center gap-2 min-w-0">${getModuleLottie(item.subject, 24)}<div class="min-w-0"><div class="text-[11px] font-mono-num text-[#0a84ff] font-bold">${item.durationMins} دقيقة • ${MODE_LABELS[item.mode] || ''}${pInfo}</div><div class="text-xs sm:text-sm font-bold flex items-center gap-1.5 min-w-0 ${item.done ? 'line-through' : ''}"><span class="truncate">[${item.subject}] ${item.title}</span>${item.pageRange ? `<span class="px-1.5 py-0.5 rounded-md bg-sky-500/15 text-[#38bdf8] text-[10px] font-mono-num font-bold shrink-0">${escapeHtml(item.pageRange)}</span>` : ''}</div></div></div>
             </label>
             <div class="flex gap-1.5 shrink-0">
               ${!item.done ? `<button type="button" data-q-start="${item.id}" class="q-start-btn tap-btn px-3 py-1.5 rounded-lg ${isActive && pomoRunning ? 'bg-amber-500' : 'bg-[#0a84ff]'} text-white text-[11px] font-bold cursor-pointer">${isActive && pomoRunning ? 'شغال الآن' : 'ابدأ'}</button>` : ''}
@@ -6783,6 +6879,16 @@
         document.querySelectorAll('#wiz-vid-durations .wiz-vspeed').forEach(s => { s.value = val; });
         updateWizWatchOut();
       };
+      document.querySelectorAll('.wiz-page-mode-btn').forEach(b => b.onclick = () => {
+        wizData.pageMode = b.dataset.pageMode;
+        syncWizStep4UI();
+      });
+      document.getElementById('wiz-page-from').oninput = updateWizPageRangeCalc;
+      document.getElementById('wiz-page-to').oninput = updateWizPageRangeCalc;
+      document.querySelectorAll('.wiz-diff-btn').forEach(b => b.onclick = () => {
+        wizData.difficulty = b.dataset.wizDiff;
+        syncWizStep4UI();
+      });
       document.querySelectorAll('.wiz-mode-btn').forEach(b => b.onclick = () => {
         wizData.mode = b.dataset.wizMode;
         document.querySelectorAll('.wiz-mode-btn').forEach(x => x.className = x.dataset.wizMode === wizData.mode ? 'wiz-mode-btn tap-btn py-2.5 rounded-xl bg-[#0a84ff] text-white cursor-pointer' : 'wiz-mode-btn tap-btn py-2.5 rounded-xl apple-subcard cursor-pointer');
@@ -6815,6 +6921,8 @@
           hasVideo: wizData.hasVideo,
           videos: selectedVideos,
           videoSpeed,
+          pageRange: wizData.pageMode === 'range' ? (wizData.pageRange || '') : '',
+          difficulty: wizData.difficulty || 'medium',
           mode: wizData.mode,
           durationMins: est.total,
           pauseSec: 0,
