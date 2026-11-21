@@ -2483,6 +2483,7 @@
       } catch (e) {}
     }
 
+    let lastAuthChatState = null;
     function updateStudentHeaderUI() {
       const label = document.getElementById('student-header-label');
       const avSlot = document.getElementById('header-student-avatar');
@@ -2536,7 +2537,11 @@
       refreshLucideIcons();
       updateChatAuthUI();
       if (typeof applyLiveStreamUI === 'function') applyLiveStreamUI();
-      if (typeof renderSubjects === 'function') renderSubjects(true);
+      const curAuthChatState = canUserChat();
+      if (lastAuthChatState !== curAuthChatState) {
+        lastAuthChatState = curAuthChatState;
+        if (typeof renderSubjects === 'function') renderSubjects(true);
+      }
     }
 
     async function saveSharedToFirestore(docName, payload) {
@@ -4698,7 +4703,7 @@
       const hasNote = rawNote.length > 0;
       const badgeCls = t.kind === 'Seminar' ? 'bg-purple-500/15 text-purple-400' : t.kind === 'Midterm' ? 'bg-amber-500/15 text-amber-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
       return `
-        <div class="apple-subcard stagger-item p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}" style="--i:${Math.min(idx, 12)}">
+        <div class="apple-subcard p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}">
           ${(() => {
             const vids = (Array.isArray(t.videos) && t.videos.length) ? t.videos : (ENT_LECTURE_VIDEOS[t.id] || []);
             const locked = !canUserChat();
@@ -4751,7 +4756,7 @@
         const m = SUBJECTS_META[c], items = shared.topics[c] || [];
         const sPct = items.length ? Math.round(items.reduce((a, t) => a + getTopicPct(t.id), 0) / items.length) : 0;
         const doneFull = items.filter(t => getTopicPct(t.id) === 100).length;
-        return `<button data-subj="${c}" class="subj-card tap-btn apple-card apple-card-hover stagger-item p-4 text-right cursor-pointer ${state.activeSubject === c ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/30' : ''}" style="--i:${idx}"><div class="flex items-center justify-between"><span class="inline-flex items-center gap-1.5 font-bold text-xs px-2 py-0.5 rounded apple-subcard text-[#0a84ff]">${getModuleLottie(c, 28)}<span>${c}</span></span><span class="font-mono-num text-[11px] font-bold">${doneFull}/${items.length} مكتمل</span></div><div class="font-bold text-sm mt-2 truncate">${m.name}</div><div class="mt-2 flex justify-between text-[11px]"><span style="color: var(--text-muted);">التقدم العام</span><span class="font-mono-num font-bold">${sPct}%</span></div><div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-1"><div class="h-full rounded-full transition-all duration-500" style="width:${sPct}%; background:${m.color}"></div></div></button>`;
+        return `<button data-subj="${c}" class="subj-card tap-btn apple-card apple-card-hover rounded-2xl p-4 h-full flex flex-col justify-between text-right cursor-pointer ${state.activeSubject === c ? 'border-[#0a84ff] ring-2 ring-[#0a84ff]/30' : ''}"><div class="flex items-center justify-between"><span class="inline-flex items-center gap-1.5 font-bold text-xs px-2 py-0.5 rounded apple-subcard text-[#0a84ff]">${getModuleLottie(c, 28)}<span>${c}</span></span><span class="font-mono-num text-[11px] font-bold">${doneFull}/${items.length} مكتمل</span></div><div class="font-bold text-sm mt-2 truncate">${m.name}</div><div class="mt-2 flex justify-between text-[11px]"><span style="color: var(--text-muted);">التقدم العام</span><span class="font-mono-num font-bold">${sPct}%</span></div><div class="w-full bg-slate-700/40 h-1.5 rounded-full mt-1"><div class="h-full rounded-full transition-all duration-500" style="width:${sPct}%; background:${m.color}"></div></div></button>`;
       }).join('');
 
       document.getElementById('active-subject-title').innerHTML = `<span class="inline-flex items-center gap-2">${getModuleLottie(state.activeSubject, 28)}<span>${SUBJECTS_META[state.activeSubject].name}</span></span>`;
@@ -4821,10 +4826,14 @@
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
       const panel = document.getElementById(`tab-${id}`);
       panel.classList.remove('hidden');
-      panel.classList.remove('fade-in');
-      void panel.offsetWidth;
-      panel.classList.add('fade-in');
-      gsapStagger(`#tab-${id} .stagger-item`, panel);
+      if (id !== 'syllabus') {
+        panel.classList.remove('fade-in');
+        void panel.offsetWidth;
+        panel.classList.add('fade-in');
+        gsapStagger(`#tab-${id} .stagger-item`, panel);
+      } else {
+        panel.classList.remove('fade-in');
+      }
       document.querySelectorAll('.nav-pill').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('active', on); b.style.color = on ? '#fff' : (b.id === 'nav-admin-tab' ? '#fbbf24' : 'var(--text-muted)'); });
       document.querySelectorAll('.mob-nav').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('bg-[#0a84ff]/15', on); b.style.color = on ? '#38bdf8' : (b.id === 'mob-admin-btn' ? '#fbbf24' : 'var(--text-muted)'); });
       if (id === 'chat') { const w = document.getElementById('chat-messages-list'); if (w) w.scrollTop = w.scrollHeight; }
