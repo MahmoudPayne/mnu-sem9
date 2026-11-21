@@ -4683,8 +4683,14 @@
         document.getElementById('wiz-final-breakdown').textContent = `مشاهدة: ${est.watch}د • ورق: ${est.read}د • راحة: ${est.brk}د`;
       }
     }
+    function buildWizSpeedOptions(selVal) {
+      const rates = ['1', '1.25', '1.5', '1.75', '2'];
+      const cur = String(selVal || '1.5');
+      return rates.map(r => `<option value="${r}" ${r === cur ? 'selected' : ''}>${r}x</option>`).join('');
+    }
     function renderWizVideoDurations(presetVideos = null) {
       const wrap = document.getElementById('wiz-vid-durations');
+      const globalSpeed = document.getElementById('wiz-vid-speed')?.value || '1.5';
       if (Array.isArray(presetVideos) && presetVideos.length) {
         let html = `<div class="space-y-1.5">`;
         presetVideos.forEach((v, i) => {
@@ -4693,25 +4699,53 @@
           const badge = v.doc === 'mosaad'
             ? '<span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[9px] font-bold shrink-0">مسعد</span>'
             : '<span class="px-1.5 py-0.5 rounded bg-[#0a84ff]/15 text-[#38bdf8] text-[9px] font-bold shrink-0">الشيمي</span>';
-          html += `<div class="flex items-center justify-between gap-2 apple-subcard rounded-xl px-2.5 py-1.5"><div class="flex items-center gap-1.5 min-w-0 flex-1">${badge}<span class="text-[11px] font-semibold truncate" title="${escapeHtml(v.title || '')}">${shortTitle}</span></div><div class="flex items-center gap-1 shrink-0"><input type="number" min="1" value="${dur}" class="wiz-vdur w-14 text-center apple-card rounded-lg px-1.5 py-1 text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none" /><span class="text-[10px]" style="color: var(--text-muted);">د</span></div></div>`;
+          html += `<div class="wiz-vid-row flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 apple-subcard rounded-xl px-2.5 py-1.5 transition-opacity"><label class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"><input type="checkbox" class="wiz-vid-chk w-4 h-4 accent-[#0a84ff] shrink-0 cursor-pointer" data-vid-idx="${i}" checked />${badge}<span class="text-[11px] font-semibold truncate" title="${escapeHtml(v.title || '')}">${shortTitle}</span></label><div class="flex items-center gap-1.5 shrink-0"><input type="number" min="1" value="${dur}" class="wiz-vdur w-14 text-center apple-card rounded-lg px-1.5 py-1 text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none disabled:opacity-50" /><span class="text-[10px]" style="color: var(--text-muted);">د</span><select class="wiz-vspeed apple-card rounded-lg px-1.5 py-1 text-base sm:text-[11px] font-mono-num font-bold text-emerald-400 focus:outline-none disabled:opacity-50 cursor-pointer">${buildWizSpeedOptions(globalSpeed)}</select></div></div>`;
         });
         wrap.innerHTML = html + `</div>`;
         wrap.querySelectorAll('.wiz-vdur').forEach(i => i.oninput = updateWizWatchOut);
+        wrap.querySelectorAll('.wiz-vspeed').forEach(s => s.onchange = updateWizWatchOut);
+        wrap.querySelectorAll('.wiz-vid-chk').forEach(chk => {
+          chk.onchange = () => {
+            const row = chk.closest('.wiz-vid-row');
+            if (row) {
+              row.classList.toggle('opacity-45', !chk.checked);
+              const durInput = row.querySelector('.wiz-vdur');
+              const spdSel = row.querySelector('.wiz-vspeed');
+              if (durInput) durInput.disabled = !chk.checked;
+              if (spdSel) spdSel.disabled = !chk.checked;
+            }
+            const checkedCount = wrap.querySelectorAll('.wiz-vid-chk:checked').length;
+            const cntEl = document.getElementById('wiz-vid-count');
+            if (cntEl) cntEl.value = String(checkedCount);
+            updateWizWatchOut();
+          };
+        });
         updateWizWatchOut();
         return;
       }
       const cnt = Math.min(15, Math.max(1, parseInt(document.getElementById('wiz-vid-count').value, 10) || 1));
-      let html = `<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">`;
-      for (let i = 0; i < cnt; i++) html += `<div class="flex items-center gap-1 apple-subcard px-2 py-1.5"><span class="text-[10px]">ف${i + 1}</span><input type="number" min="1" value="${i === 0 ? 35 : 45}" class="wiz-vdur w-full bg-transparent text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none" /><span class="text-[10px]">د</span></div>`;
+      let html = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
+      for (let i = 0; i < cnt; i++) {
+        html += `<div class="wiz-vid-row flex items-center justify-between gap-1.5 apple-subcard rounded-xl px-2.5 py-1.5"><span class="text-[11px] font-bold shrink-0">ف${i + 1}</span><div class="flex items-center gap-1"><input type="number" min="1" value="${i === 0 ? 35 : 45}" class="wiz-vdur w-14 text-center apple-card rounded-lg px-1.5 py-1 text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none" /><span class="text-[10px]" style="color: var(--text-muted);">د</span><select class="wiz-vspeed apple-card rounded-lg px-1.5 py-1 text-base sm:text-[11px] font-mono-num font-bold text-emerald-400 focus:outline-none cursor-pointer">${buildWizSpeedOptions(globalSpeed)}</select></div></div>`;
+      }
       wrap.innerHTML = html + `</div>`;
       wrap.querySelectorAll('.wiz-vdur').forEach(i => i.oninput = updateWizWatchOut);
+      wrap.querySelectorAll('.wiz-vspeed').forEach(s => s.onchange = updateWizWatchOut);
       updateWizWatchOut();
     }
     function updateWizWatchOut() {
       if (!wizData.hasVideo) { document.getElementById('wiz-vid-watch-out').textContent = '0 د'; return 0; }
-      const raw = Array.from(document.querySelectorAll('.wiz-vdur')).reduce((a, b) => a + (parseFloat(b.value) || 0), 0);
-      const speed = parseFloat(document.getElementById('wiz-vid-speed').value) || 1;
-      const watch = Math.round(raw / speed);
+      const defaultSpeed = parseFloat(document.getElementById('wiz-vid-speed').value) || 1;
+      const totalWatchFloat = Array.from(document.querySelectorAll('.wiz-vdur')).reduce((acc, inp) => {
+        if (inp.disabled) return acc;
+        const row = inp.closest('.wiz-vid-row');
+        const chk = row ? row.querySelector('.wiz-vid-chk') : null;
+        if (chk && !chk.checked) return acc;
+        const spdEl = row ? row.querySelector('.wiz-vspeed') : null;
+        const spd = parseFloat(spdEl ? spdEl.value : defaultSpeed) || defaultSpeed;
+        return acc + ((parseFloat(inp.value) || 0) / spd);
+      }, 0);
+      const watch = Math.round(totalWatchFloat);
       document.getElementById('wiz-vid-watch-out').textContent = `${watch} د`;
       return watch;
     }
@@ -4798,13 +4832,24 @@
     let plannerBannerVideos = [];
     let plannerBannerVidIdx = 0;
     let plannerBannerSpeed = 1.5;
+    let plannerCurrentRate = 1.5;
     let isSyncingVideo = false;
     let syncGuardTimer = null;
+    let ytPauseDebounceTimer = null;
+    let pomoAnchorRemaining = 0;
+    let pomoAnchorStartMs = 0;
 
     function setVideoSyncGuard(ms = 750) {
       isSyncingVideo = true;
       clearTimeout(syncGuardTimer);
       syncGuardTimer = setTimeout(() => { isSyncingVideo = false; }, ms);
+    }
+
+    function clearYtPauseDebounce() {
+      if (ytPauseDebounceTimer) {
+        clearTimeout(ytPauseDebounceTimer);
+        ytPauseDebounceTimer = null;
+      }
     }
 
     function renderPlannerVideoSwitcher() {
@@ -4819,22 +4864,78 @@
       wrap.innerHTML = plannerBannerVideos.map((v, idx) => {
         const active = idx === plannerBannerVidIdx;
         const isMosaad = v.doc === 'mosaad';
+        const spdTxt = v.speed ? ` (${v.speed}x)` : '';
         const cls = active
           ? (isMosaad ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-[#0a84ff] text-white border-[#0a84ff]')
           : (isMosaad ? 'apple-subcard border-emerald-500/35 text-emerald-400' : 'apple-subcard border-[#0a84ff]/30 text-[#38bdf8]');
-        return `<button type="button" data-pvid-idx="${idx}" class="planner-vid-switch-btn tap-btn px-2.5 py-1 rounded-xl border text-[11px] font-bold cursor-pointer inline-flex items-center gap-1"><span>${idx + 1}.</span><span class="truncate max-w-[180px]">${escapeHtml(v.title || 'فيديو ' + (idx + 1))}</span></button>`.replace('border text-[11px]', `border ${cls} text-[11px]`);
+        return `<button type="button" data-pvid-idx="${idx}" class="planner-vid-switch-btn tap-btn px-2.5 py-1 rounded-xl border ${cls} text-[11px] font-bold cursor-pointer inline-flex items-center gap-1"><span>${idx + 1}.</span><span class="truncate max-w-[180px]">${escapeHtml(v.title || 'فيديو ' + (idx + 1))}${spdTxt}</span></button>`;
       }).join('');
     }
 
-    function onPlannerYtStateChange(ev) {
+    function onPlannerYtRateChange(ev) {
+      const newRate = Number(ev && ev.data) || 1;
+      const oldRate = Number(plannerCurrentRate) || 1;
+      plannerCurrentRate = newRate;
+      const curVid = plannerBannerVideos[plannerBannerVidIdx];
+      const titleEl = document.getElementById('planner-vid-active-title');
+      if (titleEl && curVid) titleEl.textContent = `${curVid.title || ''} • سرعة ${newRate}x`;
       if (isSyncingVideo || state.videoTimerSync === false || !canUserChat()) return;
-      if (!window.YT || !window.YT.PlayerState) return;
-      if (ev.data === YT.PlayerState.PAUSED) {
-        if (pomoRunning) {
-          setVideoSyncGuard(750);
-          pauseActiveTask(true);
+      if (Math.abs(newRate - oldRate) < 0.01) return;
+      const task = getActiveTask();
+      if (!task || task.id !== plannerBannerTaskId || !plannerYtPlayer) return;
+      try {
+        const dur = typeof plannerYtPlayer.getDuration === 'function' ? Number(plannerYtPlayer.getDuration()) || 0 : 0;
+        const cur = typeof plannerYtPlayer.getCurrentTime === 'function' ? Number(plannerYtPlayer.getCurrentTime()) || 0 : 0;
+        const rawRemaining = Math.max(0, dur - cur);
+        if (rawRemaining > 0) {
+          const diffSec = Math.round((rawRemaining / newRate) - (rawRemaining / oldRate));
+          const baseRem = (task.remainingSec !== undefined) ? task.remainingSec : pomoLeftSec;
+          const updatedRem = Math.max(10, baseRem + diffSec);
+          task.remainingSec = updatedRem;
+          pomoLeftSec = updatedRem;
+          pomoTotalSec = Math.max(pomoTotalSec, updatedRem);
+          if (pomoRunning) {
+            pomoAnchorRemaining = updatedRem;
+            pomoAnchorStartMs = Date.now();
+          }
+          saveLocalStudentState();
+          syncTimerDisplay();
+          showToast(`تم تعديل وقت التايمر تلقائياً لسرعة ${newRate}x`);
         }
-      } else if (ev.data === YT.PlayerState.PLAYING) {
+      } catch (e) {}
+    }
+
+    function onPlannerYtStateChange(ev) {
+      if (!window.YT || !window.YT.PlayerState || !canUserChat()) return;
+      const st = ev.data;
+      // 1) Never pause or count a break on BUFFERING; cancel any pending seek/pause debounce
+      if (st === YT.PlayerState.BUFFERING) {
+        clearYtPauseDebounce();
+        return;
+      }
+      // 2) Auto-play next video in task.videos on ENDED without stopping timer or counting a pause
+      if (st === YT.PlayerState.ENDED) {
+        clearYtPauseDebounce();
+        if (plannerBannerTaskId && plannerBannerVideos.length > plannerBannerVidIdx + 1) {
+          const task = state.todayQueue.find(t => t.id === plannerBannerTaskId);
+          if (task) openPlannerVideoForTask(task, plannerBannerVidIdx + 1);
+        }
+        return;
+      }
+      if (isSyncingVideo || state.videoTimerSync === false) return;
+      if (st === YT.PlayerState.PAUSED) {
+        if (pomoRunning) {
+          clearYtPauseDebounce();
+          ytPauseDebounceTimer = setTimeout(() => {
+            ytPauseDebounceTimer = null;
+            if (!isSyncingVideo && state.videoTimerSync !== false && pomoRunning) {
+              setVideoSyncGuard(750);
+              pauseActiveTask(true);
+            }
+          }, 800);
+        }
+      } else if (st === YT.PlayerState.PLAYING) {
+        clearYtPauseDebounce();
         if (!pomoRunning && state.activeTaskId && getActiveTask()) {
           setVideoSyncGuard(750);
           startTaskInTimer(state.activeTaskId, { fromVideo: true });
@@ -4844,11 +4945,20 @@
 
     function loadPlannerYouTubeVideo(videoId, speed = 1.5) {
       if (!videoId) return;
+      const targetRate = Number(speed) || 1.5;
+      plannerCurrentRate = targetRate;
       const applyRate = (pl) => {
-        try { if (pl && typeof pl.setPlaybackRate === 'function' && speed) pl.setPlaybackRate(Number(speed) || 1.5); } catch (e) {}
+        try {
+          if (pl && typeof pl.setPlaybackRate === 'function') {
+            setVideoSyncGuard(900);
+            pl.setPlaybackRate(targetRate);
+            plannerCurrentRate = targetRate;
+          }
+        } catch (e) {}
       };
       if (plannerYtPlayer && typeof plannerYtPlayer.loadVideoById === 'function') {
-        setVideoSyncGuard(900);
+        clearYtPauseDebounce();
+        setVideoSyncGuard(1000);
         try {
           plannerYtPlayer.loadVideoById(videoId);
           setTimeout(() => applyRate(plannerYtPlayer), 650);
@@ -4861,7 +4971,8 @@
       const wrap = document.getElementById('planner-vid-player-wrap');
       if (!wrap) return;
       wrap.innerHTML = '<div id="planner-yt-player" class="w-full h-full"></div>';
-      setVideoSyncGuard(1000);
+      clearYtPauseDebounce();
+      setVideoSyncGuard(1100);
       plannerYtPlayer = new YT.Player('planner-yt-player', {
         width: '100%',
         height: '100%',
@@ -4869,7 +4980,8 @@
         playerVars: { autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1, fs: 1 },
         events: {
           onReady: (ev) => { applyRate(ev.target); },
-          onStateChange: onPlannerYtStateChange
+          onStateChange: onPlannerYtStateChange,
+          onPlaybackRateChange: onPlannerYtRateChange
         }
       });
     }
@@ -4885,9 +4997,10 @@
       plannerBannerTaskId = task.id;
       plannerBannerVideos = task.videos;
       plannerBannerVidIdx = Math.min(Math.max(0, vidIdx), task.videos.length - 1);
-      plannerBannerSpeed = Number(task.videoSpeed) || 1.5;
 
       const curVid = plannerBannerVideos[plannerBannerVidIdx];
+      plannerBannerSpeed = Number(curVid.speed) || Number(task.videoSpeed) || 1.5;
+      plannerCurrentRate = plannerBannerSpeed;
       if (titleEl) titleEl.textContent = `${curVid.title || task.title} • سرعة ${plannerBannerSpeed}x`;
       banner.classList.remove('hidden');
       renderPlannerVideoSwitcher();
@@ -4906,6 +5019,7 @@
     }
 
     function closePlannerVideoBanner() {
+      clearYtPauseDebounce();
       const banner = document.getElementById('planner-video-banner');
       if (banner) banner.classList.add('hidden');
       plannerBannerTaskId = null;
@@ -4926,19 +5040,34 @@
         : wizData.videoSource === 'mosaad'
           ? vids.filter(v => v.doc === 'mosaad')
           : vids;
-      return chosen.map(v => ({ title: v.title, id: v.id, doc: v.doc || 'shimy' }));
+      const defaultSpeed = parseFloat(document.getElementById('wiz-vid-speed')?.value) || 1.5;
+      const chks = Array.from(document.querySelectorAll('#wiz-vid-durations .wiz-vid-chk'));
+      if (chks.length) {
+        return chks
+          .filter(c => c.checked)
+          .map(c => {
+            const v = chosen[parseInt(c.dataset.vidIdx, 10)];
+            if (!v) return null;
+            const row = c.closest('.wiz-vid-row');
+            const spdEl = row ? row.querySelector('.wiz-vspeed') : null;
+            const speed = parseFloat(spdEl ? spdEl.value : defaultSpeed) || defaultSpeed;
+            return { title: v.title, id: v.id, doc: v.doc || 'shimy', speed };
+          })
+          .filter(Boolean);
+      }
+      return chosen.map(v => ({ title: v.title, id: v.id, doc: v.doc || 'shimy', speed: defaultSpeed }));
     }
 
     function startTaskInTimer(taskId, opts = {}) {
       const target = state.todayQueue.find(t => t.id === taskId && !t.done); if (!target) return;
-      clearInterval(pomoInterval); clearInterval(pauseInterval);
+      clearInterval(pomoInterval); clearInterval(pauseInterval); clearYtPauseDebounce();
       document.getElementById('pause-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
       state.activeTaskId = taskId;
       pomoTotalSec = target.durationMins * 60;
       if (target.remainingSec === undefined) target.remainingSec = pomoTotalSec;
-      const initialRemaining = target.remainingSec;
-      const timerStartMs = Date.now();
-      pomoLeftSec = initialRemaining;
+      pomoAnchorRemaining = target.remainingSec;
+      pomoAnchorStartMs = Date.now();
+      pomoLeftSec = pomoAnchorRemaining;
       pomoRunning = true; playSFX('click'); saveLocalStudentState(); syncTimerDisplay(); renderTimeline();
 
       const hasVids = Array.isArray(target.videos) && target.videos.length > 0;
@@ -4954,8 +5083,8 @@
       }
 
       pomoInterval = setInterval(() => {
-        const realElapsed = Math.floor((Date.now() - timerStartMs) / 1000);
-        pomoLeftSec = Math.max(0, initialRemaining - realElapsed);
+        const realElapsed = Math.floor((Date.now() - pomoAnchorStartMs) / 1000);
+        pomoLeftSec = Math.max(0, pomoAnchorRemaining - realElapsed);
         target.remainingSec = pomoLeftSec;
         if (pomoLeftSec % 5 === 0) saveLocalStudentState();
         if (pomoTotalSec > 0 && pomoLeftSec > 0) {
@@ -4973,7 +5102,7 @@
 
     function pauseActiveTask(fromVideo = false) {
       const task = getActiveTask();
-      clearInterval(pomoInterval); pomoRunning = false; playSFX('click');
+      clearInterval(pomoInterval); clearYtPauseDebounce(); pomoRunning = false; playSFX('click');
       if (task) {
         task.pauseCount = (task.pauseCount || 0) + 1; task.pauseSec = task.pauseSec || 0;
         document.getElementById('pause-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping';
@@ -4993,10 +5122,7 @@
       const task = getActiveTask();
       clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false;
       document.getElementById('pause-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
-      if (plannerYtPlayer && typeof plannerYtPlayer.pauseVideo === 'function') {
-        setVideoSyncGuard(750);
-        try { plannerYtPlayer.pauseVideo(); } catch (e) {}
-      }
+      closePlannerVideoBanner();
       if (task) {
         ensureTodayReset();
         const elapsed = elapsedOverride !== null ? elapsedOverride : Math.max(60, pomoTotalSec - pomoLeftSec);
@@ -6652,7 +6778,11 @@
       document.getElementById('wiz-vid-no').onclick = () => { wizData.hasVideo = false; renderWizardStep(); };
       document.getElementById('wiz-vid-presets-grid').onclick = (e) => { const b = e.target.closest('.wiz-vid-src-btn'); if (b) applyWizVideoPreset(b.dataset.vidSrc); };
       document.getElementById('wiz-vid-count').oninput = () => { if (wizData.videoSource !== 'manual') { wizData.videoSource = 'manual'; renderWizVideoPresets(); } renderWizVideoDurations(); };
-      document.getElementById('wiz-vid-speed').oninput = updateWizWatchOut;
+      document.getElementById('wiz-vid-speed').onchange = (e) => {
+        const val = e.target.value;
+        document.querySelectorAll('#wiz-vid-durations .wiz-vspeed').forEach(s => { s.value = val; });
+        updateWizWatchOut();
+      };
       document.querySelectorAll('.wiz-mode-btn').forEach(b => b.onclick = () => {
         wizData.mode = b.dataset.wizMode;
         document.querySelectorAll('.wiz-mode-btn').forEach(x => x.className = x.dataset.wizMode === wizData.mode ? 'wiz-mode-btn tap-btn py-2.5 rounded-xl bg-[#0a84ff] text-white cursor-pointer' : 'wiz-mode-btn tap-btn py-2.5 rounded-xl apple-subcard cursor-pointer');
@@ -6750,7 +6880,10 @@
           if (delItem && delItem.done) {
             state.completedSessions = Math.max(0, (state.completedSessions || 0) - 1);
           }
-          if (state.activeTaskId === delId) { clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null; syncTimerDisplay(); }
+          if (state.activeTaskId === delId || plannerBannerTaskId === delId) {
+            if (state.activeTaskId === delId) { clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null; syncTimerDisplay(); }
+            closePlannerVideoBanner();
+          }
           state.todayQueue = state.todayQueue.filter(x => x.id !== delId);
           saveLocalStudentState(true); renderTimeline(); updateKPIs();
           return;
@@ -6760,6 +6893,7 @@
       };
       document.getElementById('btn-clear-today').onclick = () => {
         clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null;
+        closePlannerVideoBanner();
         state.todayQueue = []; saveLocalStudentState(true); renderTimeline(); syncTimerDisplay();
       };
 
