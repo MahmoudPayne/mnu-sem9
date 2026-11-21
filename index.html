@@ -1642,6 +1642,13 @@
         <div class="text-sm font-bold">3. هتتفرج على فيديوهات؟</div>
         <div class="grid grid-cols-2 gap-2.5"><button type="button" id="wiz-vid-yes" class="tap-btn py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">نعم</button><button type="button" id="wiz-vid-no" class="tap-btn py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">لا (بدون فيديوهات)</button></div>
         <div id="wiz-vid-details" class="space-y-3 pt-2">
+          <div id="wiz-vid-presets-box" class="hidden apple-subcard rounded-xl p-3 space-y-2 border border-[#0a84ff]/25">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold text-[#38bdf8]">اختيار سريع لفيديوهات المحاضرة:</span>
+              <span id="wiz-vid-presets-hint" class="text-[10px]" style="color: var(--text-muted);">تعبئة تلقائية للمدد</span>
+            </div>
+            <div id="wiz-vid-presets-grid" class="grid grid-cols-2 gap-2"></div>
+          </div>
           <div class="grid grid-cols-2 gap-3">
             <div><label class="block text-[11px] font-semibold mb-1" style="color: var(--text-muted);">عدد الفيديوهات:</label><input id="wiz-vid-count" type="number" min="1" max="15" value="2" class="w-full px-3 py-2 apple-subcard text-base sm:text-xs font-mono-num" /></div>
             <div><label class="block text-[11px] font-semibold mb-1" style="color: var(--text-muted);">سرعة التشغيل:</label><select id="wiz-vid-speed" class="w-full px-3 py-2 apple-subcard text-base sm:text-xs font-mono-num"><option value="1">1.0x</option><option value="1.25">1.25x</option><option value="1.5" selected>1.5x</option><option value="1.75">1.75x</option><option value="2">2.0x</option></select></div>
@@ -2182,6 +2189,23 @@
         { id: 'eb-p13', title: 'L13: Making and delivering a successful academic poster', kind: 'Post-Midterm' },
         { id: 'eb-p14', title: 'L14: How to write a research proposal', kind: 'Post-Midterm' }
       ]
+    };
+
+    const VIDEO_DURATIONS_MIN = {
+      'HeyQ19ZPmtQ': 6, 'G6QKHqEcgdU': 45, 'GxYEr_FMtNs': 45, 'fCXvkvz7vb4': 32,
+      'SwqSPyDLUZ0': 74, 'D9olkXtUkL8': 62, 'iflsf49PMEA': 45, 'J9k0QuuYsN8': 45,
+      'niC42qhB9H0': 21, '9X5lvXqVvEA': 58, 'TOes27HvG5o': 59, 'ubjFlzvPulg': 67,
+      '6Y4QCQtppP8': 62, '1liejqaFWAo': 66, 'Ag29gsONI7A': 69, 'q-VJI70OGoc': 88,
+      'ye8x9MGUxz0': 52, 'X0Ypx5lkkEk': 46, 'kJFf8E-B1jI': 56, '41miUqaGwrs': 45,
+      'DxCDfSaY9Qs': 31, 'EsudHnoc6GU': 49, 'siYEDq-Shn4': 47, 'ZxaErVXGzww': 60,
+      'Fsqnjt-_qNk': 34, '4uqFRAkCKCk': 62, 'neKsoSRh2Fs': 35, 'm7LWL0gJkRg': 56,
+      '28JDsCKbkc8': 97, 'Rde7zbUvS0U': 104, 'cryGSL2yxLY': 100, '7Lgbo3j8Gic': 78,
+      'FM-lbCewaRg': 170, 'jG9iLdXmKYU': 104, 'NOUKL6y9DZc': 106, 'dOk0hOaJiJE': 119,
+      'Xb1PAdJek5g': 100, 'Nj40LkPtGQA': 114, 'jBeqPt1Xpsg': 125, 'rL_ZEwYfliI': 113,
+      'tdUESowV52I': 109, 'qxEawS9Uhe0': 105, 'Uj4Bw5NT_I0': 134, '8YrHUpSkRaQ': 93,
+      'x0nxlffCI_8': 105, 'VfSECcItQrs': 109, 'B_5zsDZcCl4': 128, '4yY2SsFfLAM': 93,
+      'sW4k7wLxFmw': 85, 'lMzsf0cX9yQ': 127, 'U5tZ4LK5Axw': 87, 'WBpbXES1fTs': 105,
+      'X7bDbGgxytg': 103, 'njD-Hdqi7MI': 105
     };
 
     const ENT_LECTURE_VIDEOS = {
@@ -4503,8 +4527,78 @@
     }
 
     // Study Wizard Modal
-    let wizStep = 1, wizData = { subj: 'ENT', topicId: '', title: '', hasVideo: true, speed: 1.5, pages: 15, mode: 'first' };
-    function openStudyWizard() { wizStep = 1; wizData.topicId = ''; wizData.title = ''; renderWizardStep(); gsapModalOpen('study-wizard-modal'); }
+    let wizStep = 1, wizData = { subj: 'ENT', topicId: '', title: '', hasVideo: true, videoSource: 'manual', speed: 1.5, pages: 15, mode: 'first' };
+    function openStudyWizard() {
+      wizStep = 1;
+      wizData.topicId = '';
+      wizData.title = '';
+      wizData.videoSource = 'manual';
+      renderWizardStep();
+      gsapModalOpen('study-wizard-modal');
+    }
+    function getWizTopicVideos() {
+      if (!wizData.topicId) return [];
+      const list = shared.topics[wizData.subj] || [];
+      const topicObj = list.find(t => t.id === wizData.topicId);
+      if (topicObj && Array.isArray(topicObj.videos) && topicObj.videos.length) return topicObj.videos;
+      return ENT_LECTURE_VIDEOS[wizData.topicId] || [];
+    }
+    function getWizVideoDurMin(v) {
+      return (v && v.id && VIDEO_DURATIONS_MIN[v.id]) ? VIDEO_DURATIONS_MIN[v.id] : 45;
+    }
+    function renderWizVideoPresets() {
+      const box = document.getElementById('wiz-vid-presets-box');
+      const grid = document.getElementById('wiz-vid-presets-grid');
+      if (!box || !grid) return;
+      const vids = getWizTopicVideos();
+      if (!vids.length) {
+        box.classList.add('hidden');
+        wizData.videoSource = 'manual';
+        return;
+      }
+      box.classList.remove('hidden');
+      const shimyVids = vids.filter(v => v.doc !== 'mosaad');
+      const mosaadVids = vids.filter(v => v.doc === 'mosaad');
+      const sumMins = arr => arr.reduce((s, v) => s + getWizVideoDurMin(v), 0);
+      const btns = [];
+      if (shimyVids.length) {
+        const on = wizData.videoSource === 'shimy';
+        btns.push(`<button type="button" data-vid-src="shimy" class="wiz-vid-src-btn tap-btn p-2.5 rounded-xl text-right cursor-pointer border transition ${on ? 'bg-[#0a84ff] text-white border-[#0a84ff]' : 'apple-card border-[#0a84ff]/30 hover:border-[#0a84ff]/70'}"><div class="text-xs font-bold">د. الشيمي</div><div class="text-[10px] font-mono-num ${on ? 'text-sky-100' : 'text-[#38bdf8]'} mt-0.5">${shimyVids.length} فيديو • ${sumMins(shimyVids)} د</div></button>`);
+      }
+      if (mosaadVids.length) {
+        const on = wizData.videoSource === 'mosaad';
+        btns.push(`<button type="button" data-vid-src="mosaad" class="wiz-vid-src-btn tap-btn p-2.5 rounded-xl text-right cursor-pointer border transition ${on ? 'bg-emerald-500 text-white border-emerald-400' : 'apple-card border-emerald-500/35 hover:border-emerald-400/75'}"><div class="text-xs font-bold">د. مسعد</div><div class="text-[10px] font-mono-num ${on ? 'text-emerald-100' : 'text-emerald-400'} mt-0.5">${mosaadVids.length} فيديو • ${sumMins(mosaadVids)} د</div></button>`);
+      }
+      if (shimyVids.length && mosaadVids.length) {
+        const on = wizData.videoSource === 'both';
+        btns.push(`<button type="button" data-vid-src="both" class="wiz-vid-src-btn tap-btn p-2.5 rounded-xl text-right cursor-pointer border transition ${on ? 'bg-purple-500 text-white border-purple-400' : 'apple-card border-purple-500/35 hover:border-purple-400/75'}"><div class="text-xs font-bold">الاتنين معاً</div><div class="text-[10px] font-mono-num ${on ? 'text-purple-100' : 'text-purple-300'} mt-0.5">${vids.length} فيديو • ${sumMins(vids)} د</div></button>`);
+      }
+      const onMan = wizData.videoSource === 'manual';
+      btns.push(`<button type="button" data-vid-src="manual" class="wiz-vid-src-btn tap-btn p-2.5 rounded-xl text-right cursor-pointer border transition ${onMan ? 'bg-slate-600 text-white border-slate-400' : 'apple-card border-white/10 hover:border-white/30'}"><div class="text-xs font-bold">إدخال يدوي</div><div class="text-[10px] ${onMan ? 'text-slate-200' : ''}" style="${onMan ? '' : 'color: var(--text-muted);'}">حدد العدد والمدد بنفسك</div></button>`);
+      grid.innerHTML = btns.join('');
+    }
+    function applyWizVideoPreset(src) {
+      const vids = getWizTopicVideos();
+      wizData.videoSource = src;
+      renderWizVideoPresets();
+      if (src === 'manual' || !vids.length) {
+        renderWizVideoDurations();
+        return;
+      }
+      const chosen = src === 'shimy'
+        ? vids.filter(v => v.doc !== 'mosaad')
+        : src === 'mosaad'
+          ? vids.filter(v => v.doc === 'mosaad')
+          : vids;
+      if (!chosen.length) {
+        wizData.videoSource = 'manual';
+        renderWizVideoPresets();
+        renderWizVideoDurations();
+        return;
+      }
+      document.getElementById('wiz-vid-count').value = String(chosen.length);
+      renderWizVideoDurations(chosen);
+    }
     function renderWizardStep() {
       document.getElementById('wiz-step-indicator').textContent = `الخطوة ${wizStep} من 5`;
       document.querySelectorAll('.wiz-step').forEach((el, idx) => el.classList.toggle('hidden', idx + 1 !== wizStep));
@@ -4521,16 +4615,40 @@
         document.getElementById('wiz-vid-yes').className = wizData.hasVideo ? 'tap-btn py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer' : 'tap-btn py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer';
         document.getElementById('wiz-vid-no').className = !wizData.hasVideo ? 'tap-btn py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer' : 'tap-btn py-2.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer';
         document.getElementById('wiz-vid-details').classList.toggle('hidden', !wizData.hasVideo);
-        renderWizVideoDurations();
+        if (wizData.hasVideo) {
+          renderWizVideoPresets();
+          if (wizData.videoSource !== 'manual' && getWizTopicVideos().length) {
+            applyWizVideoPreset(wizData.videoSource);
+          } else {
+            renderWizVideoDurations();
+          }
+        } else {
+          updateWizWatchOut();
+        }
       } else if (wizStep === 5) {
         const est = calcWizardTotal();
         document.getElementById('wiz-final-total').textContent = `${Math.floor(est.total / 60)}س ${pad2(est.total % 60)}د`;
         document.getElementById('wiz-final-breakdown').textContent = `مشاهدة: ${est.watch}د • ورق: ${est.read}د • راحة: ${est.brk}د`;
       }
     }
-    function renderWizVideoDurations() {
-      const cnt = Math.min(15, Math.max(1, parseInt(document.getElementById('wiz-vid-count').value, 10) || 1));
+    function renderWizVideoDurations(presetVideos = null) {
       const wrap = document.getElementById('wiz-vid-durations');
+      if (Array.isArray(presetVideos) && presetVideos.length) {
+        let html = `<div class="space-y-1.5">`;
+        presetVideos.forEach((v, i) => {
+          const dur = getWizVideoDurMin(v);
+          const shortTitle = escapeHtml((v.title || `فيديو ${i + 1}`).replace(/^(د\.\s*الشيمي:|د\.\s*مسعد:)\s*/i, '').trim());
+          const badge = v.doc === 'mosaad'
+            ? '<span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[9px] font-bold shrink-0">مسعد</span>'
+            : '<span class="px-1.5 py-0.5 rounded bg-[#0a84ff]/15 text-[#38bdf8] text-[9px] font-bold shrink-0">الشيمي</span>';
+          html += `<div class="flex items-center justify-between gap-2 apple-subcard rounded-xl px-2.5 py-1.5"><div class="flex items-center gap-1.5 min-w-0 flex-1">${badge}<span class="text-[11px] font-semibold truncate" title="${escapeHtml(v.title || '')}">${shortTitle}</span></div><div class="flex items-center gap-1 shrink-0"><input type="number" min="1" value="${dur}" class="wiz-vdur w-14 text-center apple-card rounded-lg px-1.5 py-1 text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none" /><span class="text-[10px]" style="color: var(--text-muted);">د</span></div></div>`;
+        });
+        wrap.innerHTML = html + `</div>`;
+        wrap.querySelectorAll('.wiz-vdur').forEach(i => i.oninput = updateWizWatchOut);
+        updateWizWatchOut();
+        return;
+      }
+      const cnt = Math.min(15, Math.max(1, parseInt(document.getElementById('wiz-vid-count').value, 10) || 1));
       let html = `<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">`;
       for (let i = 0; i < cnt; i++) html += `<div class="flex items-center gap-1 apple-subcard px-2 py-1.5"><span class="text-[10px]">ف${i + 1}</span><input type="number" min="1" value="${i === 0 ? 35 : 45}" class="wiz-vdur w-full bg-transparent text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none" /><span class="text-[10px]">د</span></div>`;
       wrap.innerHTML = html + `</div>`;
@@ -6295,11 +6413,12 @@
       // Study Wizard
       document.getElementById('btn-open-study-wizard').onclick = openStudyWizard;
       document.getElementById('wiz-modal-close').onclick = () => document.getElementById('study-wizard-modal').classList.add('hidden');
-      document.getElementById('wiz-subj-grid').onclick = (e) => { const b = e.target.closest('.wiz-subj-btn'); if (b) { wizData.subj = b.dataset.ws; wizData.topicId = ''; renderWizardStep(); } };
-      document.getElementById('wiz-lecture-select').onchange = (e) => { wizData.topicId = e.target.value; wizData.title = e.target.options[e.target.selectedIndex].text; };
+      document.getElementById('wiz-subj-grid').onclick = (e) => { const b = e.target.closest('.wiz-subj-btn'); if (b) { wizData.subj = b.dataset.ws; wizData.topicId = ''; wizData.videoSource = 'manual'; renderWizardStep(); } };
+      document.getElementById('wiz-lecture-select').onchange = (e) => { wizData.topicId = e.target.value; wizData.title = e.target.options[e.target.selectedIndex].text; wizData.videoSource = 'manual'; };
       document.getElementById('wiz-vid-yes').onclick = () => { wizData.hasVideo = true; renderWizardStep(); };
       document.getElementById('wiz-vid-no').onclick = () => { wizData.hasVideo = false; renderWizardStep(); };
-      document.getElementById('wiz-vid-count').oninput = renderWizVideoDurations;
+      document.getElementById('wiz-vid-presets-grid').onclick = (e) => { const b = e.target.closest('.wiz-vid-src-btn'); if (b) applyWizVideoPreset(b.dataset.vidSrc); };
+      document.getElementById('wiz-vid-count').oninput = () => { if (wizData.videoSource !== 'manual') { wizData.videoSource = 'manual'; renderWizVideoPresets(); } renderWizVideoDurations(); };
       document.getElementById('wiz-vid-speed').oninput = updateWizWatchOut;
       document.querySelectorAll('.wiz-mode-btn').forEach(b => b.onclick = () => {
         wizData.mode = b.dataset.wizMode;
@@ -6309,8 +6428,14 @@
       document.getElementById('wiz-next-btn').onclick = () => {
         if (wizStep === 2) {
           const custom = document.getElementById('wiz-lecture-custom').value.trim();
-          if (custom) { wizData.title = custom; wizData.topicId = ''; }
-          else { const sel = document.getElementById('wiz-lecture-select'); wizData.topicId = sel.value; wizData.title = sel.options[sel.selectedIndex]?.text || ''; }
+          const prevTopic = wizData.topicId;
+          if (custom) { wizData.title = custom; wizData.topicId = ''; wizData.videoSource = 'manual'; }
+          else {
+            const sel = document.getElementById('wiz-lecture-select');
+            wizData.topicId = sel.value;
+            wizData.title = sel.options[sel.selectedIndex]?.text || '';
+            if (prevTopic !== wizData.topicId) wizData.videoSource = 'manual';
+          }
         }
         if (wizStep < 5) { wizStep++; renderWizardStep(); }
       };
