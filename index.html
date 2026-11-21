@@ -178,7 +178,7 @@
     .apple-subcard {
       background-color: var(--bg-elevated);
       border: 1px solid var(--border-hairline);
-      border-radius: 14px;
+      border-radius: 12px;
       transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .apple-card-hover:hover {
@@ -402,127 +402,166 @@
 
   <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto p-3.5 sm:p-6 space-y-5 sm:space-y-6">
 
-    <!-- TAB 1: HOME & EXAMS (BALANCED BENTO GRID) -->
+    <!-- TAB 1: HOME & EXAMS (ZERO LONG-SCROLL SUB-TABS) -->
     <section id="tab-home" class="tab-panel space-y-4 sm:space-y-5 fade-in">
       <!-- VIP Gold Member Mini Welcome Card (Visible ONLY to Gold Members) -->
-      <div id="home-vip-card" class="hidden apple-card gold-vip-card px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+      <div id="home-vip-card" class="hidden apple-card gold-vip-card rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2.5 min-w-0">
           <span id="home-vip-badge" class="gold-vip-badge px-2.5 py-0.5 rounded-full text-[11px] shrink-0">👑 VIP</span>
           <span id="home-vip-name" class="text-xs sm:text-sm font-extrabold gold-shimmer-text truncate">أهلاً بك</span>
         </div>
         <span id="home-vip-status" class="text-[11px] font-bold text-amber-200">🟢 متصل الآن</span>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <!-- Hero Next-Exam Card (Clean, Balanced, Zero White Circle) -->
-        <div class="lg:col-span-8 rounded-2xl overflow-hidden relative shadow-xl bg-gradient-to-br from-[#071428] via-[#0b223f] to-[#062729] text-white border border-sky-400/20 flex flex-col justify-between">
-          <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-25" viewBox="0 0 800 220" preserveAspectRatio="none">
-            <path class="ecg-line" fill="none" stroke="#38bdf8" stroke-width="2.5" d="M0,130 L180,130 L205,130 L220,95 L235,155 L255,40 L275,180 L295,115 L315,130 L520,130 L545,130 L560,95 L575,155 L595,40 L615,180 L635,115 L655,130 L800,130" />
-          </svg>
 
-          <div class="relative z-10 p-5 sm:p-6 flex flex-col justify-between gap-4 h-full">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div class="space-y-1.5 min-w-0 flex-1">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/35 text-sky-300 text-[11px] font-semibold">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span id="calm-alert-banner">أقرب امتحان قادم</span>
-                </div>
-                <div class="flex items-center gap-2.5"><span id="hero-exam-icon" class="shrink-0 flex items-center"></span><h2 id="hero-exam-title" class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">Ophthalmology — Final</h2></div>
-                <p id="hero-exam-meta" class="text-xs sm:text-sm text-sky-100/80">--</p>
+      <!-- Always-Visible Hero Next-Exam Countdown Card -->
+      <div class="rounded-2xl overflow-hidden relative shadow-xl bg-gradient-to-br from-[#071428] via-[#0b223f] to-[#062729] text-white border border-sky-400/20">
+        <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-25" viewBox="0 0 800 220" preserveAspectRatio="none">
+          <path class="ecg-line" fill="none" stroke="#38bdf8" stroke-width="2.5" d="M0,130 L180,130 L205,130 L220,95 L235,155 L255,40 L275,180 L295,115 L315,130 L520,130 L545,130 L560,95 L575,155 L595,40 L615,180 L635,115 L655,130 L800,130" />
+        </svg>
+
+        <div class="relative z-10 p-4 sm:p-5 flex flex-col justify-between gap-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1.5 min-w-0 flex-1">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/35 text-sky-300 text-[11px] font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span id="calm-alert-banner">أقرب امتحان قادم</span>
               </div>
-              <div class="shrink-0 flex justify-center">
-                <lottie-player
-                  src="https://lottie.host/0074b5eb-a871-4de4-abee-f7ad55bc7948/feBAK42RyT.json"
-                  background="transparent"
-                  speed="1"
-                  loop
-                  autoplay
-                  class="w-[130px] h-[130px] sm:w-[170px] sm:h-[170px]"
-                ></lottie-player>
-              </div>
+              <div class="flex items-center gap-2.5"><span id="hero-exam-icon" class="shrink-0 flex items-center"></span><h2 id="hero-exam-title" class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">Ophthalmology — Final</h2></div>
+              <p id="hero-exam-meta" class="text-xs sm:text-sm text-sky-100/80">--</p>
             </div>
-
-            <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center" dir="ltr">
-              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-days" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">DAYS</div></div>
-              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-hours" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">HRS</div></div>
-              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-mins" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">MIN</div></div>
-              <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-2 py-3 flex flex-col items-center justify-center"><div id="hero-secs" class="font-mono-num text-2xl sm:text-3xl font-extrabold text-emerald-400">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">SEC</div></div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2.5 pt-1">
-              <button type="button" id="hero-go-planner" class="tap-btn btn-grad-primary px-5 py-2.5 rounded-full text-white text-xs font-bold transition cursor-pointer">
-                بدء المذاكرة والـ Timer
-              </button>
-              <button type="button" id="hero-open-student-auth" class="tap-btn px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition cursor-pointer">
-                مزامنة حسابك الجامعي
-              </button>
+            <div class="shrink-0 flex justify-center">
+              <lottie-player
+                src="https://lottie.host/0074b5eb-a871-4de4-abee-f7ad55bc7948/feBAK42RyT.json"
+                background="transparent"
+                speed="1"
+                loop
+                autoplay
+                class="w-[120px] h-[120px] sm:w-[155px] sm:h-[155px]"
+              ></lottie-player>
             </div>
           </div>
-        </div>
 
-        <!-- Right Bento Column: Compact Daily Goal + Syllabus Progress with 4 Mini Subject Bars -->
-        <div class="lg:col-span-4 flex flex-col gap-4">
-          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex items-center gap-4" style="--i:0">
-            <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
-              <svg class="w-full h-full -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="6.5"></circle>
-                <circle id="daily-goal-ring" cx="40" cy="40" r="33" fill="none" stroke="#30d158" stroke-width="6.5" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3" class="transition-all duration-700"></circle>
-              </svg>
-              <span id="daily-goal-pct" class="absolute font-mono-num text-xs font-extrabold text-emerald-400">0%</span>
-            </div>
-            <div class="flex-1 min-w-0 space-y-1">
+          <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center" dir="ltr">
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-2 py-2.5 sm:py-3 flex flex-col items-center justify-center"><div id="hero-days" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">DAYS</div></div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-2 py-2.5 sm:py-3 flex flex-col items-center justify-center"><div id="hero-hours" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">HRS</div></div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-2 py-2.5 sm:py-3 flex flex-col items-center justify-center"><div id="hero-mins" class="font-mono-num text-2xl sm:text-3xl font-extrabold">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">MIN</div></div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-2 py-2.5 sm:py-3 flex flex-col items-center justify-center"><div id="hero-secs" class="font-mono-num text-2xl sm:text-3xl font-extrabold text-emerald-400">00</div><div class="text-[10px] text-sky-200 font-semibold mt-0.5">SEC</div></div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5 pt-0.5">
+            <button type="button" id="hero-go-planner" class="tap-btn btn-grad-primary px-5 py-2.5 rounded-full text-white text-xs font-bold transition cursor-pointer">
+              بدء المذاكرة والـ Timer
+            </button>
+            <button type="button" id="hero-open-student-auth" class="tap-btn px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition cursor-pointer">
+              مزامنة حسابك الجامعي
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home Sub-Tabs Bar (Zero Long-Scroll Navigation) -->
+      <div class="seg-control rounded-2xl p-1.5 overflow-x-auto no-scrollbar">
+        <div class="flex sm:grid sm:grid-cols-4 items-center gap-1.5 min-w-max sm:min-w-0">
+          <button type="button" data-home-sub="summary" class="home-sub-btn tap-btn px-3.5 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5">
+            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 shrink-0"></i>
+            <span>ملخصي</span>
+          </button>
+          <button type="button" data-home-sub="exams" class="home-sub-btn tap-btn px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5" style="color: var(--text-muted);">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5 shrink-0"></i>
+            <span>الامتحانات</span>
+          </button>
+          <button type="button" data-home-sub="grading" class="home-sub-btn tap-btn px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5" style="color: var(--text-muted);">
+            <i data-lucide="award" class="w-3.5 h-3.5 shrink-0"></i>
+            <span>توزيع الدرجات</span>
+          </button>
+          <button type="button" data-home-sub="schedule" class="home-sub-btn tap-btn px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5" style="color: var(--text-muted);">
+            <i data-lucide="image" class="w-3.5 h-3.5 shrink-0"></i>
+            <span>صورة الجدول</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- HOME SUB-PANEL 1: MY SUMMARY (BENTO GRID) -->
+      <div id="home-panel-summary" class="home-sub-panel space-y-4 sm:space-y-5 fade-in">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          <!-- Daily Goal Card -->
+          <div class="lg:col-span-5">
+            <div class="apple-card apple-card-hover stagger-item rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between gap-3" style="--i:0">
               <div class="flex items-center justify-between gap-2">
-                <span class="text-sm font-bold truncate">الهدف اليومي</span>
-                <select id="daily-goal-select" class="apple-subcard px-2 py-0.5 text-xs font-mono-num font-bold focus:outline-none cursor-pointer">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0"><i data-lucide="target" class="w-4 h-4"></i></div>
+                  <span class="text-sm font-bold truncate">الهدف اليومي</span>
+                </div>
+                <select id="daily-goal-select" class="apple-subcard rounded-xl px-2.5 py-1 text-base sm:text-xs font-mono-num font-bold focus:outline-none cursor-pointer">
                   <option value="2">2h</option>
                   <option value="4" selected>4h</option>
                   <option value="6">6h</option>
                   <option value="8">8h</option>
                 </select>
               </div>
-              <div id="daily-goal-sub" class="text-xs font-mono-num" style="color: var(--text-muted);">0.0 / 4.0h اليوم</div>
+              <div class="flex items-center gap-4">
+                <div class="relative w-20 h-20 shrink-0 flex items-center justify-center">
+                  <svg class="w-full h-full -rotate-90" viewBox="0 0 80 80">
+                    <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="6.5"></circle>
+                    <circle id="daily-goal-ring" cx="40" cy="40" r="33" fill="none" stroke="#30d158" stroke-width="6.5" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3" class="transition-all duration-700"></circle>
+                  </svg>
+                  <span id="daily-goal-pct" class="absolute font-mono-num text-sm font-extrabold text-emerald-400">0%</span>
+                </div>
+                <div class="flex-1 min-w-0 space-y-1">
+                  <div id="daily-goal-sub" class="text-sm font-mono-num font-bold">0.0 / 4.0h اليوم</div>
+                  <p class="text-[11px] leading-relaxed" style="color: var(--text-muted);">حافظ على وتيرة ثابتة يومياً لتحقيق هدفك قبل الامتحانات.</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3" style="--i:1">
-            <div>
-              <div class="flex items-baseline justify-between">
-                <span class="text-xs font-semibold" style="color: var(--text-muted);">نسبة إنجاز المنهج الكلي</span>
-                <span id="kpi-overall-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 محاضرة</span>
+          <!-- Overall Syllabus Progress + 4 Mini Subject Bars -->
+          <div class="lg:col-span-7">
+            <div class="apple-card apple-card-hover stagger-item rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between space-y-3" style="--i:1">
+              <div>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-semibold" style="color: var(--text-muted);">نسبة إنجاز المنهج الكلي</span>
+                  <span id="kpi-overall-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 محاضرة</span>
+                </div>
+                <div class="flex items-center gap-3 mt-1.5">
+                  <div id="kpi-overall-pct" class="text-2xl font-extrabold font-mono-num text-[#38bdf8]">0%</div>
+                  <div class="flex-1 bg-slate-700/40 h-2 rounded-full overflow-hidden"><div id="kpi-overall-bar" class="bg-gradient-to-l from-[#38bdf8] to-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
+                </div>
               </div>
-              <div class="flex items-center gap-3 mt-1">
-                <div id="kpi-overall-pct" class="text-2xl font-extrabold font-mono-num text-[#38bdf8]">0%</div>
-                <div class="flex-1 bg-slate-700/40 h-2 rounded-full overflow-hidden"><div id="kpi-overall-bar" class="bg-gradient-to-l from-[#38bdf8] to-emerald-400 h-full transition-all duration-700" style="width: 0%"></div></div>
-              </div>
+              <div id="home-subj-mini-bars" class="grid grid-cols-2 gap-x-3 gap-y-2.5 pt-2.5 border-t" style="border-color: var(--border-hairline);"></div>
             </div>
-            <div id="home-subj-mini-bars" class="grid grid-cols-2 gap-x-3 gap-y-2 pt-2 border-t" style="border-color: var(--border-hairline);"></div>
           </div>
         </div>
 
         <!-- Bottom 3 Equal-Height Stat Cards -->
-        <div class="lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex items-center justify-between gap-3" style="--i:2">
-            <div class="space-y-1 min-w-0">
-              <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات التركيز</div>
-              <div id="kpi-hours-logged" class="text-2xl font-extrabold font-mono-num">0.0h</div>
-              <div id="kpi-sync-hint" class="text-[11px]" style="color: var(--text-muted);">محفوظ على جهازك</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch">
+          <div class="apple-card apple-card-hover stagger-item rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between gap-2" style="--i:2">
+            <div class="flex items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات التركيز</div>
+                <div id="kpi-hours-logged" class="text-2xl font-extrabold font-mono-num">0.0h</div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-[#38bdf8] flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-5 h-5"></i></div>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-[#38bdf8] flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-5 h-5"></i></div>
+            <div id="kpi-sync-hint" class="text-[11px]" style="color: var(--text-muted);">محفوظ على جهازك</div>
           </div>
 
-          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex items-center justify-between gap-3" style="--i:3">
-            <div class="space-y-1 min-w-0">
-              <div class="text-xs font-semibold" style="color: var(--text-muted);">الجلسات المنجزة</div>
-              <div id="kpi-sessions-count" class="text-2xl font-extrabold font-mono-num text-purple-400">0 جلسات</div>
-              <div class="text-[11px]" style="color: var(--text-muted);">إجمالي الجلسات المكتملة</div>
+          <div class="apple-card apple-card-hover stagger-item rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between gap-2" style="--i:3">
+            <div class="flex items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="text-xs font-semibold" style="color: var(--text-muted);">الجلسات المنجزة</div>
+                <div id="kpi-sessions-count" class="text-2xl font-extrabold font-mono-num text-purple-400">0 جلسات</div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+            <div class="text-[11px]" style="color: var(--text-muted);">إجمالي الجلسات المكتملة</div>
           </div>
 
-          <div class="apple-card apple-card-hover stagger-item p-4 sm:p-5 flex flex-col justify-between gap-2" style="--i:4">
-            <div class="flex items-center justify-between gap-2">
-              <div>
+          <div class="apple-card apple-card-hover stagger-item rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between gap-2.5" style="--i:4">
+            <div class="flex items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
                 <div class="text-xs font-semibold" style="color: var(--text-muted);">إنجاز خطة اليوم</div>
-                <div class="flex items-baseline gap-2 mt-1">
+                <div class="flex items-baseline gap-2">
                   <div id="kpi-today-pct" class="text-2xl font-extrabold font-mono-num text-emerald-400">0%</div>
                   <div id="kpi-today-sub" class="text-[11px] font-mono-num" style="color: var(--text-muted);">0 / 0 مهام</div>
                 </div>
@@ -534,136 +573,272 @@
         </div>
       </div>
 
-      <div class="apple-card p-4 sm:p-6 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-4" style="border-color: var(--border-hairline);">
-          <div><h3 class="text-base font-bold">جدول الامتحانات التفاعلي</h3><p class="text-xs mt-0.5" style="color: var(--text-muted);">متزامن في الوقت الفعلي مع الإدارة</p></div>
-          <div class="seg-control inline-flex text-xs font-semibold">
-            <button data-exam-filter="ALL" class="exam-filter-btn tap-btn px-3.5 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
-            <button data-exam-filter="Final" class="exam-filter-btn tap-btn px-3.5 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">Final</button>
-            <button data-exam-filter="OSCE" class="exam-filter-btn tap-btn px-3.5 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">OSCE</button>
+      <!-- HOME SUB-PANEL 2: INTERACTIVE EXAMS TIMELINE -->
+      <div id="home-panel-exams" class="home-sub-panel hidden space-y-4 sm:space-y-5 fade-in">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-3.5" style="border-color: var(--border-hairline);">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-[#0a84ff]/15 text-[#38bdf8] flex items-center justify-center shrink-0"><i data-lucide="calendar-clock" class="w-4 h-4"></i></div>
+              <div>
+                <h3 class="text-sm sm:text-base font-bold">جدول الامتحانات التفاعلي</h3>
+                <p class="text-xs mt-0.5" style="color: var(--text-muted);">متزامن في الوقت الفعلي مع الإدارة</p>
+              </div>
+            </div>
+            <div class="seg-control inline-flex text-xs font-semibold">
+              <button data-exam-filter="ALL" class="exam-filter-btn tap-btn px-3.5 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
+              <button data-exam-filter="Final" class="exam-filter-btn tap-btn px-3.5 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">Final</button>
+              <button data-exam-filter="OSCE" class="exam-filter-btn tap-btn px-3.5 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">OSCE</button>
+            </div>
           </div>
+          <div id="exams-timeline-list" class="space-y-2.5"></div>
         </div>
-        <div id="exams-timeline-list" class="space-y-2.5"></div>
       </div>
 
-      <!-- Official Exam Schedule Image Card -->
-      <div class="apple-card p-4 sm:p-6 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
-          <div>
-            <h3 class="text-base font-bold">صورة جدول الامتحانات الرسمي (Revised Schedule)</h3>
-            <p class="text-xs mt-0.5" style="color: var(--text-muted);">اضغط على الصورة أو زر التكبير لعرض الجدول بدقة عالية أو تحميله.</p>
+      <!-- HOME SUB-PANEL 3: SEMESTER 9 GRADING DISTRIBUTION -->
+      <div id="home-panel-grading" class="home-sub-panel hidden space-y-4 sm:space-y-5 fade-in">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2.5 border-b pb-3.5" style="border-color: var(--border-hairline);">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
+                <i data-lucide="award" class="w-4 h-4"></i>
+              </div>
+              <h3 class="text-sm sm:text-base font-bold">توزيع درجات الترم التاسع (Semester 9 Grading)</h3>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold">
+              <span class="px-2.5 py-1 rounded-full apple-subcard text-[#38bdf8] font-mono-num">22 ساعة معتمدة</span>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono-num">الإجمالي: 500 درجة</span>
+            </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button type="button" id="btn-zoom-exam-schedule" class="tap-btn px-3.5 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer"><i data-lucide="zoom-in" class="w-3.5 h-3.5 inline-block ml-1"></i><span>تكبير الجدول</span></button>
-            <a id="btn-download-exam-schedule" href="#exam-schedule-img-wrap" download="exam-schedule.jpg" class="tap-btn px-3.5 py-2 rounded-xl apple-subcard text-xs font-bold cursor-pointer"><i data-lucide="download" class="w-3.5 h-3.5 inline-block ml-1"></i><span>تحميل الصورة</span></a>
+
+          <div class="overflow-x-auto no-scrollbar rounded-xl border" style="border-color: var(--border-hairline);">
+            <table class="w-full min-w-[600px] text-right text-xs border-collapse">
+              <thead>
+                <tr class="apple-subcard border-b text-[11px]" style="border-color: var(--border-hairline); color: var(--text-muted);">
+                  <th class="py-3 px-3.5 font-bold">المادة</th>
+                  <th class="py-3 px-2.5 font-bold text-center">الساعات</th>
+                  <th class="py-3 px-2.5 font-bold text-center">Midterm</th>
+                  <th class="py-3 px-2.5 font-bold text-center">الأنشطة والحضور</th>
+                  <th class="py-3 px-2.5 font-bold text-center">OSCE</th>
+                  <th class="py-3 px-2.5 font-bold text-center bg-[#0a84ff]/10 text-[#38bdf8]">Final</th>
+                  <th class="py-3 px-3 font-bold text-center bg-emerald-500/10 text-emerald-400">الإجمالي</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y" style="border-color: var(--border-hairline);">
+                <tr class="hover:bg-white/5 transition">
+                  <td class="py-3 px-3.5 font-bold"><span class="inline-flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-md border text-[10px] font-extrabold bg-[#0a84ff]/15 text-[#38bdf8] border-[#0a84ff]/30">OPTH</span><span>Ophthalmology</span></span></td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-semibold">6</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">35</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">10</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">45</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-bold bg-[#0a84ff]/10 text-[#38bdf8]">60</td>
+                  <td class="py-3 px-3 text-center font-mono-num font-extrabold bg-emerald-500/10 text-emerald-400">150</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition">
+                  <td class="py-3 px-3.5 font-bold"><span class="inline-flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-md border text-[10px] font-extrabold bg-emerald-500/15 text-emerald-400 border-emerald-500/30">FMIMC</span><span>Family Medicine</span></span></td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-semibold">6</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">35</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">10</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">45</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-bold bg-[#0a84ff]/10 text-[#38bdf8]">60</td>
+                  <td class="py-3 px-3 text-center font-mono-num font-extrabold bg-emerald-500/10 text-emerald-400">150</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition">
+                  <td class="py-3 px-3.5 font-bold"><span class="inline-flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-md border text-[10px] font-extrabold bg-amber-500/15 text-amber-400 border-amber-500/30">ENT</span><span>Ear, Nose &amp; Throat</span></span></td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-semibold">4</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">25</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">5</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">30</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-bold bg-[#0a84ff]/10 text-[#38bdf8]">40</td>
+                  <td class="py-3 px-3 text-center font-mono-num font-extrabold bg-emerald-500/10 text-emerald-400">100</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition">
+                  <td class="py-3 px-3.5 font-bold"><span class="inline-flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-md border text-[10px] font-extrabold bg-purple-500/15 text-purple-400 border-purple-500/30">EBMR</span><span>EBM &amp; Research</span></span></td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-semibold">2</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">10</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num">10</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num" style="color: var(--text-muted);">—</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-bold bg-[#0a84ff]/10 text-[#38bdf8]">30</td>
+                  <td class="py-3 px-3 text-center font-mono-num font-extrabold bg-emerald-500/10 text-emerald-400">50</td>
+                </tr>
+                <tr class="hover:bg-white/5 transition">
+                  <td class="py-3 px-3.5 font-bold"><span class="inline-flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-md border text-[10px] font-extrabold bg-cyan-500/15 text-cyan-300 border-cyan-500/30">UCC3</span><span>Human Resources</span></span></td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-semibold">2</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num" style="color: var(--text-muted);">—</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num" style="color: var(--text-muted);">—</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num" style="color: var(--text-muted);">—</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num font-bold bg-[#0a84ff]/10 text-[#38bdf8]">50</td>
+                  <td class="py-3 px-3 text-center font-mono-num font-extrabold bg-emerald-500/10 text-emerald-400">50</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="bg-[#0a84ff]/10 border-t font-extrabold text-xs" style="border-color: var(--border-hairline);">
+                  <td class="py-3 px-3.5 text-[#38bdf8]">الإجمالي (Total)</td>
+                  <td class="py-3 px-2.5 text-center font-mono-num text-[#38bdf8]" colspan="5">22 ساعة معتمدة</td>
+                  <td class="py-3 px-3 text-center font-mono-num text-emerald-400 bg-emerald-500/15">500 درجة</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch text-xs">
+            <div class="apple-subcard rounded-xl p-3.5 h-full flex flex-col justify-between border-r-2 border-r-[#0a84ff] leading-relaxed">
+              <div><strong class="text-[#38bdf8]">شرط الفاينل:</strong> 35% على الأقل من درجة الامتحان النهائي للنجاح في المادة.</div>
+            </div>
+            <div class="apple-subcard rounded-xl p-3.5 h-full flex flex-col justify-between border-r-2 border-r-emerald-400 leading-relaxed">
+              <div><strong class="text-emerald-400">شرط النجاح الكلي:</strong> 60% على الأقل من مجموع درجات المقرر.</div>
+            </div>
+            <div class="apple-subcard rounded-xl p-3.5 h-full flex flex-col justify-between border-r-2 border-r-amber-400 leading-relaxed">
+              <div><strong class="text-amber-400">الانتقال للمستوى التالي:</strong> بحد أقصى 9 ساعات معتمدة رسوب.</div>
+            </div>
           </div>
         </div>
-        <div class="relative rounded-2xl overflow-hidden border cursor-pointer group" style="border-color: var(--border-hairline);" id="exam-schedule-img-wrap">
-          <img id="exam-schedule-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="صورة جدول الامتحانات الرسمي (Revised Schedule)" class="w-full h-auto max-h-[420px] object-contain mx-auto bg-slate-950/40 transition-transform duration-300 group-hover:scale-[1.01]" />
-          <div id="exam-schedule-fallback" class="hidden p-8 text-center text-xs space-y-2" style="color: var(--text-muted);">
-            <div class="flex justify-center"><i data-lucide="calendar-days" class="w-8 h-8 text-[#38bdf8]"></i></div>
-            <div>لم يتم العثور على ملف <span class="font-mono-num">./exam-schedule.jpg</span> محلياً، أو لم يرفع الأدمن صورة الجدول بعد.</div>
+      </div>
+
+      <!-- HOME SUB-PANEL 4: OFFICIAL EXAM SCHEDULE IMAGE -->
+      <div id="home-panel-schedule" class="home-sub-panel hidden space-y-4 sm:space-y-5 fade-in">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2.5 border-b pb-3.5" style="border-color: var(--border-hairline);">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-sky-500/15 text-[#38bdf8] flex items-center justify-center shrink-0"><i data-lucide="image" class="w-4 h-4"></i></div>
+              <div>
+                <h3 class="text-sm sm:text-base font-bold">صورة جدول الامتحانات الرسمي (Revised Schedule)</h3>
+                <p class="text-xs mt-0.5" style="color: var(--text-muted);">اضغط على الصورة أو زر التكبير لعرض الجدول بدقة عالية أو تحميله.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button type="button" id="btn-zoom-exam-schedule" class="tap-btn px-3.5 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer inline-flex items-center gap-1.5"><i data-lucide="zoom-in" class="w-3.5 h-3.5"></i><span>تكبير الجدول</span></button>
+              <a id="btn-download-exam-schedule" href="#exam-schedule-img-wrap" download="exam-schedule.jpg" class="tap-btn px-3.5 py-2 rounded-xl apple-subcard text-xs font-bold cursor-pointer inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i><span>تحميل الصورة</span></a>
+            </div>
+          </div>
+          <div class="relative rounded-xl overflow-hidden border cursor-pointer group" style="border-color: var(--border-hairline);" id="exam-schedule-img-wrap">
+            <img id="exam-schedule-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="صورة جدول الامتحانات الرسمي (Revised Schedule)" class="w-full h-auto max-h-[460px] object-contain mx-auto bg-slate-950/40 transition-transform duration-300 group-hover:scale-[1.01]" />
+            <div id="exam-schedule-fallback" class="hidden p-8 text-center text-xs space-y-2" style="color: var(--text-muted);">
+              <div class="flex justify-center"><i data-lucide="calendar-days" class="w-8 h-8 text-[#38bdf8]"></i></div>
+              <div>لم يتم العثور على ملف <span class="font-mono-num">./exam-schedule.jpg</span> محلياً، أو لم يرفع الأدمن صورة الجدول بعد.</div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- TAB 2: STUDY PLANNER & UNIFIED TIMER -->
-    <section id="tab-planner" class="tab-panel hidden space-y-5 sm:space-y-6 fade-in">
-      <div class="apple-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-r-4 border-r-[#0a84ff]">
-        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
-          <div class="shrink-0 flex justify-center">
+    <section id="tab-planner" class="tab-panel hidden space-y-4 sm:space-y-5 fade-in">
+      <!-- Compact Add Session Header Card -->
+      <div class="apple-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 border-r-4 border-r-[#0a84ff]">
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <div class="shrink-0 flex items-center justify-center">
             <lottie-player
               src="https://lottie.host/be925b4b-6d63-41dc-a165-f9e71e9c10ad/rNlBMCpggP.json"
               background="transparent"
               speed="1"
               loop
               autoplay
-              class="w-[110px] h-[110px] sm:w-[150px] sm:h-[150px]"
+              class="w-[68px] h-[68px] sm:w-[84px] sm:h-[84px]"
             ></lottie-player>
           </div>
           <div class="min-w-0">
-            <h2 class="text-base sm:text-lg font-bold">المخطط والدراسة (نظام التايمر الموحد)</h2>
-            <p class="text-xs mt-1 leading-relaxed" style="color: var(--text-muted);">أضف محاضراتك للجدول، واضغط "ابدأ" لتشغيل التايمر والترحيل التلقائي للتشيك ليست.</p>
+            <h2 class="text-sm sm:text-base font-bold">المخطط والدراسة (نظام التايمر الموحد)</h2>
+            <p class="text-xs mt-0.5 leading-relaxed" style="color: var(--text-muted);">أضف محاضراتك للجدول، واضغط "ابدأ" لتشغيل التايمر والترحيل التلقائي للتشيك ليست.</p>
           </div>
         </div>
-        <button type="button" id="btn-open-study-wizard" class="tap-btn btn-grad-primary px-5 py-3 rounded-2xl text-white text-xs sm:text-sm font-bold cursor-pointer transition shrink-0">
+        <button type="button" id="btn-open-study-wizard" class="tap-btn btn-grad-primary px-4 sm:px-5 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer transition shrink-0">
           + هتذاكر إيه النهارده؟ (إضافة جلسة)
         </button>
       </div>
 
-      <div class="apple-card p-4 sm:p-6 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div id="timer-pulse-lottie" class="hidden w-10 h-10 shrink-0">
-              <lottie-player
-                src="https://lottie.host/f4ca486a-d86d-40db-95f0-40dda6a2d988/0XYEbRGwFg.json"
-                background="transparent"
-                speed="1"
-                loop
-                autoplay
-                class="w-10 h-10"
-              ></lottie-player>
+      <!-- Balanced 2-Column Grid: Unified Timer + Today's Schedule -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        <!-- Unified Timer Column -->
+        <div class="lg:col-span-6">
+          <div class="apple-card rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-2.5 border-b pb-3" style="border-color: var(--border-hairline);">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div id="timer-pulse-lottie" class="hidden w-9 h-9 shrink-0">
+                  <lottie-player
+                    src="https://lottie.host/f4ca486a-d86d-40db-95f0-40dda6a2d988/0XYEbRGwFg.json"
+                    background="transparent"
+                    speed="1"
+                    loop
+                    autoplay
+                    class="w-9 h-9"
+                  ></lottie-player>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-sm sm:text-base font-bold">التايمر الموحد للمحاضرة النشطة</h3>
+                  <p class="text-[11px] mt-0.5" style="color: var(--text-muted);">العد التنازلي مع تنبيه صوتي اختياري عند الانتهاء.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl apple-subcard text-[11px] font-semibold cursor-pointer">
+                  <input id="bell-toggle-chk" type="checkbox" class="accent-[#0a84ff]" checked />
+                  <span>تنبيه</span>
+                </label>
+                <button id="btn-sos-burnout" class="tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تهدئة 10د</button>
+              </div>
             </div>
-            <div class="min-w-0">
-              <h3 class="text-base font-bold">التايمر الموحد للمحاضرة النشطة</h3>
-              <p class="text-xs" style="color: var(--text-muted);">يظهر العد التنازلي في تبويب المتصفح مع تنبيه صوتي اختياري عند الانتهاء.</p>
+
+            <div class="flex-1 flex flex-col justify-between gap-3">
+              <div class="apple-subcard rounded-xl p-4 flex items-center gap-4">
+                <div id="pomo-ring-wrap" class="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                  <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="7"></circle><circle id="pomo-ring" cx="60" cy="60" r="52" fill="none" stroke="#0a84ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0" class="transition-all duration-300"></circle></svg>
+                  <div id="pomo-display" class="absolute font-mono-num text-lg font-bold">00:00</div>
+                </div>
+                <div class="flex-1 min-w-0 space-y-2.5">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span id="pomo-active-icon" class="hidden shrink-0 flex items-center"></span>
+                    <span id="pomo-active-mode-badge" class="hidden px-2 py-0.5 rounded-md bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-bold"></span>
+                    <div id="pomo-active-lecture" class="text-xs sm:text-sm font-bold text-[#0a84ff] truncate">اختر محاضرة من الجدول أو اضغط تشغيل</div>
+                  </div>
+                  <div class="flex gap-2">
+                    <button id="pomo-start-btn" class="tap-btn flex-1 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تشغيل</button>
+                    <button id="pomo-finish-early" class="tap-btn px-3.5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إنهاء / تم</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="apple-subcard rounded-xl p-4 flex flex-col justify-between gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <div class="text-xs font-bold" style="color: var(--text-muted);">عداد التوقف التراكمي للجلسة</div>
+                    <div class="flex items-baseline gap-2 mt-1">
+                      <span id="pause-stopwatch-display" class="font-mono-num text-2xl font-bold text-amber-400">00:00</span>
+                      <span id="pause-count-badge" class="text-[11px] font-mono-num" style="color: var(--text-muted);">(0 توقف)</span>
+                    </div>
+                  </div>
+                  <span id="pause-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0"></span>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t" style="border-color: var(--border-hairline);">
+                  <div class="flex items-center gap-1.5 text-[11px]">
+                    <button data-ambient="off" class="ambient-btn tap-btn px-2.5 py-1.5 rounded-lg bg-[#0a84ff]/15 text-[#0a84ff] font-bold cursor-pointer">صمت</button>
+                    <button data-ambient="rain" class="ambient-btn tap-btn px-2.5 py-1.5 rounded-lg apple-card font-semibold cursor-pointer">مطر</button>
+                    <button data-ambient="brown" class="ambient-btn tap-btn px-2.5 py-1.5 rounded-lg apple-card font-semibold cursor-pointer">Brown noise</button>
+                  </div>
+                  <input id="ambient-volume" type="range" min="0" max="100" value="35" class="w-24 accent-[#0a84ff] cursor-pointer" />
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="tap-btn flex items-center gap-1.5 px-3 py-2 rounded-xl apple-subcard text-[11px] font-semibold cursor-pointer">
-              <input id="bell-toggle-chk" type="checkbox" class="accent-[#0a84ff]" checked />
-              <span>تنبيه الانتهاء</span>
-            </label>
-            <button id="btn-sos-burnout" class="tap-btn px-3.5 py-2 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">تهدئة 10د</button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="apple-subcard p-4 flex items-center gap-4">
-            <div id="pomo-ring-wrap" class="relative w-24 h-24 shrink-0 flex items-center justify-center">
-              <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="7"></circle><circle id="pomo-ring" cx="60" cy="60" r="52" fill="none" stroke="#0a84ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0" class="transition-all duration-300"></circle></svg>
-              <div id="pomo-display" class="absolute font-mono-num text-lg font-bold">00:00</div>
-            </div>
-            <div class="flex-1 min-w-0 space-y-2.5">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span id="pomo-active-icon" class="hidden shrink-0 flex items-center"></span>
-                <span id="pomo-active-mode-badge" class="hidden px-2 py-0.5 rounded-md bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-bold"></span>
-                <div id="pomo-active-lecture" class="text-xs sm:text-sm font-bold text-[#0a84ff] truncate">اختر محاضرة من الجدول أو اضغط تشغيل</div>
+        <!-- Today's Schedule Column -->
+        <div class="lg:col-span-6">
+          <div class="apple-card rounded-2xl p-4 sm:p-5 h-full flex flex-col justify-between gap-4">
+            <div class="flex items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0"><i data-lucide="calendar-check-2" class="w-4 h-4"></i></div>
+                <h3 class="text-sm sm:text-base font-bold">الجدول الزمني لمحاضرات اليوم</h3>
               </div>
-              <div class="flex gap-2">
-                <button id="pomo-start-btn" class="tap-btn flex-1 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">تشغيل</button>
-                <button id="pomo-finish-early" class="tap-btn px-3.5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">إنهاء / تم</button>
-              </div>
+              <button id="btn-clear-today" class="tap-btn px-2.5 py-1 rounded-lg bg-rose-500/10 text-xs font-semibold text-rose-400 cursor-pointer">مسح الكل</button>
             </div>
-          </div>
-
-          <div class="apple-subcard p-4 flex flex-col justify-between space-y-3">
-            <div class="flex items-center justify-between">
-              <div><div class="text-xs font-bold" style="color: var(--text-muted);">عداد التوقف التراكمي للجلسة</div><div class="flex items-baseline gap-2 mt-1"><span id="pause-stopwatch-display" class="font-mono-num text-2xl font-bold text-amber-400">00:00</span><span id="pause-count-badge" class="text-[11px] font-mono-num" style="color: var(--text-muted);">(0 توقف)</span></div></div>
-              <span id="pause-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-            </div>
-            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t" style="border-color: var(--border-hairline);">
-              <div class="flex items-center gap-1.5 text-[11px]">
-                <button data-ambient="off" class="ambient-btn tap-btn px-2.5 py-1.5 rounded-lg bg-[#0a84ff]/15 text-[#0a84ff] font-bold cursor-pointer">صمت</button>
-                <button data-ambient="rain" class="ambient-btn tap-btn px-2.5 py-1.5 rounded-lg apple-card font-semibold cursor-pointer">مطر</button>
-                <button data-ambient="brown" class="ambient-btn tap-btn px-2.5 py-1.5 rounded-lg apple-card font-semibold cursor-pointer">Brown noise</button>
-              </div>
-              <input id="ambient-volume" type="range" min="0" max="100" value="35" class="w-24 accent-[#0a84ff] cursor-pointer" />
-            </div>
+            <div id="timeline-rail" class="space-y-2.5 flex-1"></div>
           </div>
         </div>
-      </div>
-
-      <div class="apple-card p-4 sm:p-6 space-y-4">
-        <div class="flex items-center justify-between"><h3 class="text-base font-bold">الجدول الزمني لمحاضرات اليوم</h3><button id="btn-clear-today" class="tap-btn text-xs font-semibold text-rose-400 cursor-pointer">مسح الكل</button></div>
-        <div id="timeline-rail" class="space-y-2.5"></div>
       </div>
     </section>
 
     <!-- TAB 3: SYLLABUS CHECKLIST -->
-    <section id="tab-syllabus" class="tab-panel hidden space-y-5 fade-in">
-      <div class="apple-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <section id="tab-syllabus" class="tab-panel hidden space-y-4 sm:space-y-5 fade-in">
+      <div class="apple-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="shrink-0 flex justify-center">
           <lottie-player
             src="https://lottie.host/dabb0413-de28-479b-b7e6-acf2b9333bc9/z6P9VxcGKt.json"
@@ -681,9 +856,9 @@
         </div>
       </div>
 
-      <div id="subjects-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+      <div id="subjects-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch"></div>
 
-      <div class="apple-card p-4 sm:p-6 space-y-5">
+      <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-5">
         <div class="space-y-3 border-b pb-4" style="border-color: var(--border-hairline);">
           <!-- Row 1: Subject Title (Right) + 3 Sub-Tabs Capsule (Left) -->
           <div class="flex flex-wrap items-center justify-between gap-3">
@@ -702,6 +877,7 @@
               <button data-topic-filter="ALL" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
               <button data-topic-filter="Post-Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">فاينل</button>
               <button data-topic-filter="Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">ميدتيرم</button>
+              <button data-topic-filter="Seminar" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">سيمينار (Seminar)</button>
             </div>
           </div>
         </div>
@@ -710,7 +886,7 @@
         <div id="syl-panel-lectures" class="space-y-4">
           <form id="add-topic-form" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center pb-2">
             <input id="new-topic-input" type="text" placeholder="إضافة محاضرة نظرية جديدة (تُحفظ في Firestore)..." class="sm:col-span-6 px-3 py-2.5 apple-subcard text-base sm:text-xs" required />
-            <select id="new-topic-type" class="sm:col-span-3 px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold"><option value="Post-Midterm">Post-Midterm (Final)</option><option value="Midterm">Midterm</option></select>
+            <select id="new-topic-type" class="sm:col-span-3 px-3 py-2.5 apple-subcard text-base sm:text-xs font-semibold"><option value="Post-Midterm">Post-Midterm (Final)</option><option value="Midterm">Midterm</option><option value="Seminar">Seminar</option></select>
             <button type="submit" class="tap-btn sm:col-span-3 py-2.5 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">+ إضافة محاضرة</button>
           </form>
           <div id="topics-sections-container" class="space-y-6"></div>
@@ -733,7 +909,7 @@
     </section>
 
     <!-- TAB: LIVE GROUP STUDY CHAT -->
-    <section id="tab-chat" class="tab-panel hidden space-y-4 fade-in">
+    <section id="tab-chat" class="tab-panel hidden space-y-4 sm:space-y-5 fade-in">
       <div class="apple-card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
           <lottie-player
@@ -845,10 +1021,10 @@
     </section>
 
     <!-- TAB: STUDY TOGETHER (MULTI-PARTICIPANT ROOMS, ARCHIVE & VOICE/FILES) -->
-    <section id="tab-together" class="tab-panel hidden space-y-5 fade-in">
+    <section id="tab-together" class="tab-panel hidden space-y-4 sm:space-y-5 fade-in">
       <!-- Lobby View (Peer Search + Active Rooms + Archived Rooms) -->
-      <div id="together-lobby-view" class="space-y-5">
-        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-500">
+      <div id="together-lobby-view" class="space-y-4 sm:space-y-5">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border-r-4 border-r-emerald-500">
           <div>
             <h2 class="text-base sm:text-lg font-bold flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-emerald-400"></i><span>الدراسة سوا (غرف المذاكرة الخاصة)</span></h2>
             <p class="text-xs mt-0.5" style="color: var(--text-muted);">ابحث عن زملائك بالكود الجامعي وأرسل دعوات لمذاكرة جماعية (2 إلى 5+ طلاب) بتايمر مشترك وملفات وصوتيات.</p>
@@ -860,19 +1036,19 @@
           <div id="together-peer-search-result" class="hidden"></div>
         </div>
 
-        <div class="apple-card p-5 sm:p-6 space-y-4">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
           <h3 class="text-base font-bold">الغرف النشطة والدعوات</h3>
           <div id="together-rooms-list" class="space-y-2.5"></div>
         </div>
 
-        <div class="apple-card p-5 sm:p-6 space-y-4">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
           <h3 class="text-base font-bold flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4 text-sky-400"></i><span>الغرف السابقة / المحفوظة (الأرشيف)</span></h3>
           <div id="together-archive-list" class="space-y-2.5"></div>
         </div>
       </div>
 
       <!-- Inside Active / Archived Room View -->
-      <div id="together-active-room" class="hidden space-y-4">
+      <div id="together-active-room" class="hidden space-y-4 sm:space-y-5">
         <div class="apple-card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
             <button type="button" id="room-back-lobby" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-bold cursor-pointer">← الغرف</button>
@@ -954,8 +1130,8 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-            <div class="apple-subcard p-4 flex items-center justify-between gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+            <div class="apple-subcard rounded-xl p-4 h-full flex items-center justify-between gap-4">
               <div>
                 <div class="text-[11px] font-semibold" style="color: var(--text-muted);">التايمر المشترك</div>
                 <div id="room-timer-display" class="font-mono-num text-3xl font-extrabold text-[#38bdf8] mt-1">45:00</div>
@@ -968,7 +1144,7 @@
               </div>
             </div>
 
-            <div class="apple-subcard p-4 flex items-center justify-between">
+            <div class="apple-subcard rounded-xl p-4 h-full flex items-center justify-between">
               <div>
                 <div class="text-[11px] font-semibold" style="color: var(--text-muted);">عداد التوقف التراكمي المشترك</div>
                 <div class="flex items-baseline gap-2 mt-1">
@@ -1010,8 +1186,8 @@
     </section>
 
     <!-- TAB: LIVE STREAM BREAK (MEMBERS ONLY) -->
-    <section id="tab-stream" class="tab-panel hidden space-y-5 fade-in">
-      <div id="live-stream-card" class="apple-card p-4 sm:p-6 space-y-4 border border-rose-500/30 shadow-[0_12px_36px_-12px_rgba(244,63,94,0.28)]">
+    <section id="tab-stream" class="tab-panel hidden space-y-4 sm:space-y-5 fade-in">
+      <div id="live-stream-card" class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border border-rose-500/30 shadow-[0_12px_36px_-12px_rgba(244,63,94,0.28)]">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2.5 flex-wrap">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 text-[10px] font-extrabold">
@@ -1076,7 +1252,7 @@
     </section>
 
     <!-- TAB 4: ORGANIZED ADMIN PANEL (5 SUB-TABS) -->
-    <section id="tab-admin" class="tab-panel hidden space-y-5 fade-in">
+    <section id="tab-admin" class="tab-panel hidden space-y-4 sm:space-y-5 fade-in">
       <!-- Admin Horizontal Sub-Tabs -->
       <div class="apple-card p-2.5 overflow-x-auto no-scrollbar">
         <div class="inline-flex items-center gap-1.5 min-w-max">
@@ -1089,9 +1265,9 @@
       </div>
 
       <!-- ADMIN SUB-TAB 1: STUDENTS & AVATAR -->
-      <div id="adm-panel-students" class="adm-sub-panel space-y-5">
+      <div id="adm-panel-students" class="adm-sub-panel space-y-4 sm:space-y-5">
         <!-- Admin Grant VIP Gold Card -->
-        <div class="apple-card gold-vip-card p-5 sm:p-6 space-y-4">
+        <div class="apple-card gold-vip-card rounded-2xl p-4 sm:p-5 space-y-4">
           <div>
             <h2 class="text-base font-extrabold text-amber-300 flex items-center gap-2"><span>👑</span><span>منح العضوية الذهبية (VIP Gold)</span></h2>
             <p class="text-xs mt-0.5" style="color: var(--text-muted);">أدخل الكود الجامعي للطالب لتفعيل المظهر الذهبي وامتيازات VIP له فوراً.</p>
@@ -1106,7 +1282,7 @@
           <div id="admin-gold-members-list" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <div class="apple-card p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4 border-r-4 border-r-amber-400">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 border-r-4 border-r-amber-400">
           <div class="flex items-center gap-3.5 min-w-0">
             <div id="admin-avatar-preview-wrap" class="w-14 h-14 rounded-full bg-amber-500/20 border-2 border-amber-400/60 flex items-center justify-center text-amber-400 text-lg font-extrabold overflow-hidden shrink-0">A</div>
             <div class="min-w-0">
@@ -1121,7 +1297,7 @@
           </div>
         </div>
 
-        <div class="apple-card p-5 sm:p-6 space-y-4">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-hairline);">
             <div>
               <h2 class="text-base font-bold">لوحة إحصائيات الطلبة (Firestore Live)</h2>
@@ -1134,8 +1310,8 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="apple-subcard p-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
+            <div class="apple-subcard rounded-xl p-4 h-full flex flex-col justify-between">
               <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الطلبة المسجلين</div>
               <div class="flex items-baseline justify-between gap-2 mt-1">
                 <div id="admin-stat-students" class="text-2xl font-extrabold font-mono-num text-[#0a84ff]">0</div>
@@ -1146,11 +1322,11 @@
                 </div>
               </div>
             </div>
-            <div class="apple-subcard p-4">
+            <div class="apple-subcard rounded-xl p-4 h-full flex flex-col justify-between">
               <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي ساعات مذاكرة الدفعة</div>
               <div id="admin-stat-hours" class="text-2xl font-extrabold font-mono-num text-emerald-400 mt-1">0.0h</div>
             </div>
-            <div class="apple-subcard p-4">
+            <div class="apple-subcard rounded-xl p-4 h-full flex flex-col justify-between">
               <div class="text-xs font-semibold" style="color: var(--text-muted);">إجمالي الجلسات المكتملة</div>
               <div id="admin-stat-sessions" class="text-2xl font-extrabold font-mono-num text-purple-400 mt-1">0</div>
             </div>
@@ -1161,8 +1337,8 @@
       </div>
 
       <!-- ADMIN SUB-TAB 2: ALERTS, NOTIFICATIONS & EXAM SCHEDULE IMAGE -->
-      <div id="adm-panel-alerts" class="adm-sub-panel hidden space-y-5">
-        <div class="apple-card p-5 sm:p-6 space-y-4">
+      <div id="adm-panel-alerts" class="adm-sub-panel hidden space-y-4 sm:space-y-5">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
           <div class="flex items-center justify-between">
             <div><h2 class="text-base font-bold">شريط التنبيهات العلوي للدفعة (shared/notice)</h2><p class="text-xs" style="color: var(--text-muted);">أي تنبيه تنشره يظهر فوراً لجميع الطلبة في الوقت الفعلي.</p></div>
             <button type="button" id="admin-clear-notice" class="tap-btn px-3 py-1.5 rounded-xl apple-subcard text-xs font-semibold text-rose-400 cursor-pointer">مسح التنبيه</button>
@@ -1174,7 +1350,7 @@
           </form>
         </div>
 
-        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-500">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border-r-4 border-r-emerald-500">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 class="text-base font-bold">إرسال إشعار للدفعة (shared/notifications)</h2>
@@ -1198,7 +1374,7 @@
           <div id="admin-notifications-list" class="space-y-2 max-h-60 overflow-y-auto custom-scroll"></div>
         </div>
 
-        <div class="apple-card p-5 sm:p-6 space-y-3 border-r-4 border-r-[#0a84ff]">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-3 border-r-4 border-r-[#0a84ff]">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 class="text-base font-bold">صورة جدول الامتحانات الرسمي (shared/exam_schedule_image)</h3>
@@ -1214,8 +1390,8 @@
       </div>
 
       <!-- ADMIN SUB-TAB 3: LIVE STREAM MANAGEMENT -->
-      <div id="adm-panel-stream" class="adm-sub-panel hidden space-y-5">
-        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-rose-500">
+      <div id="adm-panel-stream" class="adm-sub-panel hidden space-y-4 sm:space-y-5">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border-r-4 border-r-rose-500">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 class="text-base font-bold">إدارة استراحة البث المباشر (shared/live_stream)</h2>
@@ -1251,8 +1427,8 @@
       </div>
 
       <!-- ADMIN SUB-TAB 4: CHAT LOCK, MODERATION & STUDY ROOMS -->
-      <div id="adm-panel-chat" class="adm-sub-panel hidden space-y-5">
-        <div class="apple-card p-5 sm:p-6 space-y-3 border-r-4 border-r-rose-500">
+      <div id="adm-panel-chat" class="adm-sub-panel hidden space-y-4 sm:space-y-5">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-3 border-r-4 border-r-rose-500">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 class="text-base font-bold">التحكم في غرفة المذاكرة الجماعية</h2>
@@ -1263,7 +1439,7 @@
           <input id="admin-chat-lock-msg" type="text" placeholder="سبب الإغلاق أو رسالة للطلبة (اختياري)..." class="w-full px-3.5 py-2.5 apple-subcard text-base sm:text-xs" />
         </div>
 
-        <div class="apple-card p-5 sm:p-6 space-y-4">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4">
           <div>
             <h2 class="text-base font-bold">إعدادات بوت المراقبة (shared/moderation)</h2>
             <p class="text-xs" style="color: var(--text-muted);">أضف كلمات جديدة لمنعها تلقائياً في غرفة المذاكرة الجماعية.</p>
@@ -1275,7 +1451,7 @@
           <div id="admin-mod-words-list" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border-r-4 border-r-sky-400">
           <div>
             <h2 class="text-base font-bold">مراقبة غرف الدراسة سوا (study_rooms)</h2>
             <p class="text-xs" style="color: var(--text-muted);">اعرض جميع الغرف النشطة والمؤرشفة ورسائلها وملفاتها، أو احذف أي غرفة نهائياً.</p>
@@ -1285,9 +1461,9 @@
       </div>
 
       <!-- ADMIN SUB-TAB 5: SUBJECT RESOURCES, QUIZZES & CURRICULUM SYNC -->
-      <div id="adm-panel-content" class="adm-sub-panel hidden space-y-5">
+      <div id="adm-panel-content" class="adm-sub-panel hidden space-y-4 sm:space-y-5">
         <!-- Gemini AI Admin Assistant -->
-        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-emerald-400">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border-r-4 border-r-emerald-400">
           <div class="flex items-center justify-between gap-2">
             <div>
               <h2 class="text-base font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i><span>المساعد الذكي للأدمن (Gemini AI)</span></h2>
@@ -1319,7 +1495,7 @@
         </div>
 
         <!-- Add Subject Resource -->
-        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-sky-400">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border-r-4 border-r-sky-400">
           <h2 class="text-base font-bold">إدارة الملفات والمصادر (shared/subject_resources)</h2>
           <form id="admin-resource-form" class="space-y-3 text-xs">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -1338,7 +1514,7 @@
         </div>
 
         <!-- Add Subject Quiz MCQ -->
-        <div class="apple-card p-5 sm:p-6 space-y-4 border-r-4 border-r-purple-400">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-4 border-r-4 border-r-purple-400">
           <h2 class="text-base font-bold">إدارة بنك الأسئلة MCQ (shared/subject_quizzes)</h2>
           <form id="admin-quiz-form" class="space-y-3 text-xs">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -1368,7 +1544,7 @@
         </div>
 
         <!-- Firestore Sync & Admin Logout -->
-        <div class="apple-card p-5 sm:p-6 space-y-3">
+        <div class="apple-card rounded-2xl p-4 sm:p-5 space-y-3">
           <h3 class="text-base font-bold">إدارة بيانات Cloud Firestore</h3>
           <p class="text-xs" style="color: var(--text-muted);">مسجل الدخول: <span id="admin-email-display" class="font-mono-num text-[#0a84ff]">--</span></p>
           <div class="flex flex-wrap gap-2">
@@ -1881,173 +2057,255 @@
 
     const DEFAULT_TOPICS = {
       ENT: [
-        { id: 'ent-m1', title: 'Lecture 1: Anatomy & Physiology of Ear', kind: 'Midterm' },
-        { id: 'ent-m2', title: 'Lecture 2: Diseases of the External Ear', kind: 'Midterm' },
-        { id: 'ent-m3', title: 'Lecture 3: Congenital & Traumatic Diseases of the Middle Ear', kind: 'Midterm' },
-        { id: 'ent-m4', title: 'Lecture 4: Acute Otitis Media', kind: 'Midterm' },
-        { id: 'ent-m5', title: 'Lecture 5: CSOM', kind: 'Midterm' },
-        { id: 'ent-m6', title: 'Lecture 6: Facial Nerve Palsy', kind: 'Midterm' },
-        { id: 'ent-m7', title: 'Seminar — Ear Symptoms', kind: 'Midterm' },
-        { id: 'ent-m8', title: 'Lecture 7 & 8: Anatomy of the Nose & Congenital Disease of the Nose', kind: 'Midterm' },
-        { id: 'ent-p9', title: 'Lecture 9: Epistaxis', kind: 'Post-Midterm' },
-        { id: 'ent-p10', title: 'Lecture 10: Rhinosinusitis', kind: 'Post-Midterm' },
-        { id: 'ent-p11', title: 'Lecture 11: Allergic Rhinitis (+ Atrophic Rhinitis & Rhinoscleroma)', kind: 'Post-Midterm' },
-        { id: 'ent-p12', title: 'Lecture 12: Nasal Tumour & Scleroderma', kind: 'Post-Midterm' },
-        { id: 'ent-p12b', title: 'Lecture 13: Nasal Septal Deviation', kind: 'Post-Midterm' },
-        { id: 'ent-p13', title: 'Lecture 14 & 15: Anatomy of the Pharynx & Pharyngitis (Dr. Asser)', kind: 'Post-Midterm' },
-        { id: 'ent-s1', title: 'Skill Lab 1: Ear Anatomy Revision & Ear Examination (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
-        { id: 'ent-s2', title: 'Seminar 2: Facial Nerve & Ear Symptoms / Otosclerosis (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
-        { id: 'ent-s3', title: 'Seminar 3: Anatomy & Examination of the Nose and PNS (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
-        { id: 'ent-s4', title: 'Seminar 4: Nose Symptoms (Dr. Ahmed Gad)', kind: 'Post-Midterm' },
-        { id: 'ent-s5', title: 'Seminar 5: Pharynx & Larynx (Anatomy / Examination) + Tracheostomy (Dr. Ahmed Gad)', kind: 'Post-Midterm' }
+        // Lectures (23)
+        { id: 'ent-m1', title: 'L1: Anatomy and physiology of the Ear', kind: 'Midterm' },
+        { id: 'ent-m2', title: 'L2: Congenital anomalies & diseases of external auditory canal', kind: 'Midterm' },
+        { id: 'ent-m3', title: 'L3: Congenital anomalies & Traumatic lesions of middle ear', kind: 'Midterm' },
+        { id: 'ent-m4', title: 'L4: Acute otitis media', kind: 'Midterm' },
+        { id: 'ent-m5', title: 'L5: Chronic suppurative otitis media (CSOM)', kind: 'Midterm' },
+        { id: 'ent-m6', title: 'L6: Facial nerve and facial nerve palsy', kind: 'Midterm' },
+        { id: 'ent-m8', title: 'L7: Anatomy and physiology of the nose and PNS', kind: 'Midterm' },
+        { id: 'ent-m8b', title: 'L8: Congenital and traumatic diseases of the nose', kind: 'Midterm' },
+        { id: 'ent-p10', title: 'L9: Rhinosinusitis', kind: 'Post-Midterm' },
+        { id: 'ent-p9', title: 'L10: Epistaxis', kind: 'Post-Midterm' },
+        { id: 'ent-p11', title: 'L11: Allergic rhinitis and nasal polyps', kind: 'Post-Midterm' },
+        { id: 'ent-p12', title: 'L12: Neoplasms of the nose and PNS', kind: 'Post-Midterm' },
+        { id: 'ent-p12b', title: 'L13: Diseases of the nasal septum', kind: 'Post-Midterm' },
+        { id: 'ent-p13', title: 'L14: Adenoids and tonsillitis', kind: 'Post-Midterm' },
+        { id: 'ent-p15', title: 'L15: Tumors of the nasopharynx and hypopharynx', kind: 'Post-Midterm' },
+        { id: 'ent-p16', title: 'L16: Tumors of the larynx', kind: 'Post-Midterm' },
+        { id: 'ent-p17', title: 'L17: Tracheostomy', kind: 'Post-Midterm' },
+        { id: 'ent-p18', title: 'L18: Paralysis of the larynx', kind: 'Post-Midterm' },
+        { id: 'ent-p19', title: 'L19: Ulcers of the oral cavity', kind: 'Post-Midterm' },
+        { id: 'ent-p20', title: 'L20: Obstructive sleep apnea syndrome (OSAS)', kind: 'Post-Midterm' },
+        { id: 'ent-p21', title: 'L21: Quinsy and deep neck space infections', kind: 'Post-Midterm' },
+        { id: 'ent-p22', title: 'L22: Secretory otitis media', kind: 'Post-Midterm' },
+        { id: 'ent-p23', title: 'L23: ENT Emergencies', kind: 'Post-Midterm' },
+        // Seminars (3)
+        { id: 'ent-sem1', title: 'Seminar 1: Hearing loss, Deaf child, Tinnitus', kind: 'Seminar' },
+        { id: 'ent-sem2', title: 'Seminar 2: Nasal blockage, Nasal discharge, Smell affection', kind: 'Seminar' },
+        { id: 'ent-sem3', title: 'Seminar 3: Hoarseness, Stridor, Dysphagia', kind: 'Seminar' }
       ],
       OPTH: [
-        { id: 'op-m1', title: 'Lecture 1 — Anatomy of the Eye', kind: 'Midterm' },
-        { id: 'op-m2', title: 'Lecture 2 — Conjunctivitis', kind: 'Midterm' },
-        { id: 'op-m3', title: 'Lecture 3 — Keratitis (Cornea)', kind: 'Midterm' },
-        { id: 'op-m4', title: 'Lecture 4 — Diseases of Sclera (Scleritis)', kind: 'Midterm' },
-        { id: 'op-m5', title: 'Lecture 5 — Acute Angle-Closure Glaucoma (ACG)', kind: 'Midterm' },
-        { id: 'op-m6', title: 'Lecture 6 — Uveitis (د. إيمان + أسئلة الامتحان)', kind: 'Midterm' },
-        { id: 'op-m7', title: 'Lecture 7 — Watery Eye', kind: 'Midterm' },
-        { id: 'op-m8', title: 'Lecture 8 — Cataract (+ Extra Dr. Eslam Mokhtar)', kind: 'Midterm' },
-        { id: 'op-m9', title: 'Lecture 9 & 10 — Retina 1 & Retina 2 (Retinopathy & Retinal Detachment)', kind: 'Midterm' },
-        { id: 'op-p10', title: 'Lecture 11 & 12 — Open Angle Glaucoma & Errors of Refraction', kind: 'Post-Midterm' },
-        { id: 'op-p11', title: 'Optic Nerve Diseases', kind: 'Post-Midterm' },
-        { id: 'op-p11b', title: 'Pupil', kind: 'Post-Midterm' },
-        { id: 'op-p12', title: 'Lecture 15: Eyelids (Dr. Mona)', kind: 'Post-Midterm' },
-        { id: 'op-p12b', title: 'Lecture 16: Eyelids (Dr. Mona)', kind: 'Post-Midterm' },
-        { id: 'op-p13', title: 'Lecture 17: The Orbit (Dr. Mona)', kind: 'Post-Midterm' },
-        { id: 'op-p14', title: 'Clinical Section: Ophthalmology Tests (Hospital Skills)', kind: 'Post-Midterm' }
-      ],
-      EBMR: [
-        { id: 'eb-m1', title: 'Lecture 1 — Revision of Research Methods', kind: 'Midterm' },
-        { id: 'eb-m2', title: 'Lecture 2 — Revision of Medical Statistics', kind: 'Midterm' },
-        { id: 'eb-m3', title: 'Lecture 3 — Biomedical Statistical Analysis for Beginners', kind: 'Midterm' },
-        { id: 'eb-m4', title: 'Lecture 4 — Sample Size Calculation', kind: 'Midterm' },
-        { id: 'eb-m5', title: 'Lecture 5 — Plagiarism (Dr. Amira)', kind: 'Midterm' },
-        { id: 'eb-m6', title: 'Lecture 6 — Research Ethics & Study Design', kind: 'Midterm' },
-        { id: 'eb-m7', title: 'Lecture 7 — Epidemiological Measures & Screening', kind: 'Midterm' },
-        { id: 'eb-m8', title: 'Lecture 8 — Evidence-Based Practice & Critical Appraisal', kind: 'Midterm' },
-        { id: 'eb-p6', title: 'Lecture 9: How to Select a Journal (Dr. Osama Hussein)', kind: 'Post-Midterm' },
-        { id: 'eb-p7', title: 'Lecture 10: Critical Thinking (Dr. Amira Taman)', kind: 'Post-Midterm' },
-        { id: 'eb-p8', title: 'Lecture 11: How to Search the Literature Effectively (Dr. Osama Hussein)', kind: 'Post-Midterm' },
-        { id: 'eb-p9', title: 'Lecture 12: How to Write a Scientific Paper (Dr. Asmaa)', kind: 'Post-Midterm' },
-        { id: 'eb-p10', title: 'Revision — Top 50 Important Exam Questions', kind: 'Post-Midterm' }
+        // Lectures (19)
+        { id: 'op-m1', title: 'L1: Anatomy of the Eye', kind: 'Midterm' },
+        { id: 'op-m2', title: 'L2: Conjunctivitis', kind: 'Midterm' },
+        { id: 'op-m3', title: 'L3: Keratitis', kind: 'Midterm' },
+        { id: 'op-m4', title: 'L4: Scleritis', kind: 'Midterm' },
+        { id: 'op-m6', title: 'L5: Uveitis', kind: 'Midterm' },
+        { id: 'op-m5', title: 'L6: Acute Angle-Closure Glaucoma (ACG)', kind: 'Midterm' },
+        { id: 'op-m7', title: 'L7: Watery Eye', kind: 'Midterm' },
+        { id: 'op-m8', title: 'L8: Cataract', kind: 'Midterm' },
+        { id: 'op-p10', title: 'L9: POAG (Open Angle Glaucoma)', kind: 'Post-Midterm' },
+        { id: 'op-p-eor', title: 'L10: Errors of Refraction', kind: 'Post-Midterm' },
+        { id: 'op-m9', title: 'L11: Retina 1 (DR - Retinitis Pigmentosa)', kind: 'Post-Midterm' },
+        { id: 'op-p-ret2', title: 'L12: Retina 2 (CRAO - CRVO - RD)', kind: 'Post-Midterm' },
+        { id: 'op-p11', title: 'L13: Neuro-ophthalmology', kind: 'Post-Midterm' },
+        { id: 'op-p-trauma', title: 'L14: Trauma', kind: 'Post-Midterm' },
+        { id: 'op-p-laser', title: 'L15: Medical Ophthalmology & Laser', kind: 'Post-Midterm' },
+        { id: 'op-p12', title: 'L16: Lid', kind: 'Post-Midterm' },
+        { id: 'op-p13', title: 'L17: Orbit', kind: 'Post-Midterm' },
+        { id: 'op-p-ped', title: 'L18: Pediatric Ophthalmology', kind: 'Post-Midterm' },
+        { id: 'op-p-strab', title: 'L19: Strabismus', kind: 'Post-Midterm' },
+        // Seminars (18)
+        { id: 'op-sem1', title: 'Seminar 1: Spring Catarrh', kind: 'Seminar' },
+        { id: 'op-sem2', title: 'Seminar 2: MPC', kind: 'Seminar' },
+        { id: 'op-sem3', title: 'Seminar 3: Hypopyon Ulcer', kind: 'Seminar' },
+        { id: 'op-sem4', title: 'Seminar 4: Herpetic Keratitis', kind: 'Seminar' },
+        { id: 'op-sem5', title: 'Seminar 5: Uveitis', kind: 'Seminar' },
+        { id: 'op-sem6', title: 'Seminar 6: ACG', kind: 'Seminar' },
+        { id: 'op-sem7', title: 'Seminar 7: Dacryocystitis', kind: 'Seminar' },
+        { id: 'op-sem8', title: 'Seminar 8: Hypermature Cataract', kind: 'Seminar' },
+        { id: 'op-sem9', title: 'Seminar 9: POAG', kind: 'Seminar' },
+        { id: 'op-sem10', title: 'Seminar 10: Lens Subluxation', kind: 'Seminar' },
+        { id: 'op-sem11', title: 'Seminar 11: Diabetic Retinopathy – RP', kind: 'Seminar' },
+        { id: 'op-sem12', title: 'Seminar 12: CRAO – CRVO - RD', kind: 'Seminar' },
+        { id: 'op-sem13', title: 'Seminar 13: Papilledema', kind: 'Seminar' },
+        { id: 'op-sem14', title: 'Seminar 14: Hyphema - Penetrating Trauma - Chemical Injury', kind: 'Seminar' },
+        { id: 'op-sem15', title: 'Seminar 15: Chalazion', kind: 'Seminar' },
+        { id: 'op-sem16', title: 'Seminar 16: Thyroid Eye Disease', kind: 'Seminar' },
+        { id: 'op-sem17', title: 'Seminar 17: Acc. Esotropia', kind: 'Seminar' },
+        { id: 'op-sem18', title: 'Seminar 18: Congenital Esotropia', kind: 'Seminar' }
       ],
       FMIMC: [
-        { id: 'fm-ch1', title: '[Chest & Cardio & Medicine] Chest L1: Pulmonary Function Tests (Dr. Magda)', kind: 'Post-Midterm' },
-        { id: 'fm-ch2', title: '[Chest & Cardio & Medicine] Chest L2: Sleep Related Breathing Disorders (Dr. Magda)', kind: 'Post-Midterm' },
-        { id: 'fm-ca1', title: '[Chest & Cardio & Medicine] Cardio Seminar 1: Approach to Chest Pain (Dr. Khaled Essam)', kind: 'Post-Midterm' },
-        { id: 'fm-md1', title: '[Chest & Cardio & Medicine] Medicine Seminar 1: Abdominal Pain, Weight Loss & Weight Gain', kind: 'Post-Midterm' },
-        { id: 'fm-m16', title: '[Tropical Medicine] Travel Medicine (Dr. Sahar Zakaria)', kind: 'Midterm' },
-        { id: 'fm-p23', title: '[Tropical Medicine] Tropical L2: Parasitic Infections (Dr. Sahar Zakaria)', kind: 'Post-Midterm' },
-        { id: 'fm-tr3', title: '[Tropical Medicine] Tropical L3: Heat-Related Disorders (Dr. Sahar Zakaria)', kind: 'Post-Midterm' },
-        { id: 'fm-tr4', title: '[Tropical Medicine] Tropical L4: Approach to a Patient with Fever (Dr. Sahar Zakaria)', kind: 'Post-Midterm' },
-        { id: 'fm-m9', title: '[Pediatrics & Orthopedic] Routine and Catch-up Vaccination', kind: 'Midterm' },
-        { id: 'fm-m10', title: '[Pediatrics & Orthopedic] Integrated Management of Childhood Illness (IMCI)', kind: 'Midterm' },
-        { id: 'fm-m11', title: '[Pediatrics & Orthopedic] Enuresis', kind: 'Midterm' },
-        { id: 'fm-p24', title: '[Pediatrics & Orthopedic] Orthopedic L1: Limping Child (Dr. Bassem)', kind: 'Post-Midterm' },
-        { id: 'fm-p25', title: '[Pediatrics & Orthopedic] Pediatric Seminar 1: Fever with Rash (Dr. Hossam Eltahan)', kind: 'Post-Midterm' },
-        { id: 'fm-p26', title: '[Pediatrics & Orthopedic] Pediatric Seminar 2: Growth & Development Assessment (Dr. Hossam Eltahan)', kind: 'Post-Midterm' },
-        { id: 'fm-m1', title: '[Family Medicine & Quality & Practical] Health Care System in Egypt, PHC and Health Insurance', kind: 'Midterm' },
-        { id: 'fm-m2', title: '[Family Medicine & Quality & Practical] Family Practice Approach and Family Influences', kind: 'Midterm' },
-        { id: 'fm-m3', title: '[Family Medicine & Quality & Practical] Referral, Consultation, and Team Care', kind: 'Midterm' },
-        { id: 'fm-m4', title: '[Family Medicine & Quality & Practical] Screening for Common Diseases', kind: 'Midterm' },
-        { id: 'fm-p18', title: '[Family Medicine & Quality & Practical] Lecture 5: Travellers Immunization (Dr. Asmaa)', kind: 'Post-Midterm' },
-        { id: 'fm-p19', title: '[Family Medicine & Quality & Practical] Lecture 6: Quality in Healthcare (Dr. Asmaa)', kind: 'Post-Midterm' },
-        { id: 'fm-pr2', title: '[Family Medicine & Quality & Practical] Practical 2: Screening Training (Dr. Fatma)', kind: 'Post-Midterm' },
-        { id: 'fm-pr3', title: '[Family Medicine & Quality & Practical] Practical 3: Quality Training (Dr. Fatma)', kind: 'Post-Midterm' },
-        { id: 'fm-m15', title: '[Forensic / Ethics] Lecture 1: MLA of FGM (Dr. Amal)', kind: 'Midterm' },
-        { id: 'fm-p22', title: '[Forensic / Ethics] Lecture 2: Domestic Violence (Dr. Basma)', kind: 'Post-Midterm' },
-        { id: 'fm-m5', title: '[Geriatric Medicine] Geriatric L1: Introduction to Geriatric Medicine', kind: 'Midterm' },
-        { id: 'fm-m6', title: '[Geriatric Medicine] Geriatric L2: Atypical Presentation of Illnesses in Elderly (Dr. Heba El-Sobky)', kind: 'Midterm' },
-        { id: 'fm-m7', title: '[Geriatric Medicine] Geriatric L3: Frailty', kind: 'Midterm' },
-        { id: 'fm-m8', title: '[Geriatric Medicine] Geriatric L4: Urinary Incontinence', kind: 'Midterm' },
-        { id: 'fm-p20', title: '[Geriatric Medicine] Geriatric L5: Delirium and Dementia', kind: 'Post-Midterm' },
-        { id: 'fm-p21', title: '[Geriatric Medicine] Geriatric: Polypharmacy & Drug Reaction (Dr. Amany)', kind: 'Post-Midterm' },
-        { id: 'fm-m12', title: '[Obstetrics & Gynecology] Obs/Gyn L1: Female Genital Mutilation (FGM)', kind: 'Midterm' },
-        { id: 'fm-m13', title: '[Obstetrics & Gynecology] Obs/Gyn L2: Menopause', kind: 'Midterm' },
-        { id: 'fm-m14', title: '[Obstetrics & Gynecology] Obs/Gyn L3: Preconceptional & Antenatal Care (Dr. Mohamed Galal)', kind: 'Midterm' },
-        { id: 'fm-m17', title: '[Psychiatry] Abuse, Neglect, and Violence in Special Populations', kind: 'Midterm' }
+        // Lectures
+        { id: 'fm-m1', title: '[Community] Health care system in Egypt, PHC & health insurance', kind: 'Midterm' },
+        { id: 'fm-m2', title: '[Community] Family practice approach & family influences', kind: 'Midterm' },
+        { id: 'fm-m3', title: '[Community] Referral, consultation, and team care', kind: 'Midterm' },
+        { id: 'fm-p18', title: '[Community] Special immunization programs (traveler, adolescent, maternal, geriatric)', kind: 'Post-Midterm' },
+        { id: 'fm-m4', title: '[Community] Screening for common diseases & complications', kind: 'Midterm' },
+        { id: 'fm-p19', title: '[Community] Quality improvement in family unit practice', kind: 'Post-Midterm' },
+        { id: 'fm-p-comm7', title: '[Community] Geriatric community health, hospice & palliative care', kind: 'Post-Midterm' },
+        { id: 'fm-m5', title: '[Geriatric] Introduction to geriatric medicine', kind: 'Midterm' },
+        { id: 'fm-m6', title: '[Geriatric] Atypical presentation of diseases in elderly', kind: 'Midterm' },
+        { id: 'fm-m7', title: '[Geriatric] Frailty', kind: 'Midterm' },
+        { id: 'fm-m8', title: '[Geriatric] Urinary incontinence and dysuria', kind: 'Midterm' },
+        { id: 'fm-p20', title: '[Geriatric] Dementia and delirium', kind: 'Post-Midterm' },
+        { id: 'fm-m9', title: '[Pediatrics] Routine and catch-up vaccination', kind: 'Midterm' },
+        { id: 'fm-m10', title: '[Pediatrics] Integrated Management of Childhood Illness (IMCI)', kind: 'Midterm' },
+        { id: 'fm-m11', title: '[Pediatrics] Enuresis', kind: 'Midterm' },
+        { id: 'fm-m12', title: '[Obs/Gyn] Female genital mutilation (FGM)', kind: 'Midterm' },
+        { id: 'fm-m13', title: '[Obs/Gyn] Postmenopausal symptoms', kind: 'Midterm' },
+        { id: 'fm-m14', title: '[Obs/Gyn] Preconception and routine prenatal care', kind: 'Midterm' },
+        { id: 'fm-p22', title: '[Forensic] Domestic Violence: medico-legal aspects', kind: 'Post-Midterm' },
+        { id: 'fm-m15', title: '[Forensic] Female genital mutilation: medico-legal aspects', kind: 'Midterm' },
+        { id: 'fm-m16', title: '[Tropical] Travel medicine', kind: 'Midterm' },
+        { id: 'fm-p23', title: '[Tropical] Parasitic infections', kind: 'Post-Midterm' },
+        { id: 'fm-tr3', title: '[Tropical] Heat-related disorders', kind: 'Post-Midterm' },
+        { id: 'fm-ch1', title: '[Chest] Pulmonary function tests', kind: 'Post-Midterm' },
+        { id: 'fm-ch2', title: '[Chest] Sleep-related breathing disorders', kind: 'Post-Midterm' },
+        { id: 'fm-p21', title: '[Pharmacology] Polypharmacy and drug reactions', kind: 'Post-Midterm' },
+        { id: 'fm-m17', title: '[Psychiatry] Abuse, neglect, and violence in special populations', kind: 'Midterm' },
+        { id: 'fm-p24', title: '[Orthopedics] Limping child', kind: 'Post-Midterm' },
+        // Seminars (7)
+        { id: 'fm-sem-im1', title: 'Seminar [Internal Med]: Integrative medicine & management of comorbidity', kind: 'Seminar' },
+        { id: 'fm-md1', title: 'Seminar [Internal Med]: Abdominal pain; weight gain & weight loss', kind: 'Seminar' },
+        { id: 'fm-sem-neuro1', title: 'Seminar [Neurology]: Headache', kind: 'Seminar' },
+        { id: 'fm-p26', title: 'Seminar [Pediatrics]: Anthropometric measurements, Nutrition & Breast Feeding', kind: 'Seminar' },
+        { id: 'fm-p25', title: 'Seminar [Pediatrics]: Fever with rash', kind: 'Seminar' },
+        { id: 'fm-ca1', title: 'Seminar [Cardiology]: Chest pain', kind: 'Seminar' },
+        { id: 'fm-tr4', title: 'Seminar [Tropical]: Approach to fever', kind: 'Seminar' }
+      ],
+      EBMR: [
+        { id: 'eb-m1', title: 'L1: Revision of research methods', kind: 'Midterm' },
+        { id: 'eb-m2', title: 'L2: Revision of medical statistics', kind: 'Midterm' },
+        { id: 'eb-m3', title: 'L3: Biomedical statistical analysis for beginners', kind: 'Midterm' },
+        { id: 'eb-m4', title: 'L4: Sample size calculation', kind: 'Midterm' },
+        { id: 'eb-m5', title: 'L5: Plagiarism', kind: 'Midterm' },
+        { id: 'eb-m8', title: 'L6: Evidence-based medicine', kind: 'Midterm' },
+        { id: 'eb-m6', title: 'L7: Research ethics', kind: 'Midterm' },
+        { id: 'eb-m7', title: 'L8: Critical appraisal', kind: 'Midterm' },
+        { id: 'eb-p7', title: 'L9: Critical thinking', kind: 'Post-Midterm' },
+        { id: 'eb-p8', title: 'L10: How to search for scientific paper', kind: 'Post-Midterm' },
+        { id: 'eb-p6', title: 'L11: Selecting a journal for publication', kind: 'Post-Midterm' },
+        { id: 'eb-p9', title: 'L12: Scientific writing an article', kind: 'Post-Midterm' },
+        { id: 'eb-p13', title: 'L13: Making and delivering a successful academic poster', kind: 'Post-Midterm' },
+        { id: 'eb-p14', title: 'L14: How to write a research proposal', kind: 'Post-Midterm' }
       ]
     };
 
     const ENT_LECTURE_VIDEOS = {
-      "ent-m1": [
-        { title: "Intro to ENT", id: "HeyQ19ZPmtQ" }, { title: "Anatomy of the Ear", id: "G6QKHqEcgdU" }, { title: "Physiology of the Ear", id: "GxYEr_FMtNs" },
-        { title: "د. مسعد: Anatomy & Physiology of the Ear", id: "28JDsCKbkc8", doc: "mosaad" }
+      'ent-m1': [
+        { title: 'د. الشيمي: Intro to ENT', id: 'HeyQ19ZPmtQ', doc: 'shimy' },
+        { title: 'د. الشيمي: Anatomy of the Ear', id: 'G6QKHqEcgdU', doc: 'shimy' },
+        { title: 'د. الشيمي: Physiology of the Ear', id: 'GxYEr_FMtNs', doc: 'shimy' },
+        { title: 'د. مسعد: Anatomy & Physiology of the Ear', id: '28JDsCKbkc8', doc: 'mosaad' }
       ],
-      "ent-m2": [
-        { title: "External Ear Diseases", id: "fCXvkvz7vb4" },
-        { title: "د. مسعد: External Ear (Ear 2)", id: "Rde7zbUvS0U", doc: "mosaad" }
+      'ent-m2': [
+        { title: 'د. الشيمي: External Ear Diseases', id: 'fCXvkvz7vb4', doc: 'shimy' },
+        { title: 'د. مسعد: External Ear (Ear 2)', id: 'Rde7zbUvS0U', doc: 'mosaad' }
       ],
-      "ent-m3": [
-        { title: "Middle Ear Diseases - Part 1", id: "SwqSPyDLUZ0" },
-        { title: "د. مسعد: Trauma, Tumors & Otosclerosis", id: "jG9iLdXmKYU", doc: "mosaad" }
+      'ent-m3': [
+        { title: 'د. الشيمي: Middle Ear Diseases - Part 1', id: 'SwqSPyDLUZ0', doc: 'shimy' },
+        { title: 'د. مسعد: Trauma, Tumors & Otosclerosis (Ear 6)', id: 'jG9iLdXmKYU', doc: 'mosaad' }
       ],
-      "ent-m4": [
-        { title: "Middle Ear Diseases - Part 2", id: "D9olkXtUkL8" }, { title: "Secretory Otitis Media", id: "niC42qhB9H0" }, { title: "Cranial Complications of OM", id: "iflsf49PMEA" }, { title: "Intracranial Complications of OM", id: "J9k0QuuYsN8" },
-        { title: "د. مسعد: AOM & OME (Ear 3)", id: "cryGSL2yxLY", doc: "mosaad" }
+      'ent-m4': [
+        { title: 'د. الشيمي: Middle Ear Diseases - Part 2', id: 'D9olkXtUkL8', doc: 'shimy' },
+        { title: 'د. مسعد: AOM & OME (Ear 3)', id: 'cryGSL2yxLY', doc: 'mosaad' }
       ],
-      "ent-m5": [
-        { title: "Middle Ear Diseases - Part 2 (CSOM)", id: "D9olkXtUkL8" }, { title: "Cranial Complications", id: "iflsf49PMEA" }, { title: "Intracranial Complications", id: "J9k0QuuYsN8" },
-        { title: "د. مسعد: CSOM (Ear 4)", id: "7Lgbo3j8Gic", doc: "mosaad" }, { title: "د. مسعد: Complications of OM (Ear 5)", id: "FM-lbCewaRg", doc: "mosaad" }
+      'ent-m5': [
+        { title: 'د. الشيمي: Middle Ear Diseases - Part 2 (CSOM)', id: 'D9olkXtUkL8', doc: 'shimy' },
+        { title: 'د. الشيمي: Cranial Complications of OM', id: 'iflsf49PMEA', doc: 'shimy' },
+        { title: 'د. الشيمي: Intracranial Complications of OM', id: 'J9k0QuuYsN8', doc: 'shimy' },
+        { title: 'د. مسعد: CSOM (Ear 4)', id: '7Lgbo3j8Gic', doc: 'mosaad' },
+        { title: 'د. مسعد: Complications of OM (Ear 5)', id: 'FM-lbCewaRg', doc: 'mosaad' }
       ],
-      "ent-m6": [
-        { title: "Facial Nerve Paralysis", id: "TOes27HvG5o" },
-        { title: "د. مسعد: The Facial Nerve (Ear 8)", id: "dOk0hOaJiJE", doc: "mosaad" }
+      'ent-m6': [
+        { title: 'د. الشيمي: Facial Nerve Paralysis', id: 'TOes27HvG5o', doc: 'shimy' },
+        { title: 'د. مسعد: The Facial Nerve (Ear 8)', id: 'dOk0hOaJiJE', doc: 'mosaad' }
       ],
-      "ent-m7": [
-        { title: "Ear Symptomatology", id: "ubjFlzvPulg" }, { title: "Inner Ear Diseases", id: "9X5lvXqVvEA" },
-        { title: "د. مسعد: Ear Symptomatology (Ear 9)", id: "Xb1PAdJek5g", doc: "mosaad" }, { title: "د. مسعد: Inner Ear & CN VIII (Ear 7)", id: "NOUKL6y9DZc", doc: "mosaad" }, { title: "د. مسعد: Audiology & Operations", id: "Nj40LkPtGQA", doc: "mosaad" }
+      'ent-m8': [
+        { title: 'د. الشيمي: Anatomy & Physiology of Nose & PNS', id: '6Y4QCQtppP8', doc: 'shimy' },
+        { title: 'د. مسعد: Nose Anatomy & Physiology (Nose 1)', id: 'jBeqPt1Xpsg', doc: 'mosaad' }
       ],
-      "ent-m8": [
-        { title: "Anatomy & Physiology of Nose & PNS", id: "6Y4QCQtppP8" }, { title: "Congenital Anomalies & Trauma of Nose", id: "1liejqaFWAo" },
-        { title: "د. مسعد: Nose Anatomy & Physiology", id: "jBeqPt1Xpsg", doc: "mosaad" }
+      'ent-m8b': [
+        { title: 'د. الشيمي: Congenital Anomalies & Trauma of Nose', id: '1liejqaFWAo', doc: 'shimy' },
+        { title: 'د. مسعد: Inflammatory Diseases & Septum (Nose 2)', id: 'rL_ZEwYfliI', doc: 'mosaad' }
       ],
-      "ent-p9": [
-        { title: "Nose Symptomatology", id: "X0Ypx5lkkEk" },
-        { title: "د. مسعد: Nose Symptomatology & Operations", id: "Uj4Bw5NT_I0", doc: "mosaad" }
+      'ent-p10': [
+        { title: 'د. الشيمي: Acute, Chronic & Fungal Rhinosinusitis', id: 'Ag29gsONI7A', doc: 'shimy' },
+        { title: 'د. الشيمي: Complications of Sinusitis', id: 'q-VJI70OGoc', doc: 'shimy' },
+        { title: 'د. مسعد: Rhinosinusitis & Complications (Nose 3)', id: 'tdUESowV52I', doc: 'mosaad' }
       ],
-      "ent-p10": [
-        { title: "Rhinosinusitis & Fungal Sinusitis", id: "Ag29gsONI7A" }, { title: "Complications of Sinusitis", id: "q-VJI70OGoc" },
-        { title: "د. مسعد: Rhinosinusitis & Complications", id: "tdUESowV52I", doc: "mosaad" }
+      'ent-p9': [
+        { title: 'د. الشيمي: Nose Symptomatology (Epistaxis)', id: 'X0Ypx5lkkEk', doc: 'shimy' },
+        { title: 'د. مسعد: Nose Symptomatology & Operations (Nose 5)', id: 'Uj4Bw5NT_I0', doc: 'mosaad' }
       ],
-      "ent-p11": [
-        { title: "Allergic Rhinitis & Nasal Polyps", id: "q-VJI70OGoc" },
-        { title: "د. مسعد: Allergic Rhinitis & Polyps", id: "qxEawS9Uhe0", doc: "mosaad" }, { title: "د. مسعد: Inflammatory Diseases (Nose 2)", id: "rL_ZEwYfliI", doc: "mosaad" }
+      'ent-p11': [
+        { title: 'د. الشيمي: Allergic Rhinitis & Nasal Polyps', id: 'q-VJI70OGoc', doc: 'shimy' },
+        { title: 'د. مسعد: Allergic Rhinitis & Polyps (Nose 4)', id: 'qxEawS9Uhe0', doc: 'mosaad' }
       ],
-      "ent-p12": [
-        { title: "Neoplasm of the Nose & Septum", id: "ye8x9MGUxz0" },
-        { title: "د. مسعد: Nasal Tumors & Cysts", id: "qxEawS9Uhe0", doc: "mosaad" }
+      'ent-p12': [
+        { title: 'د. الشيمي: Neoplasm of the Nose & Septum', id: 'ye8x9MGUxz0', doc: 'shimy' },
+        { title: 'د. مسعد: Nasal Tumors & Cysts (Nose 4)', id: 'qxEawS9Uhe0', doc: 'mosaad' }
       ],
-      "ent-p12b": [
-        { title: "Septum Diseases & Deviation", id: "ye8x9MGUxz0" },
-        { title: "د. مسعد: Nasal Septum (Nose 2)", id: "rL_ZEwYfliI", doc: "mosaad" }
+      'ent-p12b': [
+        { title: 'د. الشيمي: Septum Diseases', id: 'ye8x9MGUxz0', doc: 'shimy' },
+        { title: 'د. مسعد: Nasal Septum (Nose 2)', id: 'rL_ZEwYfliI', doc: 'mosaad' }
       ],
-      "ent-p13": [
-        { title: "Anatomy of Pharynx, Adenoid & Tonsillitis", id: "ZxaErVXGzww" }, { title: "Pharyngitis", id: "neKsoSRh2Fs" }, { title: "Suppuration of the Pharynx", id: "Fsqnjt-_qNk" }, { title: "Ludwig's Angina, Pouch & OSAS", id: "4uqFRAkCKCk" },
-        { title: "د. مسعد: Pharynx 1 (Anatomy & Tonsillitis)", id: "8YrHUpSkRaQ", doc: "mosaad" }, { title: "د. مسعد: Pharynx 2 (Inflammation & Pouch)", id: "x0nxlffCI_8", doc: "mosaad" }, { title: "د. مسعد: Pharynx 3 (Suppuration)", id: "VfSECcItQrs", doc: "mosaad" }, { title: "د. مسعد: Pharynx 4 (Tumours & Tonsillectomy)", id: "B_5zsDZcCl4", doc: "mosaad" }, { title: "د. مسعد: Pharynx 5 (Oesophagus & Palate)", id: "4yY2SsFfLAM", doc: "mosaad" }
+      'ent-p13': [
+        { title: 'د. الشيمي: Anatomy of Pharynx, Adenoid & Tonsillitis', id: 'ZxaErVXGzww', doc: 'shimy' },
+        { title: 'د. الشيمي: Pharyngitis', id: 'neKsoSRh2Fs', doc: 'shimy' },
+        { title: 'د. مسعد: Pharynx 1 (Anatomy, Adenoid & Tonsillitis)', id: '8YrHUpSkRaQ', doc: 'mosaad' }
       ],
-      "ent-s1": [
-        { title: "Anatomy of the Ear", id: "G6QKHqEcgdU" },
-        { title: "د. مسعد: Ear Anatomy & Physiology", id: "28JDsCKbkc8", doc: "mosaad" }
+      'ent-p15': [
+        { title: 'د. الشيمي: Tumors of Larynx & Pharynx', id: 'm7LWL0gJkRg', doc: 'shimy' },
+        { title: 'د. مسعد: Tumours of Pharynx & Operations (Pharynx 4)', id: 'B_5zsDZcCl4', doc: 'mosaad' }
       ],
-      "ent-s2": [
-        { title: "Facial Nerve Paralysis", id: "TOes27HvG5o" }, { title: "Ear Symptomatology", id: "ubjFlzvPulg" },
-        { title: "د. مسعد: Facial Nerve", id: "dOk0hOaJiJE", doc: "mosaad" }, { title: "د. مسعد: Ear Symptomatology", id: "Xb1PAdJek5g", doc: "mosaad" }
+      'ent-p16': [
+        { title: 'د. الشيمي: Anatomy of the Larynx', id: 'kJFf8E-B1jI', doc: 'shimy' },
+        { title: 'د. الشيمي: Larynx Benign Tumors & Nodules', id: 'DxCDfSaY9Qs', doc: 'shimy' },
+        { title: 'د. الشيمي: Tumors of Larynx & Pharynx', id: 'm7LWL0gJkRg', doc: 'shimy' },
+        { title: 'د. مسعد: Larynx 1 (Anatomy & Physiology)', id: 'sW4k7wLxFmw', doc: 'mosaad' },
+        { title: 'د. مسعد: Larynx 3 (Tumors of Larynx)', id: 'U5tZ4LK5Axw', doc: 'mosaad' }
       ],
-      "ent-s3": [
-        { title: "Anatomy of Nose & PNS", id: "6Y4QCQtppP8" },
-        { title: "د. مسعد: Nose Anatomy & Physiology", id: "jBeqPt1Xpsg", doc: "mosaad" }
+      'ent-p17': [
+        { title: 'د. الشيمي: Tracheostomy', id: 'siYEDq-Shn4', doc: 'shimy' },
+        { title: 'د. مسعد: Tracheostomy & ENT LASER (Larynx 5)', id: 'X7bDbGgxytg', doc: 'mosaad' }
       ],
-      "ent-s4": [
-        { title: "Nose Symptomatology", id: "X0Ypx5lkkEk" },
-        { title: "د. مسعد: Nose Symptomatology", id: "Uj4Bw5NT_I0", doc: "mosaad" }
+      'ent-p18': [
+        { title: 'د. الشيمي: Vocal Cord Paralysis, Stridor & HOV', id: 'EsudHnoc6GU', doc: 'shimy' },
+        { title: 'د. مسعد: Vocal Cord Paralysis & Symptomatology (Larynx 4)', id: 'WBpbXES1fTs', doc: 'mosaad' }
       ],
-      "ent-s5": [
-        { title: "Anatomy of the Larynx", id: "kJFf8E-B1jI" }, { title: "Laryngitis", id: "41miUqaGwrs" }, { title: "Larynx Benign & Congenital", id: "DxCDfSaY9Qs" }, { title: "Vocal Cord Paralysis & Stridor", id: "EsudHnoc6GU" }, { title: "Tracheostomy", id: "siYEDq-Shn4" }, { title: "Tumors of Larynx & Pharynx", id: "m7LWL0gJkRg" },
-        { title: "د. مسعد: Larynx 1 (Anatomy)", id: "sW4k7wLxFmw", doc: "mosaad" }, { title: "د. مسعد: Larynx 2 (Congenital & Inflammatory)", id: "lMzsf0cX9yQ", doc: "mosaad" }, { title: "د. مسعد: Larynx 3 (Tumors)", id: "U5tZ4LK5Axw", doc: "mosaad" }, { title: "د. مسعد: Larynx 4 (Vocal Cord Paralysis)", id: "WBpbXES1fTs", doc: "mosaad" }, { title: "د. مسعد: Larynx 5 (Tracheostomy & LASER)", id: "X7bDbGgxytg", doc: "mosaad" }, { title: "د. مسعد: Neck Swellings & Phoniatrics", id: "njD-Hdqi7MI", doc: "mosaad" }
+      'ent-p19': [
+        { title: 'د. الشيمي: Oropharyngeal Ulcers & Pharynx', id: 'ZxaErVXGzww', doc: 'shimy' },
+        { title: 'د. مسعد: Pharynx 2 (Inflammation & Silent Areas)', id: 'x0nxlffCI_8', doc: 'mosaad' }
+      ],
+      'ent-p20': [
+        { title: 'د. الشيمي: Ludwig Angina, Pouch & OSAS', id: '4uqFRAkCKCk', doc: 'shimy' },
+        { title: 'د. مسعد: Pharynx 2 (Pouch & Inflammation)', id: 'x0nxlffCI_8', doc: 'mosaad' }
+      ],
+      'ent-p21': [
+        { title: 'د. الشيمي: Suppuration of the Pharynx', id: 'Fsqnjt-_qNk', doc: 'shimy' },
+        { title: 'د. الشيمي: Ludwig Angina & Deep Neck', id: '4uqFRAkCKCk', doc: 'shimy' },
+        { title: 'د. مسعد: Pharyngeal Suppuration (Pharynx 3)', id: 'VfSECcItQrs', doc: 'mosaad' },
+        { title: 'د. مسعد: Neck Swellings & Phoniatrics', id: 'njD-Hdqi7MI', doc: 'mosaad' }
+      ],
+      'ent-p22': [
+        { title: 'د. الشيمي: Secretory Otitis Media', id: 'niC42qhB9H0', doc: 'shimy' },
+        { title: 'د. مسعد: AOM & OME (Ear 3)', id: 'cryGSL2yxLY', doc: 'mosaad' }
+      ],
+      'ent-p23': [
+        { title: 'د. الشيمي: Tracheostomy & Airway', id: 'siYEDq-Shn4', doc: 'shimy' },
+        { title: 'د. مسعد: Larynx 2 (Congenital, Traumatic & Inflammatory)', id: 'lMzsf0cX9yQ', doc: 'mosaad' },
+        { title: 'د. مسعد: Larynx 5 (Tracheostomy & LASER)', id: 'X7bDbGgxytg', doc: 'mosaad' }
+      ],
+      'ent-sem1': [
+        { title: 'د. الشيمي: Ear Symptomatology', id: 'ubjFlzvPulg', doc: 'shimy' },
+        { title: 'د. الشيمي: Inner Ear Diseases', id: '9X5lvXqVvEA', doc: 'shimy' },
+        { title: 'د. مسعد: Inner Ear & CN VIII (Ear 7)', id: 'NOUKL6y9DZc', doc: 'mosaad' },
+        { title: 'د. مسعد: Ear Symptomatology (Ear 9)', id: 'Xb1PAdJek5g', doc: 'mosaad' },
+        { title: 'د. مسعد: Audiology & Ear Operations (Ear 10)', id: 'Nj40LkPtGQA', doc: 'mosaad' }
+      ],
+      'ent-sem2': [
+        { title: 'د. الشيمي: Nose Symptomatology', id: 'X0Ypx5lkkEk', doc: 'shimy' },
+        { title: 'د. مسعد: Nose Symptomatology (Nose 5)', id: 'Uj4Bw5NT_I0', doc: 'mosaad' }
+      ],
+      'ent-sem3': [
+        { title: 'د. الشيمي: Laryngitis', id: '41miUqaGwrs', doc: 'shimy' },
+        { title: 'د. الشيمي: Vocal Cord Paralysis, Stridor & HOV', id: 'EsudHnoc6GU', doc: 'shimy' },
+        { title: 'د. مسعد: Larynx 4 (Vocal Cord & Symptomatology)', id: 'WBpbXES1fTs', doc: 'mosaad' },
+        { title: 'د. مسعد: Oesophagus & Palate (Pharynx 5)', id: '4yY2SsFfLAM', doc: 'mosaad' }
       ]
     };
 
@@ -4438,7 +4696,7 @@
       const rawNote = (state.notes[t.id] || '').trim();
       const noteVal = (state.notes[t.id] || '').replace(/"/g, '&quot;');
       const hasNote = rawNote.length > 0;
-      const badgeCls = t.kind === 'Midterm' ? 'bg-amber-500/15 text-amber-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
+      const badgeCls = t.kind === 'Seminar' ? 'bg-purple-500/15 text-purple-400' : t.kind === 'Midterm' ? 'bg-amber-500/15 text-amber-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
       return `
         <div class="apple-subcard stagger-item p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}" style="--i:${Math.min(idx, 12)}">
           ${(() => {
@@ -4499,7 +4757,7 @@
       document.getElementById('active-subject-title').innerHTML = `<span class="inline-flex items-center gap-2">${getModuleLottie(state.activeSubject, 28)}<span>${SUBJECTS_META[state.activeSubject].name}</span></span>`;
       const q = (document.getElementById('topic-search-input').value || '').trim().toLowerCase();
       const all = (shared.topics[state.activeSubject] || []).filter(t => t.title.toLowerCase().includes(q));
-      const postList = all.filter(t => t.kind === 'Post-Midterm'), midList = all.filter(t => t.kind === 'Midterm');
+      const postList = all.filter(t => t.kind === 'Post-Midterm'), midList = all.filter(t => t.kind === 'Midterm'), semList = all.filter(t => t.kind === 'Seminar');
 
       let html = '';
       if (state.topicFilter === 'ALL' || state.topicFilter === 'Post-Midterm') {
@@ -4507,6 +4765,9 @@
       }
       if (state.topicFilter === 'ALL' || state.topicFilter === 'Midterm') {
         html += `<div class="space-y-2.5 pt-2"><h4 class="text-xs sm:text-sm font-extrabold text-amber-400 px-1">Midterm — الميدتيرم (${midList.length})</h4>${midList.length ? midList.map((t, i) => renderTopicRow(t, i)).join('') : '<div class="text-xs py-2">لا توجد محاضرات</div>'}</div>`;
+      }
+      if ((state.topicFilter === 'ALL' && semList.length) || state.topicFilter === 'Seminar') {
+        html += `<div class="space-y-2.5 pt-2"><h4 class="text-xs sm:text-sm font-extrabold text-purple-400 px-1">Seminars — السيمينارات الداخلة في الفاينل (${semList.length})</h4>${semList.length ? semList.map((t, i) => renderTopicRow(t, i)).join('') : '<div class="text-xs py-2">لا توجد سيمينارات لهذه المادة</div>'}</div>`;
       }
       document.getElementById('topics-sections-container').innerHTML = html;
       updateKPIs();
@@ -5131,6 +5392,28 @@
         await saveSharedToFirestore('live_stream', { visible, streams: nextStreams });
         showToast('تمت إضافة البث الجديد للقائمة بنجاح!');
       };
+
+      // Home 4 Sub-Tabs (Summary | Exams | Grading | Schedule)
+      function switchHomeSubTab(sub) {
+        document.querySelectorAll('.home-sub-btn').forEach(x => {
+          const on = x.dataset.homeSub === sub;
+          x.className = on
+            ? 'home-sub-btn tap-btn px-3.5 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5'
+            : 'home-sub-btn tap-btn px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5';
+          x.style.color = on ? '#fff' : 'var(--text-muted)';
+        });
+        document.querySelectorAll('.home-sub-panel').forEach(p => p.classList.add('hidden'));
+        const target = document.getElementById(`home-panel-${sub}`);
+        if (target) {
+          target.classList.remove('hidden');
+          target.classList.remove('fade-in');
+          void target.offsetWidth;
+          target.classList.add('fade-in');
+          gsapStagger(`#home-panel-${sub} .stagger-item`, target);
+        }
+        refreshLucideIcons();
+      }
+      document.querySelectorAll('.home-sub-btn').forEach(b => b.onclick = () => switchHomeSubTab(b.dataset.homeSub));
 
       // Syllabus 3 Sub-Tabs (Lectures | Resources | Quizzes)
       document.querySelectorAll('.syl-sub-btn').forEach(b => b.onclick = () => {
