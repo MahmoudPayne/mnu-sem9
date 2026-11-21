@@ -790,6 +790,26 @@
         <div id="planner-vid-player-wrap" class="w-full aspect-video rounded-xl overflow-hidden bg-black/90 border border-white/10">
           <div id="planner-yt-player" class="w-full h-full"></div>
         </div>
+        <!-- Unified Pro Video Control Bar (planner) -->
+        <div id="planner-vid-controls" class="apple-subcard rounded-xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" id="planner-ctrl-play" class="tap-btn min-h-[34px] px-3 py-1.5 rounded-xl bg-[#0a84ff] text-white font-bold cursor-pointer inline-flex items-center gap-1">▶️ تشغيل</button>
+            <button type="button" data-ctrl-target="planner" data-seek="-10" class="yt-ctrl-seek tap-btn min-h-[34px] px-2.5 py-1.5 rounded-xl apple-card font-bold cursor-pointer">⏪ -10ث</button>
+            <button type="button" data-ctrl-target="planner" data-seek="10" class="yt-ctrl-seek tap-btn min-h-[34px] px-2.5 py-1.5 rounded-xl apple-card font-bold cursor-pointer">+10ث ⏩</button>
+          </div>
+          <div class="flex flex-wrap items-center gap-1" dir="ltr">
+            <button type="button" data-ctrl-target="planner" data-rate="1" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1x</button>
+            <button type="button" data-ctrl-target="planner" data-rate="1.25" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1.25x</button>
+            <button type="button" data-ctrl-target="planner" data-rate="1.5" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1.5x</button>
+            <button type="button" data-ctrl-target="planner" data-rate="1.75" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1.75x</button>
+            <button type="button" data-ctrl-target="planner" data-rate="2" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">2x</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="planner-ctrl-mute" class="tap-btn min-h-[34px] px-2.5 py-1.5 rounded-xl apple-card text-sm cursor-pointer" title="كتم / تفعيل الصوت">🔊</button>
+            <input id="planner-ctrl-vol" type="range" min="0" max="100" value="100" class="w-20 sm:w-24 accent-[#0a84ff] cursor-pointer" />
+            <button type="button" id="planner-ctrl-vol100" class="tap-btn min-h-[32px] px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono-num text-[11px] font-bold cursor-pointer">100%</button>
+          </div>
+        </div>
       </div>
 
       <!-- Balanced 2-Column Grid: Unified Timer + Today's Schedule -->
@@ -2087,9 +2107,29 @@
         <h3 id="video-modal-title" class="text-xs sm:text-base font-bold truncate">شرح المحاضرة</h3>
         <button type="button" id="video-modal-close" class="tap-btn px-2.5 py-1 rounded-lg apple-subcard text-sm font-bold text-rose-400 cursor-pointer shrink-0">✕</button>
       </div>
-      <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10">
-        <iframe id="video-modal-iframe" src="about:blank" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div id="video-modal-player-wrap" class="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10">
+        <div id="video-modal-iframe" class="w-full h-full"></div>
       </div>
+        <!-- Unified Pro Video Control Bar (modal) -->
+        <div id="modal-vid-controls" class="apple-subcard rounded-xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" id="modal-ctrl-play" class="tap-btn min-h-[34px] px-3 py-1.5 rounded-xl bg-[#0a84ff] text-white font-bold cursor-pointer inline-flex items-center gap-1">▶️ تشغيل</button>
+            <button type="button" data-ctrl-target="modal" data-seek="-10" class="yt-ctrl-seek tap-btn min-h-[34px] px-2.5 py-1.5 rounded-xl apple-card font-bold cursor-pointer">⏪ -10ث</button>
+            <button type="button" data-ctrl-target="modal" data-seek="10" class="yt-ctrl-seek tap-btn min-h-[34px] px-2.5 py-1.5 rounded-xl apple-card font-bold cursor-pointer">+10ث ⏩</button>
+          </div>
+          <div class="flex flex-wrap items-center gap-1" dir="ltr">
+            <button type="button" data-ctrl-target="modal" data-rate="1" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1x</button>
+            <button type="button" data-ctrl-target="modal" data-rate="1.25" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1.25x</button>
+            <button type="button" data-ctrl-target="modal" data-rate="1.5" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1.5x</button>
+            <button type="button" data-ctrl-target="modal" data-rate="1.75" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">1.75x</button>
+            <button type="button" data-ctrl-target="modal" data-rate="2" class="yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer">2x</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="modal-ctrl-mute" class="tap-btn min-h-[34px] px-2.5 py-1.5 rounded-xl apple-card text-sm cursor-pointer" title="كتم / تفعيل الصوت">🔊</button>
+            <input id="modal-ctrl-vol" type="range" min="0" max="100" value="100" class="w-20 sm:w-24 accent-[#0a84ff] cursor-pointer" />
+            <button type="button" id="modal-ctrl-vol100" class="tap-btn min-h-[32px] px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono-num text-[11px] font-bold cursor-pointer">100%</button>
+          </div>
+        </div>
     </div>
   </div>
 
@@ -2453,7 +2493,9 @@
       animationsPreferenceSet: false,
       streamSafeMode: true,
       goldWelcomed: false,
-      videoTimerSync: true
+      videoTimerSync: true,
+      videoProgress: {},
+      queueUpdatedAt: 0
     };
 
     let shared = {
@@ -2532,10 +2574,53 @@
       ensureTodayReset();
     }
 
-    function saveLocalStudentState(immediateCloud = false) {
+    function mergeVideoProgress(remoteProg) {
+      if (!remoteProg || typeof remoteProg !== 'object') return;
+      if (!state.videoProgress || typeof state.videoProgress !== 'object') state.videoProgress = {};
+      Object.keys(remoteProg).forEach(vidId => {
+        const r = remoteProg[vidId];
+        if (!r || typeof r.time !== 'number') return;
+        const l = state.videoProgress[vidId];
+        const rTs = Number(r.updatedAt) || 0;
+        const lTs = l ? (Number(l.updatedAt) || 0) : 0;
+        if (!l || rTs >= lTs) {
+          state.videoProgress[vidId] = { time: Math.max(0, Math.floor(r.time)), updatedAt: rTs || Date.now() };
+        }
+      });
+    }
+
+    function formatMinSec(sec) {
+      const s = Math.max(0, Math.floor(Number(sec) || 0));
+      return `${pad2(Math.floor(s / 60))}:${pad2(s % 60)}`;
+    }
+
+    function applyRemoteStudentResume(d) {
+      if (!d || typeof d !== 'object') return false;
+      mergeVideoProgress(d.videoProgress);
+      const remoteTs = Number(d.queueUpdatedAt) || (d.lastActive ? (Date.parse(d.lastActive) || 0) : 0);
+      const localTs = Number(state.queueUpdatedAt) || 0;
+      let queueChanged = false;
+      if (Array.isArray(d.todayQueue) && d.todayQueue.length) {
+        const remoteIsNewer = remoteTs > localTs;
+        if (!state.todayQueue.length || (remoteIsNewer && typeof pomoRunning !== 'undefined' && !pomoRunning)) {
+          state.todayQueue = d.todayQueue;
+          state.queueUpdatedAt = remoteTs;
+          queueChanged = true;
+        }
+      }
+      if (queueChanged) {
+        if (typeof renderTimeline === 'function') renderTimeline();
+        if (typeof syncTimerDisplay === 'function') syncTimerDisplay();
+        if (typeof updateKPIs === 'function') updateKPIs();
+      }
+      return queueChanged;
+    }
+
+    function saveLocalStudentState(immediateCloud = false, fromRemote = false) {
       ensureTodayReset();
+      if (!fromRemote) state.queueUpdatedAt = Date.now();
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-      if (state.studentProfile && state.studentProfile.studentId && fbDb) {
+      if (!fromRemote && state.studentProfile && state.studentProfile.studentId && fbDb) {
         if (immediateCloud) {
           clearTimeout(studentSyncTimer);
           syncStudentToFirestore();
@@ -2571,6 +2656,8 @@
           todayDate: state.todayDate || getTodayDateStr(),
           todayHoursLogged: Number((state.todayHoursLogged || 0).toFixed(3)),
           todayQueue: state.todayQueue || [],
+          queueUpdatedAt: state.queueUpdatedAt || Date.now(),
+          videoProgress: state.videoProgress || {},
           stages: state.stages || {},
           notes: state.notes || {},
           lastActive: new Date().toISOString()
@@ -2589,9 +2676,9 @@
           if (typeof d.completedSessions === 'number' && d.completedSessions > state.completedSessions) state.completedSessions = d.completedSessions;
           if (d.stages && Object.keys(d.stages).length) state.stages = { ...d.stages, ...state.stages };
           if (d.notes && Object.keys(d.notes).length) state.notes = { ...d.notes, ...state.notes };
-          if (Array.isArray(d.todayQueue) && d.todayQueue.length && !state.todayQueue.length) state.todayQueue = d.todayQueue;
-          saveLocalStudentState(false);
-          renderTimeline(); renderSubjects(); updateKPIs();
+          applyRemoteStudentResume(d);
+          saveLocalStudentState(false, true);
+          renderTimeline(); renderSubjects(); syncTimerDisplay(); updateKPIs();
         }
       } catch (e) {}
     }
@@ -4144,7 +4231,8 @@
           state.goldWelcomed = false;
           try { localStorage.removeItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
         }
-        saveLocalStudentState(false);
+        applyRemoteStudentResume(d);
+        saveLocalStudentState(false, true);
         updateStudentHeaderUI();
       }, () => {});
     }
@@ -4924,18 +5012,75 @@
     }
 
     let plannerYtPlayer = null;
+    let modalYtPlayer = null;
     let plannerBannerTaskId = null;
     let plannerBannerVideos = [];
     let plannerBannerVidIdx = 0;
     let plannerBannerSpeed = 1.5;
     let plannerCurrentRate = 1.5;
+    let modalCurrentRate = 1;
+    let plannerCurrentVideoId = null;
+    let modalCurrentVideoId = null;
+
+    function getSavedVideoResumeSec(videoId) {
+      if (!videoId || !state.videoProgress || !state.videoProgress[videoId]) return 0;
+      const t = Math.floor(Number(state.videoProgress[videoId].time) || 0);
+      return t > 10 ? t : 0;
+    }
+
+    function saveVideoProgressFor(player, videoId, { forceReset = false, immediateCloud = false } = {}) {
+      if (!videoId) return;
+      if (!state.videoProgress || typeof state.videoProgress !== 'object') state.videoProgress = {};
+      if (forceReset) {
+        state.videoProgress[videoId] = { time: 0, updatedAt: Date.now() };
+        saveLocalStudentState(immediateCloud);
+        return;
+      }
+      if (!player || typeof player.getCurrentTime !== 'function') return;
+      try {
+        const cur = Math.floor(Number(player.getCurrentTime()) || 0);
+        const dur = typeof player.getDuration === 'function' ? Number(player.getDuration()) || 0 : 0;
+        const saveSec = (dur > 0 && (dur - cur) <= 15) ? 0 : Math.max(0, cur);
+        state.videoProgress[videoId] = { time: saveSec, updatedAt: Date.now() };
+        saveLocalStudentState(immediateCloud);
+      } catch (e) {}
+    }
+
+    function saveAllActiveVideoProgress(immediateCloud = false) {
+      const pBanner = document.getElementById('planner-video-banner');
+      if (pBanner && !pBanner.classList.contains('hidden') && plannerYtPlayer && plannerCurrentVideoId) {
+        saveVideoProgressFor(plannerYtPlayer, plannerCurrentVideoId, { immediateCloud });
+      }
+      const mModal = document.getElementById('video-player-modal');
+      if (mModal && !mModal.classList.contains('hidden') && modalYtPlayer && modalCurrentVideoId) {
+        saveVideoProgressFor(modalYtPlayer, modalCurrentVideoId, { immediateCloud });
+      }
+    }
+
+    // Periodic 10-second auto-save while any YouTube player is actively playing
+    setInterval(() => {
+      if (!window.YT || !window.YT.PlayerState) return;
+      try {
+        const pBanner = document.getElementById('planner-video-banner');
+        if (pBanner && !pBanner.classList.contains('hidden') && plannerYtPlayer && plannerCurrentVideoId && plannerYtPlayer.getPlayerState && plannerYtPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+          saveVideoProgressFor(plannerYtPlayer, plannerCurrentVideoId, { immediateCloud: false });
+        }
+      } catch (e) {}
+      try {
+        const mModal = document.getElementById('video-player-modal');
+        if (mModal && !mModal.classList.contains('hidden') && modalYtPlayer && modalCurrentVideoId && modalYtPlayer.getPlayerState && modalYtPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+          saveVideoProgressFor(modalYtPlayer, modalCurrentVideoId, { immediateCloud: false });
+        }
+      } catch (e) {}
+    }, 10000);
+    let hasVideoStartedOnce = false;
     let isSyncingVideo = false;
     let syncGuardTimer = null;
     let ytPauseDebounceTimer = null;
     let pomoAnchorRemaining = 0;
     let pomoAnchorStartMs = 0;
 
-    function setVideoSyncGuard(ms = 750) {
+    function setVideoSyncGuard(ms = 850) {
       isSyncingVideo = true;
       clearTimeout(syncGuardTimer);
       syncGuardTimer = setTimeout(() => { isSyncingVideo = false; }, ms);
@@ -4946,6 +5091,59 @@
         clearTimeout(ytPauseDebounceTimer);
         ytPauseDebounceTimer = null;
       }
+    }
+
+    function updateCtrlPlayUI(prefix, isPlaying) {
+      const btn = document.getElementById(`${prefix}-ctrl-play`);
+      if (!btn) return;
+      btn.textContent = isPlaying ? '⏸️ إيقاف' : '▶️ تشغيل';
+      btn.className = isPlaying
+        ? 'tap-btn min-h-[34px] px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold cursor-pointer inline-flex items-center gap-1'
+        : 'tap-btn min-h-[34px] px-3 py-1.5 rounded-xl bg-[#0a84ff] text-white font-bold cursor-pointer inline-flex items-center gap-1';
+    }
+
+    function updateCtrlRateUI(prefix, rate) {
+      const rNum = Number(rate) || 1;
+      document.querySelectorAll(`.yt-ctrl-rate[data-ctrl-target="${prefix}"]`).forEach(btn => {
+        const on = Math.abs(Number(btn.dataset.rate) - rNum) < 0.01;
+        btn.className = on
+          ? 'yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg bg-[#0a84ff] text-white font-mono-num text-[11px] font-bold cursor-pointer'
+          : 'yt-ctrl-rate tap-btn min-h-[32px] px-2 py-1 rounded-lg apple-card font-mono-num text-[11px] font-bold cursor-pointer';
+      });
+    }
+
+    function updateCtrlVolumeUI(prefix, vol, muted) {
+      const muteBtn = document.getElementById(`${prefix}-ctrl-mute`);
+      const volEl = document.getElementById(`${prefix}-ctrl-vol`);
+      if (muteBtn) muteBtn.textContent = (muted || vol <= 0) ? '🔇' : '🔊';
+      if (volEl && typeof vol === 'number' && !Number.isNaN(vol)) volEl.value = String(Math.round(vol));
+    }
+
+    function adjustTimerForPlaybackRate(oldRate, newRate) {
+      if (state.videoTimerSync === false || !canUserChat()) return;
+      if (Math.abs(newRate - oldRate) < 0.01) return;
+      const task = getActiveTask();
+      if (!task || task.id !== plannerBannerTaskId || !plannerYtPlayer) return;
+      try {
+        const dur = typeof plannerYtPlayer.getDuration === 'function' ? Number(plannerYtPlayer.getDuration()) || 0 : 0;
+        const cur = typeof plannerYtPlayer.getCurrentTime === 'function' ? Number(plannerYtPlayer.getCurrentTime()) || 0 : 0;
+        const rawRemaining = Math.max(0, dur - cur);
+        if (rawRemaining > 0) {
+          const diffSec = Math.round((rawRemaining / newRate) - (rawRemaining / oldRate));
+          const baseRem = (task.remainingSec !== undefined) ? task.remainingSec : pomoLeftSec;
+          const updatedRem = Math.max(10, baseRem + diffSec);
+          task.remainingSec = updatedRem;
+          pomoLeftSec = updatedRem;
+          pomoTotalSec = Math.max(pomoTotalSec, updatedRem);
+          if (pomoRunning) {
+            pomoAnchorRemaining = updatedRem;
+            pomoAnchorStartMs = Date.now();
+          }
+          saveLocalStudentState();
+          syncTimerDisplay();
+          showToast(`تم تعديل وقت التايمر تلقائياً لسرعة ${newRate}x`);
+        }
+      } catch (e) {}
     }
 
     function renderPlannerVideoSwitcher() {
@@ -4972,83 +5170,87 @@
       const newRate = Number(ev && ev.data) || 1;
       const oldRate = Number(plannerCurrentRate) || 1;
       plannerCurrentRate = newRate;
+      updateCtrlRateUI('planner', newRate);
       const curVid = plannerBannerVideos[plannerBannerVidIdx];
       const titleEl = document.getElementById('planner-vid-active-title');
       if (titleEl && curVid) titleEl.textContent = `${curVid.title || ''} • سرعة ${newRate}x`;
-      if (isSyncingVideo || state.videoTimerSync === false || !canUserChat()) return;
-      if (Math.abs(newRate - oldRate) < 0.01) return;
-      const task = getActiveTask();
-      if (!task || task.id !== plannerBannerTaskId || !plannerYtPlayer) return;
-      try {
-        const dur = typeof plannerYtPlayer.getDuration === 'function' ? Number(plannerYtPlayer.getDuration()) || 0 : 0;
-        const cur = typeof plannerYtPlayer.getCurrentTime === 'function' ? Number(plannerYtPlayer.getCurrentTime()) || 0 : 0;
-        const rawRemaining = Math.max(0, dur - cur);
-        if (rawRemaining > 0) {
-          const diffSec = Math.round((rawRemaining / newRate) - (rawRemaining / oldRate));
-          const baseRem = (task.remainingSec !== undefined) ? task.remainingSec : pomoLeftSec;
-          const updatedRem = Math.max(10, baseRem + diffSec);
-          task.remainingSec = updatedRem;
-          pomoLeftSec = updatedRem;
-          pomoTotalSec = Math.max(pomoTotalSec, updatedRem);
-          if (pomoRunning) {
-            pomoAnchorRemaining = updatedRem;
-            pomoAnchorStartMs = Date.now();
-          }
-          saveLocalStudentState();
-          syncTimerDisplay();
-          showToast(`تم تعديل وقت التايمر تلقائياً لسرعة ${newRate}x`);
-        }
-      } catch (e) {}
+      if (isSyncingVideo) return;
+      adjustTimerForPlaybackRate(oldRate, newRate);
     }
 
     function onPlannerYtStateChange(ev) {
       if (!window.YT || !window.YT.PlayerState || !canUserChat()) return;
       const st = ev.data;
-      // 1) Never pause or count a break on BUFFERING; cancel any pending seek/pause debounce
+      if (st === YT.PlayerState.PLAYING) {
+        hasVideoStartedOnce = true;
+        updateCtrlPlayUI('planner', true);
+        clearYtPauseDebounce();
+        if (!isSyncingVideo && state.videoTimerSync !== false && !pomoRunning && state.activeTaskId && getActiveTask()) {
+          setVideoSyncGuard(850);
+          startTaskInTimer(state.activeTaskId, { fromVideo: true });
+        }
+        return;
+      }
       if (st === YT.PlayerState.BUFFERING) {
         clearYtPauseDebounce();
         return;
       }
-      // 2) Auto-play next video in task.videos on ENDED without stopping timer or counting a pause
       if (st === YT.PlayerState.ENDED) {
+        updateCtrlPlayUI('planner', false);
         clearYtPauseDebounce();
+        if (plannerCurrentVideoId) saveVideoProgressFor(plannerYtPlayer, plannerCurrentVideoId, { forceReset: true, immediateCloud: true });
         if (plannerBannerTaskId && plannerBannerVideos.length > plannerBannerVidIdx + 1) {
           const task = state.todayQueue.find(t => t.id === plannerBannerTaskId);
           if (task) openPlannerVideoForTask(task, plannerBannerVidIdx + 1);
         }
         return;
       }
-      if (isSyncingVideo || state.videoTimerSync === false) return;
       if (st === YT.PlayerState.PAUSED) {
+        updateCtrlPlayUI('planner', false);
+        // iOS/iPadOS guard: never pause timer or count a break before video actually plays once
+        if (!hasVideoStartedOnce) return;
+        if (plannerCurrentVideoId) saveVideoProgressFor(plannerYtPlayer, plannerCurrentVideoId, { immediateCloud: true });
+        if (isSyncingVideo || state.videoTimerSync === false) return;
         if (pomoRunning) {
           clearYtPauseDebounce();
           ytPauseDebounceTimer = setTimeout(() => {
             ytPauseDebounceTimer = null;
-            if (!isSyncingVideo && state.videoTimerSync !== false && pomoRunning) {
-              setVideoSyncGuard(750);
+            if (hasVideoStartedOnce && !isSyncingVideo && state.videoTimerSync !== false && pomoRunning) {
+              setVideoSyncGuard(850);
               pauseActiveTask(true);
             }
           }, 800);
         }
-      } else if (st === YT.PlayerState.PLAYING) {
-        clearYtPauseDebounce();
-        if (!pomoRunning && state.activeTaskId && getActiveTask()) {
-          setVideoSyncGuard(750);
-          startTaskInTimer(state.activeTaskId, { fromVideo: true });
-        }
       }
     }
 
-    function loadPlannerYouTubeVideo(videoId, speed = 1.5) {
+    function loadPlannerYouTubeVideo(videoId, speed = 1.5, fromUserGesture = false) {
       if (!videoId) return;
+      if (plannerCurrentVideoId && plannerCurrentVideoId !== videoId && plannerYtPlayer) {
+        saveVideoProgressFor(plannerYtPlayer, plannerCurrentVideoId, { immediateCloud: true });
+      }
+      plannerCurrentVideoId = videoId;
+      const resumeSec = getSavedVideoResumeSec(videoId);
       const targetRate = Number(speed) || 1.5;
+      hasVideoStartedOnce = false;
       plannerCurrentRate = targetRate;
+      updateCtrlPlayUI('planner', false);
+      updateCtrlRateUI('planner', targetRate);
+      if (resumeSec > 10) showToast(`تم استكمال الفيديو من الدقيقة ${formatMinSec(resumeSec)} ⏱️`);
       const applyRate = (pl) => {
         try {
+          if (resumeSec > 10 && pl && typeof pl.getCurrentTime === 'function' && pl.getCurrentTime() < 5 && typeof pl.seekTo === 'function') {
+            setVideoSyncGuard(900);
+            pl.seekTo(resumeSec, true);
+          }
           if (pl && typeof pl.setPlaybackRate === 'function') {
             setVideoSyncGuard(900);
             pl.setPlaybackRate(targetRate);
             plannerCurrentRate = targetRate;
+            updateCtrlRateUI('planner', targetRate);
+          }
+          if (pl && typeof pl.getVolume === 'function') {
+            updateCtrlVolumeUI('planner', pl.getVolume(), pl.isMuted && pl.isMuted());
           }
         } catch (e) {}
       };
@@ -5056,7 +5258,8 @@
         clearYtPauseDebounce();
         setVideoSyncGuard(1000);
         try {
-          plannerYtPlayer.loadVideoById(videoId);
+          plannerYtPlayer.loadVideoById({ videoId, startSeconds: resumeSec || 0 });
+          if (fromUserGesture && typeof plannerYtPlayer.playVideo === 'function') plannerYtPlayer.playVideo();
           setTimeout(() => applyRate(plannerYtPlayer), 650);
           return;
         } catch (e) {
@@ -5073,7 +5276,7 @@
         width: '100%',
         height: '100%',
         videoId,
-        playerVars: { autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1, fs: 1 },
+        playerVars: { autoplay: 1, playsinline: 1, enablejsapi: 1, rel: 0, modestbranding: 1, fs: 1, start: resumeSec || 0 },
         events: {
           onReady: (ev) => { applyRate(ev.target); },
           onStateChange: onPlannerYtStateChange,
@@ -5082,11 +5285,12 @@
       });
     }
 
-    function openPlannerVideoForTask(task, vidIdx = 0) {
+    function openPlannerVideoForTask(task, vidIdx = 0, fromUserGesture = false) {
       if (!task || !Array.isArray(task.videos) || !task.videos.length) return;
       const banner = document.getElementById('planner-video-banner');
       const lockBox = document.getElementById('planner-vid-guest-lock');
       const playerWrap = document.getElementById('planner-vid-player-wrap');
+      const ctrlBar = document.getElementById('planner-vid-controls');
       const titleEl = document.getElementById('planner-vid-active-title');
       if (!banner) return;
 
@@ -5097,34 +5301,101 @@
       const curVid = plannerBannerVideos[plannerBannerVidIdx];
       plannerBannerSpeed = Number(curVid.speed) || Number(task.videoSpeed) || 1.5;
       plannerCurrentRate = plannerBannerSpeed;
+      hasVideoStartedOnce = false;
       if (titleEl) titleEl.textContent = `${curVid.title || task.title} • سرعة ${plannerBannerSpeed}x`;
       banner.classList.remove('hidden');
       renderPlannerVideoSwitcher();
+      updateCtrlRateUI('planner', plannerBannerSpeed);
       refreshLucideIcons();
 
       if (!canUserChat()) {
         if (lockBox) lockBox.classList.remove('hidden');
         if (playerWrap) playerWrap.classList.add('hidden');
+        if (ctrlBar) ctrlBar.classList.add('hidden');
         try { if (plannerYtPlayer && typeof plannerYtPlayer.pauseVideo === 'function') plannerYtPlayer.pauseVideo(); } catch (e) {}
         return;
       }
 
       if (lockBox) lockBox.classList.add('hidden');
       if (playerWrap) playerWrap.classList.remove('hidden');
-      ensureYouTubeAPI(() => loadPlannerYouTubeVideo(curVid.id, plannerBannerSpeed));
+      if (ctrlBar) ctrlBar.classList.remove('hidden');
+      ensureYouTubeAPI(() => loadPlannerYouTubeVideo(curVid.id, plannerBannerSpeed, fromUserGesture));
     }
 
     function closePlannerVideoBanner() {
+      if (plannerYtPlayer && plannerCurrentVideoId) {
+        saveVideoProgressFor(plannerYtPlayer, plannerCurrentVideoId, { immediateCloud: true });
+      }
+      plannerCurrentVideoId = null;
       clearYtPauseDebounce();
+      hasVideoStartedOnce = false;
       const banner = document.getElementById('planner-video-banner');
       if (banner) banner.classList.add('hidden');
       plannerBannerTaskId = null;
       plannerBannerVideos = [];
       plannerBannerVidIdx = 0;
-      setVideoSyncGuard(750);
+      setVideoSyncGuard(850);
+      updateCtrlPlayUI('planner', false);
       try {
         if (plannerYtPlayer && typeof plannerYtPlayer.stopVideo === 'function') plannerYtPlayer.stopVideo();
       } catch (e) {}
+    }
+
+    // Syllabus Modal YT.Player (Unified Pro Controls + iOS/iPadOS + Cross-Device Resume)
+    function loadModalYouTubeVideo(videoId) {
+      if (!videoId) return;
+      if (modalCurrentVideoId && modalCurrentVideoId !== videoId && modalYtPlayer) {
+        saveVideoProgressFor(modalYtPlayer, modalCurrentVideoId, { immediateCloud: true });
+      }
+      modalCurrentVideoId = videoId;
+      const resumeSec = getSavedVideoResumeSec(videoId);
+      modalCurrentRate = 1;
+      updateCtrlPlayUI('modal', false);
+      updateCtrlRateUI('modal', 1);
+      if (resumeSec > 10) showToast(`تم استكمال الفيديو من الدقيقة ${formatMinSec(resumeSec)} ⏱️`);
+      if (modalYtPlayer && typeof modalYtPlayer.loadVideoById === 'function') {
+        try {
+          modalYtPlayer.loadVideoById({ videoId, startSeconds: resumeSec || 0 });
+          modalYtPlayer.playVideo();
+          return;
+        } catch (e) {
+          try { modalYtPlayer.destroy(); } catch (_) {}
+          modalYtPlayer = null;
+        }
+      }
+      const wrap = document.getElementById('video-modal-player-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = '<div id="video-modal-iframe" class="w-full h-full"></div>';
+      modalYtPlayer = new YT.Player('video-modal-iframe', {
+        width: '100%',
+        height: '100%',
+        videoId,
+        playerVars: { autoplay: 1, playsinline: 1, enablejsapi: 1, rel: 0, modestbranding: 1, fs: 1, start: resumeSec || 0 },
+        events: {
+          onReady: (ev) => {
+            try {
+              if (resumeSec > 10 && ev.target.getCurrentTime && ev.target.getCurrentTime() < 5 && ev.target.seekTo) {
+                ev.target.seekTo(resumeSec, true);
+              }
+              updateCtrlRateUI('modal', ev.target.getPlaybackRate ? ev.target.getPlaybackRate() : 1);
+              if (ev.target.getVolume) updateCtrlVolumeUI('modal', ev.target.getVolume(), ev.target.isMuted && ev.target.isMuted());
+            } catch (e) {}
+          },
+          onStateChange: (ev) => {
+            if (!window.YT || !window.YT.PlayerState) return;
+            updateCtrlPlayUI('modal', ev.data === YT.PlayerState.PLAYING);
+            if (ev.data === YT.PlayerState.PAUSED && modalCurrentVideoId) {
+              saveVideoProgressFor(modalYtPlayer, modalCurrentVideoId, { immediateCloud: true });
+            } else if (ev.data === YT.PlayerState.ENDED && modalCurrentVideoId) {
+              saveVideoProgressFor(modalYtPlayer, modalCurrentVideoId, { forceReset: true, immediateCloud: true });
+            }
+          },
+          onPlaybackRateChange: (ev) => {
+            modalCurrentRate = Number(ev && ev.data) || 1;
+            updateCtrlRateUI('modal', modalCurrentRate);
+          }
+        }
+      });
     }
 
     function getWizSelectedVideos() {
@@ -5170,7 +5441,7 @@
       const bannerEl = document.getElementById('planner-video-banner');
       const bannerVisible = bannerEl && !bannerEl.classList.contains('hidden');
       if (hasVids && (opts.openBanner || plannerBannerTaskId !== taskId || !bannerVisible)) {
-        openPlannerVideoForTask(target, 0);
+        openPlannerVideoForTask(target, 0, !!opts.fromUserGesture);
       } else if (!opts.fromVideo && state.videoTimerSync !== false && bannerVisible && plannerBannerTaskId === taskId && canUserChat()) {
         if (plannerYtPlayer && typeof plannerYtPlayer.playVideo === 'function') {
           setVideoSyncGuard(750);
@@ -5445,7 +5716,7 @@
       startLiveStudyingCounter();
       setInterval(updateCountdowns, 1000);
       switchTab(state.activeTab || 'home');
-      window.addEventListener('beforeunload', () => { saveLocalStudentState(true); sendWatchingStreamHeartbeat(0); });
+      window.addEventListener('beforeunload', () => { saveAllActiveVideoProgress(true); saveLocalStudentState(true); sendWatchingStreamHeartbeat(0); });
 
       applyAnimationsPreference();
       if (!state.animationsPreferenceSet) {
@@ -5662,6 +5933,8 @@
               todayDate: state.todayDate || getTodayDateStr(),
               todayHoursLogged: state.todayHoursLogged || 0,
               todayQueue: state.todayQueue || [],
+              queueUpdatedAt: state.queueUpdatedAt || Date.now(),
+              videoProgress: state.videoProgress || {},
               stages: state.stages || {},
               notes: state.notes || {},
               createdAt: new Date().toISOString(),
@@ -5680,6 +5953,8 @@
             state.todayDate = d.todayDate || getTodayDateStr();
             state.todayHoursLogged = d.todayHoursLogged || 0;
             state.todayQueue = Array.isArray(d.todayQueue) ? d.todayQueue : [];
+            state.queueUpdatedAt = Number(d.queueUpdatedAt) || (d.lastActive ? (Date.parse(d.lastActive) || Date.now()) : Date.now());
+            mergeVideoProgress(d.videoProgress);
             state.stages = d.stages || {};
             state.notes = d.notes || {};
             ensureTodayReset();
@@ -6997,7 +7272,7 @@
           return;
         }
         const startBtn = e.target.closest('.q-start-btn');
-        if (startBtn) startTaskInTimer(startBtn.dataset.qStart, { openBanner: true });
+        if (startBtn) startTaskInTimer(startBtn.dataset.qStart, { openBanner: true, fromUserGesture: true });
       };
       document.getElementById('btn-clear-today').onclick = () => {
         clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null;
@@ -7030,9 +7305,122 @@
         state.notes[e.target.dataset.noteId] = e.target.value; saveLocalStudentState();
       };
       function closeVideoModal() {
+        if (modalYtPlayer && modalCurrentVideoId) {
+          saveVideoProgressFor(modalYtPlayer, modalCurrentVideoId, { immediateCloud: true });
+        }
+        modalCurrentVideoId = null;
         document.getElementById('video-player-modal').classList.add('hidden');
-        document.getElementById('video-modal-iframe').src = 'about:blank';
+        updateCtrlPlayUI('modal', false);
+        try { if (modalYtPlayer && typeof modalYtPlayer.stopVideo === 'function') modalYtPlayer.stopVideo(); } catch (e) {}
       }
+
+      // Unified Pro Video Controls (Planner & Syllabus Modal)
+      function getPlayerByTarget(prefix) { return prefix === 'planner' ? plannerYtPlayer : modalYtPlayer; }
+      ['planner', 'modal'].forEach(prefix => {
+        const playBtn = document.getElementById(`${prefix}-ctrl-play`);
+        const muteBtn = document.getElementById(`${prefix}-ctrl-mute`);
+        const volEl = document.getElementById(`${prefix}-ctrl-vol`);
+        const vol100Btn = document.getElementById(`${prefix}-ctrl-vol100`);
+        if (playBtn) playBtn.onclick = () => {
+          const pl = getPlayerByTarget(prefix);
+          if (!pl || typeof pl.getPlayerState !== 'function') return;
+          const isPlaying = window.YT && window.YT.PlayerState && pl.getPlayerState() === YT.PlayerState.PLAYING;
+          if (prefix === 'planner') {
+            clearYtPauseDebounce();
+            setVideoSyncGuard(900);
+          }
+          try {
+            if (isPlaying) {
+              pl.pauseVideo();
+              updateCtrlPlayUI(prefix, false);
+              if (prefix === 'planner' && state.videoTimerSync !== false && pomoRunning) pauseActiveTask(true);
+            } else {
+              pl.playVideo();
+              updateCtrlPlayUI(prefix, true);
+              if (prefix === 'planner') {
+                hasVideoStartedOnce = true;
+                if (state.videoTimerSync !== false && !pomoRunning && state.activeTaskId && getActiveTask()) {
+                  startTaskInTimer(state.activeTaskId, { fromVideo: true });
+                }
+              }
+            }
+          } catch (e) {}
+        };
+        if (muteBtn) muteBtn.onclick = () => {
+          const pl = getPlayerByTarget(prefix);
+          if (!pl) return;
+          try {
+            if (pl.isMuted && pl.isMuted()) {
+              pl.unMute();
+              const v = pl.getVolume ? pl.getVolume() : 100;
+              updateCtrlVolumeUI(prefix, v || 100, false);
+            } else if (pl.mute) {
+              pl.mute();
+              updateCtrlVolumeUI(prefix, pl.getVolume ? pl.getVolume() : 0, true);
+            }
+          } catch (e) {}
+        };
+        if (volEl) volEl.oninput = (e) => {
+          const pl = getPlayerByTarget(prefix);
+          const v = parseInt(e.target.value, 10) || 0;
+          if (pl) {
+            try {
+              if (v > 0 && pl.unMute) pl.unMute();
+              if (pl.setVolume) pl.setVolume(v);
+            } catch (err) {}
+          }
+          updateCtrlVolumeUI(prefix, v, v === 0);
+        };
+        if (vol100Btn) vol100Btn.onclick = () => {
+          const pl = getPlayerByTarget(prefix);
+          if (pl) {
+            try {
+              if (pl.unMute) pl.unMute();
+              if (pl.setVolume) pl.setVolume(100);
+            } catch (e) {}
+          }
+          updateCtrlVolumeUI(prefix, 100, false);
+        };
+      });
+
+      document.querySelectorAll('.yt-ctrl-seek').forEach(btn => {
+        btn.onclick = () => {
+          const prefix = btn.dataset.ctrlTarget;
+          const delta = parseFloat(btn.dataset.seek) || 0;
+          const pl = getPlayerByTarget(prefix);
+          if (!pl || typeof pl.getCurrentTime !== 'function' || typeof pl.seekTo !== 'function') return;
+          if (prefix === 'planner') { clearYtPauseDebounce(); setVideoSyncGuard(950); }
+          try {
+            const cur = Number(pl.getCurrentTime()) || 0;
+            const dur = typeof pl.getDuration === 'function' ? Number(pl.getDuration()) || 0 : 0;
+            const next = Math.max(0, dur ? Math.min(dur - 0.5, cur + delta) : cur + delta);
+            pl.seekTo(next, true);
+          } catch (e) {}
+        };
+      });
+
+      document.querySelectorAll('.yt-ctrl-rate').forEach(btn => {
+        btn.onclick = () => {
+          const prefix = btn.dataset.ctrlTarget;
+          const rate = Number(btn.dataset.rate) || 1;
+          const pl = getPlayerByTarget(prefix);
+          if (prefix === 'planner') {
+            const oldRate = Number(plannerCurrentRate) || 1;
+            plannerCurrentRate = rate;
+            updateCtrlRateUI('planner', rate);
+            const curVid = plannerBannerVideos[plannerBannerVidIdx];
+            const titleEl = document.getElementById('planner-vid-active-title');
+            if (titleEl && curVid) titleEl.textContent = `${curVid.title || ''} • سرعة ${rate}x`;
+            setVideoSyncGuard(900);
+            try { if (pl && typeof pl.setPlaybackRate === 'function') pl.setPlaybackRate(rate); } catch (e) {}
+            adjustTimerForPlaybackRate(oldRate, rate);
+          } else {
+            modalCurrentRate = rate;
+            updateCtrlRateUI('modal', rate);
+            try { if (pl && typeof pl.setPlaybackRate === 'function') pl.setPlaybackRate(rate); } catch (e) {}
+          }
+        };
+      });
       document.getElementById('video-modal-close').onclick = closeVideoModal;
       document.getElementById('video-player-modal').onclick = (e) => { if (e.target.id === 'video-player-modal') closeVideoModal(); };
 
@@ -7060,8 +7448,8 @@
             return;
           }
           document.getElementById('video-modal-title').textContent = vidBtn.dataset.vidTitle || 'شرح المحاضرة';
-          document.getElementById('video-modal-iframe').src = `https://www.youtube.com/embed/${vidBtn.dataset.vidId}?rel=0`;
           gsapModalOpen('video-player-modal');
+          ensureYouTubeAPI(() => loadModalYouTubeVideo(vidBtn.dataset.vidId));
           return;
         }
         if (e.target.classList.contains('del-topic-btn') && shared.isAdmin) {
