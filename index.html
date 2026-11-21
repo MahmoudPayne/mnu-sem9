@@ -1863,6 +1863,18 @@
         </div>
       </div>
 
+      <div id="edit-sess-videos-box" class="hidden space-y-2.5 pt-1 border-t" style="border-color: var(--border-hairline);">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs font-bold text-[#38bdf8]">فيديوهات الشرح للجلسة:</span>
+          <div class="flex flex-wrap items-center gap-1 text-[10px] font-bold">
+            <button type="button" data-edit-vpreset="all" class="edit-vpreset-btn tap-btn px-2 py-1 rounded-lg bg-purple-500/15 text-purple-300 border border-purple-500/30 cursor-pointer">الكل</button>
+            <button type="button" data-edit-vpreset="shimy" class="edit-vpreset-btn tap-btn px-2 py-1 rounded-lg bg-[#0a84ff]/15 text-[#38bdf8] border border-[#0a84ff]/30 cursor-pointer">د. الشيمي فقط</button>
+            <button type="button" data-edit-vpreset="mosaad" class="edit-vpreset-btn tap-btn px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 cursor-pointer">د. مسعد فقط</button>
+          </div>
+        </div>
+        <div id="edit-sess-videos-list" class="space-y-1.5 max-h-52 overflow-y-auto custom-scroll pr-0.5"></div>
+      </div>
+
       <div class="apple-subcard rounded-xl p-3.5 space-y-1 text-xs border border-[#0a84ff]/30">
         <div class="flex items-center justify-between gap-2">
           <span style="color: var(--text-muted);">معاينة وقت الجلسة:</span>
@@ -7410,11 +7422,83 @@
         if (task) openPlannerVideoForTask(task, idx);
       };
 
-      // Quick Edit Session Pages & Time Modal Logic
-      let editSessState = { taskId: null, pageMode: 'count', pageRange: '', difficulty: 'medium' };
+      // Quick Edit Session Pages, Videos & Time Modal Logic
+      let editSessState = { taskId: null, pageMode: 'count', pageRange: '', difficulty: 'medium', catalogVideos: [] };
+
+      function getCatalogVideosForTask(task) {
+        if (!task || !task.topicId) return [];
+        const list = shared.topics[task.subject] || [];
+        const topicObj = list.find(t => t.id === task.topicId);
+        if (topicObj && Array.isArray(topicObj.videos) && topicObj.videos.length) return topicObj.videos;
+        return ENT_LECTURE_VIDEOS[task.topicId] || [];
+      }
+
+      function renderEditSessionVideos(task) {
+        const box = document.getElementById('edit-sess-videos-box');
+        const listEl = document.getElementById('edit-sess-videos-list');
+        if (!box || !listEl) return;
+        const catalog = getCatalogVideosForTask(task);
+        editSessState.catalogVideos = catalog;
+        if (!catalog.length) {
+          box.classList.add('hidden');
+          listEl.innerHTML = '';
+          return;
+        }
+        box.classList.remove('hidden');
+        const existingMap = {};
+        (Array.isArray(task.videos) ? task.videos : []).forEach(v => { if (v && v.id) existingMap[v.id] = v; });
+        const defSpeed = String(task.videoSpeed || 1.5);
+        listEl.innerHTML = catalog.map((v, idx) => {
+          const saved = existingMap[v.id];
+          const checked = !!saved;
+          const dur = (saved && Number(saved.durationMins)) ? Number(saved.durationMins) : getWizVideoDurMin(v);
+          const spd = (saved && saved.speed) ? String(saved.speed) : defSpeed;
+          const shortTitle = escapeHtml((v.title || `فيديو ${idx + 1}`).replace(/^(د\.\s*الشيمي:|د\.\s*مسعد:)\s*/i, '').trim());
+          const badge = v.doc === 'mosaad'
+            ? '<span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[9px] font-bold shrink-0">مسعد</span>'
+            : '<span class="px-1.5 py-0.5 rounded bg-[#0a84ff]/15 text-[#38bdf8] text-[9px] font-bold shrink-0">الشيمي</span>';
+          return `<div class="edit-vid-row flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 apple-subcard rounded-xl px-2.5 py-1.5 transition-opacity ${checked ? '' : 'opacity-45'}" data-doc="${v.doc === 'mosaad' ? 'mosaad' : 'shimy'}" data-vid-idx="${idx}"><label class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"><input type="checkbox" class="edit-vid-chk w-4 h-4 accent-[#0a84ff] shrink-0 cursor-pointer" data-vid-idx="${idx}" ${checked ? 'checked' : ''} />${badge}<span class="text-[11px] font-semibold truncate" title="${escapeHtml(v.title || '')}">${shortTitle}</span></label><div class="flex items-center gap-1.5 shrink-0"><input type="number" min="1" value="${dur}" ${checked ? '' : 'disabled'} class="edit-vid-dur w-14 text-center apple-card rounded-lg px-1.5 py-1 text-base sm:text-xs font-mono-num text-[#0a84ff] font-bold focus:outline-none disabled:opacity-50" /><span class="text-[10px]" style="color: var(--text-muted);">د</span><select ${checked ? '' : 'disabled'} class="edit-vid-speed apple-card rounded-lg px-1.5 py-1 text-base sm:text-[11px] font-mono-num font-bold text-emerald-400 focus:outline-none disabled:opacity-50 cursor-pointer">${buildWizSpeedOptions(spd)}</select></div></div>`;
+        }).join('');
+        listEl.querySelectorAll('.edit-vid-chk').forEach(chk => {
+          chk.onchange = () => {
+            const row = chk.closest('.edit-vid-row');
+            if (row) {
+              row.classList.toggle('opacity-45', !chk.checked);
+              const dInp = row.querySelector('.edit-vid-dur');
+              const sSel = row.querySelector('.edit-vid-speed');
+              if (dInp) dInp.disabled = !chk.checked;
+              if (sSel) sSel.disabled = !chk.checked;
+            }
+            syncEditSessionModalUI();
+          };
+        });
+        listEl.querySelectorAll('.edit-vid-dur').forEach(i => i.oninput = syncEditSessionModalUI);
+        listEl.querySelectorAll('.edit-vid-speed').forEach(s => s.onchange = syncEditSessionModalUI);
+      }
+
+      function getEditSelectedVideosAndWatch(task) {
+        const box = document.getElementById('edit-sess-videos-box');
+        if (!box || box.classList.contains('hidden') || !editSessState.catalogVideos.length) {
+          return { hasCatalog: false, videos: Array.isArray(task.videos) ? task.videos : [], watch: Math.max(0, Number(task.videoWatchMins) || 0) };
+        }
+        const selected = [];
+        let watchFloat = 0;
+        document.querySelectorAll('#edit-sess-videos-list .edit-vid-row').forEach(row => {
+          const chk = row.querySelector('.edit-vid-chk');
+          if (!chk || !chk.checked) return;
+          const idx = parseInt(row.dataset.vidIdx, 10);
+          const v = editSessState.catalogVideos[idx];
+          if (!v) return;
+          const dur = Math.max(1, parseFloat(row.querySelector('.edit-vid-dur')?.value) || getWizVideoDurMin(v));
+          const speed = parseFloat(row.querySelector('.edit-vid-speed')?.value) || 1.5;
+          watchFloat += (dur / speed);
+          selected.push({ title: v.title, id: v.id, doc: v.doc || 'shimy', speed, durationMins: dur });
+        });
+        return { hasCatalog: true, videos: selected, watch: Math.round(watchFloat) };
+      }
 
       function calcEditSessionEstimate(task) {
-        if (!task) return { pages: 0, watch: 0, read: 0, brk: 0, total: 15, pageRange: '' };
+        if (!task) return { pages: 0, watch: 0, read: 0, brk: 0, total: 15, pageRange: '', hasCatalog: false, videos: [] };
         let pages = Math.max(0, parseInt(document.getElementById('edit-sess-pages').value, 10) || 0);
         let pageRange = '';
         if (editSessState.pageMode === 'range') {
@@ -7431,13 +7515,14 @@
             if (outEl) { outEl.textContent = `الإجمالي: ${pages} صفحة (${pageRange})`; outEl.className = 'apple-subcard rounded-xl px-3 py-1.5 text-xs font-bold text-center text-[#38bdf8] font-mono-num'; }
           }
         }
-        const watch = Math.max(0, Number(task.videoWatchMins) || 0);
+        const vidInfo = getEditSelectedVideosAndWatch(task);
+        const watch = vidInfo.watch;
         const mult = task.mode === 'review' ? 2.5 : task.mode === 'solve' ? 2.0 : task.mode === 'video' ? 0 : 4.5;
         const diffMult = editSessState.difficulty === 'easy' ? 0.75 : editSessState.difficulty === 'hard' ? 1.4 : 1.0;
         const read = Math.round(pages * mult * diffMult);
         const brk = Math.floor((watch + read) / 50) * 10;
         const total = Math.max(15, watch + read + brk);
-        return { pages, watch, read, brk, total, pageRange };
+        return { pages, watch, read, brk, total, pageRange, hasCatalog: vidInfo.hasCatalog, videos: vidInfo.videos };
       }
 
       function syncEditSessionModalUI() {
@@ -7466,7 +7551,8 @@
         const diff = est.total - oldMins;
         const diffTxt = diff === 0 ? 'بدون تغيير' : (diff > 0 ? `+${diff} د` : `${diff} د`);
         document.getElementById('edit-sess-preview').textContent = `${oldMins} د ← ${est.total} د (${diffTxt})`;
-        document.getElementById('edit-sess-breakdown').textContent = `مشاهدة: ${est.watch}د • ورق: ${est.read}د (${est.pages} ص) • راحة: ${est.brk}د`;
+        const vCountTxt = est.hasCatalog ? ` (${est.videos.length} ف)` : '';
+        document.getElementById('edit-sess-breakdown').textContent = `مشاهدة: ${est.watch}د${vCountTxt} • ورق: ${est.read}د (${est.pages} ص) • راحة: ${est.brk}د`;
       }
 
       function openEditSessionModal(taskId) {
@@ -7488,6 +7574,7 @@
           document.getElementById('edit-sess-from').value = '1';
           document.getElementById('edit-sess-to').value = String(Math.max(1, estPages || 15));
         }
+        renderEditSessionVideos(task);
         syncEditSessionModalUI();
         gsapModalOpen('edit-session-modal');
       }
@@ -7495,6 +7582,7 @@
       function closeEditSessionModal() {
         document.getElementById('edit-session-modal').classList.add('hidden');
         editSessState.taskId = null;
+        editSessState.catalogVideos = [];
       }
 
       document.getElementById('edit-sess-close').onclick = closeEditSessionModal;
@@ -7502,6 +7590,21 @@
       document.getElementById('edit-session-modal').onclick = (e) => { if (e.target.id === 'edit-session-modal') closeEditSessionModal(); };
       document.querySelectorAll('.edit-pmode-btn').forEach(b => b.onclick = () => { editSessState.pageMode = b.dataset.editPmode; syncEditSessionModalUI(); });
       document.querySelectorAll('.edit-diff-btn').forEach(b => b.onclick = () => { editSessState.difficulty = b.dataset.editDiff; syncEditSessionModalUI(); });
+      document.querySelectorAll('.edit-vpreset-btn').forEach(b => b.onclick = () => {
+        const mode = b.dataset.editVpreset;
+        document.querySelectorAll('#edit-sess-videos-list .edit-vid-row').forEach(row => {
+          const doc = row.dataset.doc;
+          const shouldCheck = mode === 'all' || (mode === 'shimy' && doc !== 'mosaad') || (mode === 'mosaad' && doc === 'mosaad');
+          const chk = row.querySelector('.edit-vid-chk');
+          const dInp = row.querySelector('.edit-vid-dur');
+          const sSel = row.querySelector('.edit-vid-speed');
+          if (chk) chk.checked = shouldCheck;
+          row.classList.toggle('opacity-45', !shouldCheck);
+          if (dInp) dInp.disabled = !shouldCheck;
+          if (sSel) sSel.disabled = !shouldCheck;
+        });
+        syncEditSessionModalUI();
+      });
       document.getElementById('edit-sess-pages').oninput = syncEditSessionModalUI;
       document.getElementById('edit-sess-from').oninput = syncEditSessionModalUI;
       document.getElementById('edit-sess-to').oninput = syncEditSessionModalUI;
@@ -7520,6 +7623,11 @@
         task.pagesCount = est.pages;
         task.pageRange = editSessState.pageMode === 'range' ? est.pageRange : '';
         task.difficulty = editSessState.difficulty;
+        if (est.hasCatalog) {
+          task.videos = est.videos;
+          task.hasVideo = est.videos.length > 0;
+          task.videoWatchMins = est.watch;
+        }
         task.durationMins = est.total;
         task.remainingSec = newRem;
 
@@ -7530,13 +7638,22 @@
             pomoAnchorRemaining = newRem;
             pomoAnchorStartMs = Date.now();
           }
+          // Update planner switcher buttons live without reloading or pausing the currently playing video
+          const pBanner = document.getElementById('planner-video-banner');
+          if (pBanner && !pBanner.classList.contains('hidden') && plannerBannerTaskId === task.id && est.hasCatalog) {
+            plannerBannerVideos = task.videos;
+            const keepIdx = plannerBannerVideos.findIndex(v => v.id === plannerCurrentVideoId);
+            if (keepIdx >= 0) plannerBannerVidIdx = keepIdx;
+            else plannerBannerVidIdx = Math.min(plannerBannerVidIdx, Math.max(0, plannerBannerVideos.length - 1));
+            renderPlannerVideoSwitcher();
+          }
         }
         saveLocalStudentState(true);
         renderTimeline();
         syncTimerDisplay();
         closeEditSessionModal();
         playSFX('check');
-        showToast('تم تحديث عدد الصفحات ووقت التايمر بنجاح!');
+        showToast('تم تحديث فيديوهات ووقت الجلسة بنجاح!');
       };
 
       // Unified Timer Controls
