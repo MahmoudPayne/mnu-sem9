@@ -10,6 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <!-- YouTube IFrame Player API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <!-- Firebase Web SDK v10.14.1 (Compat CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -744,6 +746,50 @@
         <button type="button" id="btn-open-study-wizard" class="tap-btn btn-grad-primary px-4 sm:px-5 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer transition shrink-0">
           + هتذاكر إيه النهارده؟ (إضافة جلسة)
         </button>
+      </div>
+
+      <!-- Integrated Lecture Video Player Banner (Hidden by default) -->
+      <div id="planner-video-banner" class="hidden apple-card rounded-2xl p-4 sm:p-5 space-y-3 border border-[#0a84ff]/30">
+        <div class="flex flex-wrap items-center justify-between gap-2.5 border-b pb-3" style="border-color: var(--border-hairline);">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <div class="w-8 h-8 rounded-xl bg-[#0a84ff]/15 text-[#38bdf8] flex items-center justify-center shrink-0">
+              <i data-lucide="play-circle" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-sm sm:text-base font-bold">مشغّل شرح المحاضرة النشطة</h3>
+              <p id="planner-vid-active-title" class="text-[11px] truncate mt-0.5" style="color: var(--text-muted);">--</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <label class="tap-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl apple-subcard text-[11px] font-bold cursor-pointer">
+              <input id="planner-vid-sync-chk" type="checkbox" class="w-3.5 h-3.5 accent-[#0a84ff]" checked />
+              <span>مزامنة الفيديو مع التايمر</span>
+            </label>
+            <button type="button" id="btn-planner-vid-close" class="tap-btn px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-xs font-bold cursor-pointer">
+              إخفاء المشغّل ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Multi-video switcher pills (shown when session has > 1 video) -->
+        <div id="planner-vid-switcher" class="hidden flex flex-wrap items-center gap-1.5"></div>
+
+        <!-- Guest Lock Screen (Shown when !canUserChat()) -->
+        <div id="planner-vid-guest-lock" class="hidden apple-subcard rounded-xl p-6 text-center space-y-3 border border-[#0a84ff]/25">
+          <div class="w-11 h-11 rounded-2xl bg-[#0a84ff]/15 text-[#38bdf8] flex items-center justify-center mx-auto">
+            <i data-lucide="lock" class="w-5 h-5"></i>
+          </div>
+          <div class="text-xs sm:text-sm font-bold">🔒 فيديوهات الشرح متاحة فقط لأعضاء المنصة المسجلين</div>
+          <p class="text-[11px]" style="color: var(--text-muted);">التايمر يعمل بشكل طبيعي — سجّل دخولك بحسابك الجامعي لفتح مشغّل الفيديو.</p>
+          <button type="button" id="btn-planner-vid-login" class="tap-btn btn-grad-primary px-5 py-2 rounded-full text-white text-xs font-bold cursor-pointer">
+            تسجيل الدخول للمشاهدة
+          </button>
+        </div>
+
+        <!-- 16:9 Responsive Inline YouTube Player (playsinline for iOS Safari + fullscreen button inside) -->
+        <div id="planner-vid-player-wrap" class="w-full aspect-video rounded-xl overflow-hidden bg-black/90 border border-white/10">
+          <div id="planner-yt-player" class="w-full h-full"></div>
+        </div>
       </div>
 
       <!-- Balanced 2-Column Grid: Unified Timer + Today's Schedule -->
@@ -2364,7 +2410,8 @@
       animationsEnabled: true,
       animationsPreferenceSet: false,
       streamSafeMode: true,
-      goldWelcomed: false
+      goldWelcomed: false,
+      videoTimerSync: true
     };
 
     let shared = {
@@ -2565,6 +2612,11 @@
       if (lastAuthChatState !== curAuthChatState) {
         lastAuthChatState = curAuthChatState;
         if (typeof renderSubjects === 'function') renderSubjects(true);
+        const pBanner = document.getElementById('planner-video-banner');
+        if (pBanner && !pBanner.classList.contains('hidden') && plannerBannerTaskId) {
+          const pTask = state.todayQueue.find(t => t.id === plannerBannerTaskId);
+          if (pTask && typeof openPlannerVideoForTask === 'function') openPlannerVideoForTask(pTask, plannerBannerVidIdx);
+        }
       }
     }
 
@@ -4721,7 +4773,163 @@
       clearTimeout(motivToastTimer);
       motivToastTimer = setTimeout(() => wrap.classList.add('hidden'), 4000);
     }
-    function startTaskInTimer(taskId) {
+    // YouTube IFrame API & Planner Integrated Video Banner (Bidirectional Sync)
+    let ytApiReady = !!(window.YT && window.YT.Player);
+    const ytReadyQueue = [];
+    window.onYouTubeIframeAPIReady = () => {
+      ytApiReady = true;
+      while (ytReadyQueue.length) {
+        const fn = ytReadyQueue.shift();
+        try { fn(); } catch (e) {}
+      }
+    };
+    function ensureYouTubeAPI(cb) {
+      if (window.YT && window.YT.Player) { ytApiReady = true; cb(); return; }
+      ytReadyQueue.push(cb);
+      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        const s = document.createElement('script');
+        s.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(s);
+      }
+    }
+
+    let plannerYtPlayer = null;
+    let plannerBannerTaskId = null;
+    let plannerBannerVideos = [];
+    let plannerBannerVidIdx = 0;
+    let plannerBannerSpeed = 1.5;
+    let isSyncingVideo = false;
+    let syncGuardTimer = null;
+
+    function setVideoSyncGuard(ms = 750) {
+      isSyncingVideo = true;
+      clearTimeout(syncGuardTimer);
+      syncGuardTimer = setTimeout(() => { isSyncingVideo = false; }, ms);
+    }
+
+    function renderPlannerVideoSwitcher() {
+      const wrap = document.getElementById('planner-vid-switcher');
+      if (!wrap) return;
+      if (plannerBannerVideos.length <= 1) {
+        wrap.classList.add('hidden');
+        wrap.innerHTML = '';
+        return;
+      }
+      wrap.classList.remove('hidden');
+      wrap.innerHTML = plannerBannerVideos.map((v, idx) => {
+        const active = idx === plannerBannerVidIdx;
+        const isMosaad = v.doc === 'mosaad';
+        const cls = active
+          ? (isMosaad ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-[#0a84ff] text-white border-[#0a84ff]')
+          : (isMosaad ? 'apple-subcard border-emerald-500/35 text-emerald-400' : 'apple-subcard border-[#0a84ff]/30 text-[#38bdf8]');
+        return `<button type="button" data-pvid-idx="${idx}" class="planner-vid-switch-btn tap-btn px-2.5 py-1 rounded-xl border text-[11px] font-bold cursor-pointer inline-flex items-center gap-1"><span>${idx + 1}.</span><span class="truncate max-w-[180px]">${escapeHtml(v.title || 'فيديو ' + (idx + 1))}</span></button>`.replace('border text-[11px]', `border ${cls} text-[11px]`);
+      }).join('');
+    }
+
+    function onPlannerYtStateChange(ev) {
+      if (isSyncingVideo || state.videoTimerSync === false || !canUserChat()) return;
+      if (!window.YT || !window.YT.PlayerState) return;
+      if (ev.data === YT.PlayerState.PAUSED) {
+        if (pomoRunning) {
+          setVideoSyncGuard(750);
+          pauseActiveTask(true);
+        }
+      } else if (ev.data === YT.PlayerState.PLAYING) {
+        if (!pomoRunning && state.activeTaskId && getActiveTask()) {
+          setVideoSyncGuard(750);
+          startTaskInTimer(state.activeTaskId, { fromVideo: true });
+        }
+      }
+    }
+
+    function loadPlannerYouTubeVideo(videoId, speed = 1.5) {
+      if (!videoId) return;
+      const applyRate = (pl) => {
+        try { if (pl && typeof pl.setPlaybackRate === 'function' && speed) pl.setPlaybackRate(Number(speed) || 1.5); } catch (e) {}
+      };
+      if (plannerYtPlayer && typeof plannerYtPlayer.loadVideoById === 'function') {
+        setVideoSyncGuard(900);
+        try {
+          plannerYtPlayer.loadVideoById(videoId);
+          setTimeout(() => applyRate(plannerYtPlayer), 650);
+          return;
+        } catch (e) {
+          try { plannerYtPlayer.destroy(); } catch (_) {}
+          plannerYtPlayer = null;
+        }
+      }
+      const wrap = document.getElementById('planner-vid-player-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = '<div id="planner-yt-player" class="w-full h-full"></div>';
+      setVideoSyncGuard(1000);
+      plannerYtPlayer = new YT.Player('planner-yt-player', {
+        width: '100%',
+        height: '100%',
+        videoId,
+        playerVars: { autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1, fs: 1 },
+        events: {
+          onReady: (ev) => { applyRate(ev.target); },
+          onStateChange: onPlannerYtStateChange
+        }
+      });
+    }
+
+    function openPlannerVideoForTask(task, vidIdx = 0) {
+      if (!task || !Array.isArray(task.videos) || !task.videos.length) return;
+      const banner = document.getElementById('planner-video-banner');
+      const lockBox = document.getElementById('planner-vid-guest-lock');
+      const playerWrap = document.getElementById('planner-vid-player-wrap');
+      const titleEl = document.getElementById('planner-vid-active-title');
+      if (!banner) return;
+
+      plannerBannerTaskId = task.id;
+      plannerBannerVideos = task.videos;
+      plannerBannerVidIdx = Math.min(Math.max(0, vidIdx), task.videos.length - 1);
+      plannerBannerSpeed = Number(task.videoSpeed) || 1.5;
+
+      const curVid = plannerBannerVideos[plannerBannerVidIdx];
+      if (titleEl) titleEl.textContent = `${curVid.title || task.title} • سرعة ${plannerBannerSpeed}x`;
+      banner.classList.remove('hidden');
+      renderPlannerVideoSwitcher();
+      refreshLucideIcons();
+
+      if (!canUserChat()) {
+        if (lockBox) lockBox.classList.remove('hidden');
+        if (playerWrap) playerWrap.classList.add('hidden');
+        try { if (plannerYtPlayer && typeof plannerYtPlayer.pauseVideo === 'function') plannerYtPlayer.pauseVideo(); } catch (e) {}
+        return;
+      }
+
+      if (lockBox) lockBox.classList.add('hidden');
+      if (playerWrap) playerWrap.classList.remove('hidden');
+      ensureYouTubeAPI(() => loadPlannerYouTubeVideo(curVid.id, plannerBannerSpeed));
+    }
+
+    function closePlannerVideoBanner() {
+      const banner = document.getElementById('planner-video-banner');
+      if (banner) banner.classList.add('hidden');
+      plannerBannerTaskId = null;
+      plannerBannerVideos = [];
+      plannerBannerVidIdx = 0;
+      setVideoSyncGuard(750);
+      try {
+        if (plannerYtPlayer && typeof plannerYtPlayer.stopVideo === 'function') plannerYtPlayer.stopVideo();
+      } catch (e) {}
+    }
+
+    function getWizSelectedVideos() {
+      if (!wizData.hasVideo || wizData.videoSource === 'manual') return [];
+      const vids = getWizTopicVideos();
+      if (!vids.length) return [];
+      const chosen = wizData.videoSource === 'shimy'
+        ? vids.filter(v => v.doc !== 'mosaad')
+        : wizData.videoSource === 'mosaad'
+          ? vids.filter(v => v.doc === 'mosaad')
+          : vids;
+      return chosen.map(v => ({ title: v.title, id: v.id, doc: v.doc || 'shimy' }));
+    }
+
+    function startTaskInTimer(taskId, opts = {}) {
       const target = state.todayQueue.find(t => t.id === taskId && !t.done); if (!target) return;
       clearInterval(pomoInterval); clearInterval(pauseInterval);
       document.getElementById('pause-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
@@ -4732,6 +4940,19 @@
       const timerStartMs = Date.now();
       pomoLeftSec = initialRemaining;
       pomoRunning = true; playSFX('click'); saveLocalStudentState(); syncTimerDisplay(); renderTimeline();
+
+      const hasVids = Array.isArray(target.videos) && target.videos.length > 0;
+      const bannerEl = document.getElementById('planner-video-banner');
+      const bannerVisible = bannerEl && !bannerEl.classList.contains('hidden');
+      if (hasVids && (opts.openBanner || plannerBannerTaskId !== taskId || !bannerVisible)) {
+        openPlannerVideoForTask(target, 0);
+      } else if (!opts.fromVideo && state.videoTimerSync !== false && bannerVisible && plannerBannerTaskId === taskId && canUserChat()) {
+        if (plannerYtPlayer && typeof plannerYtPlayer.playVideo === 'function') {
+          setVideoSyncGuard(750);
+          try { plannerYtPlayer.playVideo(); } catch (e) {}
+        }
+      }
+
       pomoInterval = setInterval(() => {
         const realElapsed = Math.floor((Date.now() - timerStartMs) / 1000);
         pomoLeftSec = Math.max(0, initialRemaining - realElapsed);
@@ -4750,13 +4971,20 @@
       }, 1000);
     }
 
-    function pauseActiveTask() {
+    function pauseActiveTask(fromVideo = false) {
       const task = getActiveTask();
       clearInterval(pomoInterval); pomoRunning = false; playSFX('click');
       if (task) {
         task.pauseCount = (task.pauseCount || 0) + 1; task.pauseSec = task.pauseSec || 0;
         document.getElementById('pause-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping';
         pauseInterval = setInterval(() => { task.pauseSec++; if (task.pauseSec % 5 === 0) saveLocalStudentState(); syncTimerDisplay(); }, 1000);
+      }
+      if (!fromVideo && state.videoTimerSync !== false) {
+        const bannerEl = document.getElementById('planner-video-banner');
+        if (bannerEl && !bannerEl.classList.contains('hidden') && plannerYtPlayer && typeof plannerYtPlayer.pauseVideo === 'function') {
+          setVideoSyncGuard(750);
+          try { plannerYtPlayer.pauseVideo(); } catch (e) {}
+        }
       }
       saveLocalStudentState(); syncTimerDisplay();
     }
@@ -4765,6 +4993,10 @@
       const task = getActiveTask();
       clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false;
       document.getElementById('pause-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
+      if (plannerYtPlayer && typeof plannerYtPlayer.pauseVideo === 'function') {
+        setVideoSyncGuard(750);
+        try { plannerYtPlayer.pauseVideo(); } catch (e) {}
+      }
       if (task) {
         ensureTodayReset();
         const elapsed = elapsedOverride !== null ? elapsedOverride : Math.max(60, pomoTotalSec - pomoLeftSec);
@@ -4984,6 +5216,7 @@
       document.body.classList.toggle('dark-mode', state.darkMode);
       renderStaticModuleIcons();
       document.getElementById('bell-toggle-chk').checked = state.bellEnabled;
+      const vidSyncChk = document.getElementById('planner-vid-sync-chk'); if (vidSyncChk) vidSyncChk.checked = state.videoTimerSync !== false;
       initFirebaseSync();
       updateStudentHeaderUI();
       renderNoticeBar(); applyAdminUI(); renderTimeline(); syncTimerDisplay();
@@ -6442,10 +6675,41 @@
       document.getElementById('wiz-prev-btn').onclick = () => { if (wizStep > 1) { wizStep--; renderWizardStep(); } };
       document.getElementById('wiz-submit-btn').onclick = () => {
         const est = calcWizardTotal();
-        state.todayQueue.push({ id: 'q-' + Date.now(), subject: wizData.subj, topicId: wizData.topicId, title: wizData.title || `جلسة ${wizData.subj}`, hasVideo: wizData.hasVideo, mode: wizData.mode, durationMins: est.total, pauseSec: 0, pauseCount: 0, done: false });
+        const selectedVideos = getWizSelectedVideos();
+        const videoSpeed = parseFloat(document.getElementById('wiz-vid-speed').value) || 1.5;
+        state.todayQueue.push({
+          id: 'q-' + Date.now(),
+          subject: wizData.subj,
+          topicId: wizData.topicId,
+          title: wizData.title || `جلسة ${wizData.subj}`,
+          hasVideo: wizData.hasVideo,
+          videos: selectedVideos,
+          videoSpeed,
+          mode: wizData.mode,
+          durationMins: est.total,
+          pauseSec: 0,
+          pauseCount: 0,
+          done: false
+        });
         document.getElementById('wiz-lecture-custom').value = '';
         document.getElementById('study-wizard-modal').classList.add('hidden');
         saveLocalStudentState(true); renderTimeline(); playSFX('check'); showToast('تمت إضافة الجلسة لجدول اليوم');
+      };
+
+      // Planner Integrated Video Banner Controls
+      document.getElementById('planner-vid-sync-chk').onchange = (e) => {
+        state.videoTimerSync = e.target.checked;
+        saveLocalStudentState();
+        showToast(state.videoTimerSync ? 'تم تفعيل مزامنة الفيديو مع التايمر' : 'تم فصل مزامنة الفيديو عن التايمر');
+      };
+      document.getElementById('btn-planner-vid-close').onclick = closePlannerVideoBanner;
+      document.getElementById('btn-planner-vid-login').onclick = () => openStudentAuthModal('login');
+      document.getElementById('planner-vid-switcher').onclick = (e) => {
+        const btn = e.target.closest('.planner-vid-switch-btn');
+        if (!btn) return;
+        const idx = parseInt(btn.dataset.pvidIdx, 10);
+        const task = state.todayQueue.find(t => t.id === plannerBannerTaskId);
+        if (task) openPlannerVideoForTask(task, idx);
       };
 
       // Unified Timer Controls
@@ -6492,7 +6756,7 @@
           return;
         }
         const startBtn = e.target.closest('.q-start-btn');
-        if (startBtn) startTaskInTimer(startBtn.dataset.qStart);
+        if (startBtn) startTaskInTimer(startBtn.dataset.qStart, { openBanner: true });
       };
       document.getElementById('btn-clear-today').onclick = () => {
         clearInterval(pomoInterval); clearInterval(pauseInterval); pomoRunning = false; state.activeTaskId = null;
