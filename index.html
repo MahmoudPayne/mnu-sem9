@@ -2435,9 +2435,9 @@
         { id: 'eb-m3', title: 'L3: Biomedical statistical analysis for beginners', kind: 'Midterm' },
         { id: 'eb-m4', title: 'L4: Sample size calculation', kind: 'Midterm' },
         { id: 'eb-m5', title: 'L5: Plagiarism', kind: 'Midterm' },
-        { id: 'eb-m8', title: 'L6: Evidence-based medicine', kind: 'Midterm' },
-        { id: 'eb-m6', title: 'L7: Research ethics', kind: 'Midterm' },
-        { id: 'eb-m7', title: 'L8: Critical appraisal', kind: 'Midterm' },
+        { id: 'eb-m8', title: 'L6: Evidence-based medicine', kind: 'Post-Midterm' },
+        { id: 'eb-m6', title: 'L7: Research ethics', kind: 'Post-Midterm' },
+        { id: 'eb-m7', title: 'L8: Critical appraisal', kind: 'Post-Midterm' },
         { id: 'eb-p7', title: 'L9: Critical thinking', kind: 'Post-Midterm' },
         { id: 'eb-p8', title: 'L10: How to search for scientific paper', kind: 'Post-Midterm' },
         { id: 'eb-p6', title: 'L11: Selecting a journal for publication', kind: 'Post-Midterm' },
@@ -3355,6 +3355,7 @@
             </div>
           </div>`;
       }).join('');
+      refreshLucideIcons();
     }
 
 
@@ -4712,7 +4713,6 @@
         const isFromCloud = !(doc.metadata && doc.metadata.hasPendingWrites);
         if (isFromCloud) {
           applyCloudDocument(d, { isBoot: !hasLoadedCloudOnce });
-          hasLoadedCloudOnce = true;
           hasLoadedCloudOnce = true;
           studentCloudBooted = true;
           setCloudSyncPill('synced');
@@ -7263,8 +7263,20 @@
         if (!shared.activeRoomId || !fbDb) return;
         await fbDb.collection('study_rooms').doc(shared.activeRoomId).set({ mode: e.target.value }, { merge: true });
       };
-      document.getElementById('room-vid-yes').onclick = () => { roomHasVideo = true; document.getElementById('room-vid-details').classList.remove('hidden'); calcRoomTotalMins(); };
-      document.getElementById('room-vid-no').onclick = () => { roomHasVideo = false; document.getElementById('room-vid-durations').innerHTML = ''; calcRoomTotalMins(); };
+      document.getElementById('room-vid-yes').onclick = () => {
+        roomHasVideo = true;
+        document.getElementById('room-vid-details').classList.remove('hidden');
+        document.getElementById('room-vid-yes').className = 'tap-btn px-3 py-1 rounded-lg bg-[#0a84ff] text-white text-[11px] font-bold cursor-pointer';
+        document.getElementById('room-vid-no').className = 'tap-btn px-3 py-1 rounded-lg apple-card text-[11px] font-bold cursor-pointer';
+        renderRoomVidDurations();
+      };
+      document.getElementById('room-vid-no').onclick = () => {
+        roomHasVideo = false;
+        document.getElementById('room-vid-durations').innerHTML = '';
+        document.getElementById('room-vid-no').className = 'tap-btn px-3 py-1 rounded-lg bg-[#0a84ff] text-white text-[11px] font-bold cursor-pointer';
+        document.getElementById('room-vid-yes').className = 'tap-btn px-3 py-1 rounded-lg apple-card text-[11px] font-bold cursor-pointer';
+        calcRoomTotalMins();
+      };
       document.getElementById('room-vid-count').oninput = renderRoomVidDurations;
       document.getElementById('room-vid-speed').oninput = calcRoomTotalMins;
       document.getElementById('room-pages-input').oninput = calcRoomTotalMins;
