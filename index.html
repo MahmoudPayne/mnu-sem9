@@ -5952,7 +5952,7 @@
       const bannerEl = document.getElementById('planner-video-banner');
       const bannerVisible = bannerEl && !bannerEl.classList.contains('hidden');
       if (hasVids && (opts.openBanner || plannerBannerTaskId !== taskId || !bannerVisible)) {
-        openPlannerVideoForTask(target, 0, !!opts.fromUserGesture);
+        openPlannerVideoForTask(target, opts.videoIndex || 0, !!opts.fromUserGesture);
       } else if (!opts.fromVideo && state.videoTimerSync !== false && bannerVisible && plannerBannerTaskId === taskId && canUserChat()) {
         if (plannerYtPlayer && typeof plannerYtPlayer.playVideo === 'function') {
           setVideoSyncGuard(750);
@@ -6273,7 +6273,7 @@
         state.animationsEnabled = enabled;
         state.animationsPreferenceSet = true;
         try { localStorage.setItem(ANIM_PREF_KEY, enabled ? 'on' : 'off'); } catch (e) {}
-        saveLocalStudentState();
+        saveLocalPrefsOnly();
         applyAnimationsPreference();
       }
       function choosePerfMode(enabled) {
@@ -6341,7 +6341,7 @@
       document.getElementById('acc-dark-toggle-unified').onchange = (e) => {
         state.darkMode = e.target.checked;
         document.body.classList.toggle('dark-mode', state.darkMode);
-        saveLocalStudentState();
+        saveLocalPrefsOnly();
         renderStaticModuleIcons(); renderExamsTimeline(); renderSubjects(); renderTimeline(); syncTimerDisplay(); renderChatMessages(); updateKPIs();
       };
       document.getElementById('acc-admin-avatar-btn').onclick = () => {
@@ -6409,10 +6409,13 @@
       document.getElementById('tab-stu-signup').onclick = () => openStudentAuthModal('signup');
 
       function logoutStudentAccount() {
+        hasLoadedCloudOnce = false;
+        studentCloudBooted = false;
+        if (myStudentDocUnsub) { myStudentDocUnsub(); myStudentDocUnsub = null; }
         state.studentProfile = null;
         state.guestDismissed = false;
         updateStudentHeaderUI();
-        saveLocalStudentState();
+        saveLocalPrefsOnly();
         showToast('تم تسجيل خروج الطالب');
         openStudentAuthModal('login');
       }
@@ -7768,10 +7771,7 @@
           }
         }
         document.getElementById('remote-session-resume-bar').classList.add('hidden');
-        startTaskInTimer(task.id, { openBanner: true, fromUserGesture: true });
-        if (Array.isArray(task.videos) && task.videos.length && Number(sess.currentVideoIndex) > 0) {
-          openPlannerVideoForTask(task, Number(sess.currentVideoIndex), true);
-        }
+        startTaskInTimer(task.id, { openBanner: true, fromUserGesture: true, videoIndex: Number(sess.currentVideoIndex) || 0 });
       };
       document.getElementById('btn-remote-session-dismiss').onclick = () => {
         const sess = state.activeSession;
@@ -8117,7 +8117,7 @@
       document.getElementById('sos-close').onclick = () => document.getElementById('sos-modal').classList.add('hidden');
 
       // 4-Stage Syllabus Checklist
-      document.getElementById('subjects-cards-grid').onclick = (e) => { const b = e.target.closest('.subj-card'); if (b) { state.activeSubject = b.dataset.subj; saveLocalStudentState(); renderSubjects(); } };
+      document.getElementById('subjects-cards-grid').onclick = (e) => { const b = e.target.closest('.subj-card'); if (b) { state.activeSubject = b.dataset.subj; saveLocalPrefsOnly(); renderSubjects(); } };
       document.getElementById('topic-search-input').oninput = renderSubjects;
       document.querySelectorAll('.topic-filter-btn').forEach(b => b.onclick = () => {
         state.topicFilter = b.dataset.topicFilter;
