@@ -2746,11 +2746,15 @@
       const remoteTs = Number(d.queueUpdatedAt) || (d.lastActive ? (Date.parse(d.lastActive) || 0) : 0);
       const localTs = Number(state.queueUpdatedAt) || 0;
       let queueChanged = false;
-      if (Array.isArray(d.todayQueue) && d.todayQueue.length) {
+      if (Array.isArray(d.todayQueue)) {
         const remoteIsNewer = remoteTs > localTs;
-        if (!state.todayQueue.length || (remoteIsNewer && typeof pomoRunning !== 'undefined' && !pomoRunning)) {
+        const canApplyNewer = remoteIsNewer && (typeof pomoRunning === 'undefined' || !pomoRunning);
+        if (canApplyNewer || (!state.todayQueue.length && d.todayQueue.length)) {
           state.todayQueue = d.todayQueue;
           state.queueUpdatedAt = remoteTs;
+          if (state.activeTaskId && !state.todayQueue.some(t => t.id === state.activeTaskId)) {
+            state.activeTaskId = null;
+          }
           queueChanged = true;
         }
       }
@@ -2760,6 +2764,11 @@
         if (typeof updateKPIs === 'function') updateKPIs();
       }
       return queueChanged;
+    }
+
+    let studentCloudBooted = false;
+    function saveLocalPrefsOnly() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
     }
 
     function saveLocalStudentState(immediateCloud = false, fromRemote = false) {
@@ -2789,8 +2798,49 @@
       return 'fb_' + (h >>> 0).toString(16);
     }
 
+    async function syncSingleStageToFirestore(topicId, key, val) {
+      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId || !topicId || !key) return;
+      const sid = state.studentProfile.studentId;
+      const ref = fbDb.collection('students').doc(sid);
+      const nowIso = new Date().toISOString();
+      try {
+        await ref.update({
+          [`stages.${topicId}.${key}`]: !!val,
+          stagesUpdatedAt: Date.now(),
+          lastActive: nowIso
+        });
+      } catch (err) {
+        try {
+          await ref.set({
+            stages: { [topicId]: { [key]: !!val } },
+            stagesUpdatedAt: Date.now(),
+            lastActive: nowIso
+          }, { merge: true });
+        } catch (e) {}
+      }
+    }
+
+    const noteSyncTimers = {};
+    function syncSingleNoteToFirestore(topicId, noteText) {
+      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId || !topicId) return;
+      clearTimeout(noteSyncTimers[topicId]);
+      noteSyncTimers[topicId] = setTimeout(async () => {
+        const sid = state.studentProfile && state.studentProfile.studentId;
+        if (!sid || !fbDb) return;
+        const ref = fbDb.collection('students').doc(sid);
+        const nowIso = new Date().toISOString();
+        try {
+          await ref.update({ [`notes.${topicId}`]: noteText, lastActive: nowIso });
+        } catch (err) {
+          try {
+            await ref.set({ notes: { [topicId]: noteText }, lastActive: nowIso }, { merge: true });
+          } catch (e) {}
+        }
+      }, 450);
+    }
+
     async function syncStudentToFirestore() {
-      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      if (!studentCloudBooted || !fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
       try {
         await fbDb.collection('students').doc(state.studentProfile.studentId).set({
           name: state.studentProfile.name,
@@ -2804,8 +2854,7 @@
           todayQueue: state.todayQueue || [],
           queueUpdatedAt: state.queueUpdatedAt || Date.now(),
           videoProgress: state.videoProgress || {},
-          stages: state.stages || {},
-          notes: state.notes || {},
+          lastWatchedVideo: state.lastWatchedVideo || null,
           lastActive: new Date().toISOString()
         }, { merge: true });
       } catch (e) {}
@@ -2818,15 +2867,20 @@
         if (doc.exists) {
           const d = doc.data();
           if (d.avatarType && state.studentProfile && !state.studentProfile.avatarType) state.studentProfile.avatarType = d.avatarType;
-          if (typeof d.hoursLogged === 'number' && d.hoursLogged > state.hoursLogged) state.hoursLogged = d.hoursLogged;
-          if (typeof d.completedSessions === 'number' && d.completedSessions > state.completedSessions) state.completedSessions = d.completedSessions;
-          if (d.stages && Object.keys(d.stages).length) state.stages = { ...d.stages, ...state.stages };
-          if (d.notes && Object.keys(d.notes).length) state.notes = { ...d.notes, ...state.notes };
+          if (typeof d.hoursLogged === 'number') state.hoursLogged = d.hoursLogged;
+          if (typeof d.completedSessions === 'number') state.completedSessions = d.completedSessions;
+          if (typeof d.dailyGoalHours === 'number') state.dailyGoalHours = d.dailyGoalHours;
+          if (typeof d.dailyGoalHours === 'number') state.dailyGoalHours = d.dailyGoalHours;
+          if (typeof d.todayHoursLogged === 'number' && (!d.todayDate || d.todayDate === getTodayDateStr())) state.todayHoursLogged = d.todayHoursLogged;
+          state.stages = d.stages || {};
+          state.notes = d.notes || {};
           applyRemoteStudentResume(d);
           saveLocalStudentState(false, true);
-          renderTimeline(); renderSubjects(); syncTimerDisplay(); updateKPIs();
+          renderTimeline(); renderSubjects(true); syncTimerDisplay(); updateKPIs();
         }
-      } catch (e) {}
+      } catch (e) {} finally {
+        studentCloudBooted = true;
+      }
     }
 
     let lastAuthChatState = null;
@@ -4030,10 +4084,10 @@
       state.completedSessions = (state.completedSessions || 0) + 1;
       if (ev.topicId) {
         const st = getTopicStage(ev.topicId);
-        if (ev.hasVideo || ev.mode === 'video') st.videos = true;
-        if (ev.mode === 'review') st.reviewed = true;
-        else if (ev.mode === 'solve') st.solved = true;
-        else if (ev.mode === 'first') st.studied = true;
+        if (ev.hasVideo || ev.mode === 'video') { st.videos = true; syncSingleStageToFirestore(ev.topicId, 'videos', true); }
+        if (ev.mode === 'review') { st.reviewed = true; syncSingleStageToFirestore(ev.topicId, 'reviewed', true); }
+        else if (ev.mode === 'solve') { st.solved = true; syncSingleStageToFirestore(ev.topicId, 'solved', true); }
+        else if (ev.mode === 'first') { st.studied = true; syncSingleStageToFirestore(ev.topicId, 'studied', true); }
       }
       saveLocalStudentState(true);
       renderSubjects();
@@ -4377,9 +4431,23 @@
           state.goldWelcomed = false;
           try { localStorage.removeItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
         }
+        const isFromCloud = !(doc.metadata && doc.metadata.hasPendingWrites);
+        if (isFromCloud) {
+          state.stages = d.stages || {};
+          state.notes = d.notes || {};
+          if (typeof d.hoursLogged === 'number') state.hoursLogged = d.hoursLogged;
+          if (typeof d.completedSessions === 'number') state.completedSessions = d.completedSessions;
+          if (typeof d.todayHoursLogged === 'number' && (!d.todayDate || d.todayDate === getTodayDateStr())) state.todayHoursLogged = d.todayHoursLogged;
+        }
         applyRemoteStudentResume(d);
         saveLocalStudentState(false, true);
         updateStudentHeaderUI();
+        if (isFromCloud) {
+          const activeEl = document.activeElement;
+          const typingNote = activeEl && activeEl.classList && activeEl.classList.contains('topic-note-input');
+          if (!typingNote && typeof renderSubjects === 'function') renderSubjects(true);
+          if (typeof updateKPIs === 'function') updateKPIs();
+        }
       }, () => {});
     }
 
@@ -4661,7 +4729,7 @@
       return state.stages[id];
     }
     function getTopicPct(id) {
-      const s = getTopicStage(id);
+      const s = (state.stages && state.stages[id]) || { videos: false, studied: false, reviewed: false, solved: false };
       return ((s.videos ? 1 : 0) + (s.studied ? 1 : 0) + (s.reviewed ? 1 : 0) + (s.solved ? 1 : 0)) * 25;
     }
 
@@ -5669,11 +5737,11 @@
     function autoSyncTaskToChecklist(task) {
       if (!task.topicId) return;
       const st = getTopicStage(task.topicId);
-      if (task.hasVideo || task.mode === 'video') st.videos = true;
-      if (task.mode === 'first') st.studied = true;
-      else if (task.mode === 'review') st.reviewed = true;
-      else if (task.mode === 'solve') st.solved = true;
-      saveLocalStudentState(true); renderSubjects();
+      if (task.hasVideo || task.mode === 'video') { st.videos = true; syncSingleStageToFirestore(task.topicId, 'videos', true); }
+      if (task.mode === 'first') { st.studied = true; syncSingleStageToFirestore(task.topicId, 'studied', true); }
+      else if (task.mode === 'review') { st.reviewed = true; syncSingleStageToFirestore(task.topicId, 'reviewed', true); }
+      else if (task.mode === 'solve') { st.solved = true; syncSingleStageToFirestore(task.topicId, 'solved', true); }
+      saveLocalStudentState(true); renderSubjects(true);
       showToast(`تم إنهاء "${task.title}" وتحديث التشيك ليست تلقائياً!`);
     }
 
@@ -5703,7 +5771,7 @@
 
     // 4-Stage Syllabus Checklist
     function renderTopicRow(t, idx) {
-      const st = getTopicStage(t.id), pct = getTopicPct(t.id);
+      const st = (state.stages && state.stages[t.id]) || { videos: false, studied: false, reviewed: false, solved: false }, pct = getTopicPct(t.id);
       const rawNote = (state.notes[t.id] || '').trim();
       const noteVal = (state.notes[t.id] || '').replace(/"/g, '&quot;');
       const hasNote = rawNote.length > 0;
@@ -5844,7 +5912,7 @@
       document.querySelectorAll('.mob-nav').forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('bg-[#0a84ff]/15', on); b.style.color = on ? '#38bdf8' : (b.id === 'mob-admin-btn' ? '#fbbf24' : 'var(--text-muted)'); });
       if (id === 'chat') { const w = document.getElementById('chat-messages-list'); if (w) w.scrollTop = w.scrollHeight; }
       if (id === 'stream' && document.visibilityState === 'visible') { sendWatchingStreamHeartbeat(Date.now()); } else { sendWatchingStreamHeartbeat(0); }
-      saveLocalStudentState();
+      saveLocalPrefsOnly();
     }
 
     // Student Auth Modal State
@@ -5907,7 +5975,7 @@
       document.querySelectorAll('.nav-pill, .mob-nav').forEach(b => b.addEventListener('click', () => { playSFX('click'); switchTab(b.dataset.tab); }));
       document.getElementById('hero-go-planner').onclick = () => switchTab('planner');
       document.getElementById('hero-open-student-auth').onclick = () => openStudentAuthModal('login');
-      document.getElementById('btn-theme-toggle').onclick = () => { state.darkMode = !state.darkMode; document.body.classList.toggle('dark-mode', state.darkMode); saveLocalStudentState(); renderStaticModuleIcons(); renderExamsTimeline(); renderSubjects(); renderTimeline(); syncTimerDisplay(); renderChatMessages(); updateKPIs(); };
+      document.getElementById('btn-theme-toggle').onclick = () => { state.darkMode = !state.darkMode; document.body.classList.toggle('dark-mode', state.darkMode); saveLocalPrefsOnly(); renderStaticModuleIcons(); renderExamsTimeline(); renderSubjects(); renderTimeline(); syncTimerDisplay(); renderChatMessages(); updateKPIs(); };
 
       // Daily goal & Bell toggle
       document.getElementById('daily-goal-select').onchange = (e) => {
@@ -5916,7 +5984,7 @@
       };
       document.getElementById('bell-toggle-chk').onchange = (e) => {
         state.bellEnabled = e.target.checked;
-        saveLocalStudentState();
+        saveLocalPrefsOnly();
       };
 
       // Student Auth Modal Handlers
@@ -6130,6 +6198,7 @@
             await docRef.set({ lastActive: new Date().toISOString() }, { merge: true });
             showToast(`أهلاً بعودتك، ${state.studentProfile.name.split(' ')[0]}!`);
           }
+          studentCloudBooted = true;
           document.getElementById('student-auth-modal').classList.add('hidden');
           document.getElementById('stu-pass-input').value = '';
           updateStudentHeaderUI();
@@ -7409,7 +7478,7 @@
       // Planner Integrated Video Banner Controls
       document.getElementById('planner-vid-sync-chk').onchange = (e) => {
         state.videoTimerSync = e.target.checked;
-        saveLocalStudentState();
+        saveLocalPrefsOnly();
         showToast(state.videoTimerSync ? 'تم تفعيل مزامنة الفيديو مع التايمر' : 'تم فصل مزامنة الفيديو عن التايمر');
       };
       document.getElementById('btn-planner-vid-close').onclick = closePlannerVideoBanner;
@@ -7728,14 +7797,23 @@
       });
       document.getElementById('topics-sections-container').onchange = (e) => {
         if (!e.target.classList.contains('stage-check')) return;
-        const st = getTopicStage(e.target.dataset.stId);
-        st[e.target.dataset.stKey] = e.target.checked;
-        if (e.target.checked) { playSFX('check'); if (getTopicPct(e.target.dataset.stId) === 100) triggerConfetti(); }
-        saveLocalStudentState(true); renderSubjects(true);
+        const tid = e.target.dataset.stId;
+        const key = e.target.dataset.stKey;
+        const val = !!e.target.checked;
+        const st = getTopicStage(tid);
+        st[key] = val;
+        if (val) { playSFX('check'); if (getTopicPct(tid) === 100) triggerConfetti(); }
+        saveLocalStudentState(false, true);
+        syncSingleStageToFirestore(tid, key, val);
+        renderSubjects(true);
       };
       document.getElementById('topics-sections-container').oninput = (e) => {
         if (!e.target.classList.contains('topic-note-input')) return;
-        state.notes[e.target.dataset.noteId] = e.target.value; saveLocalStudentState();
+        const nid = e.target.dataset.noteId;
+        const val = e.target.value;
+        state.notes[nid] = val;
+        saveLocalStudentState(false, true);
+        syncSingleNoteToFirestore(nid, val);
       };
       function closeVideoModal() {
         if (modalYtPlayer && modalCurrentVideoId) {
