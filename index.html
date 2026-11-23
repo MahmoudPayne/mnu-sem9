@@ -343,6 +343,11 @@
 
           <span id="admin-active-badge" class="hidden"></span>
 
+          <button id="btn-cloud-sync-pill" type="button" class="tap-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full apple-subcard text-[10px] sm:text-[11px] font-bold cursor-pointer whitespace-nowrap" title="حالة المزامنة السحابية — اضغط للمزامنة الفورية">
+            <span id="cloud-sync-dot" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+            <span id="cloud-sync-text" class="text-emerald-400">متزامن</span>
+          </button>
+
           <button id="btn-notifications-bell" type="button" class="tap-btn relative p-1.5 sm:p-2 rounded-full apple-subcard cursor-pointer" title="إشعارات الدفعة">
             <svg id="bell-icon-svg" class="w-4 h-4 text-[#38bdf8] bell-anim-svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -739,6 +744,23 @@
         <div class="flex items-center gap-2 shrink-0">
           <button type="button" id="btn-resume-last-video" class="tap-btn px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold cursor-pointer">متابعة الآن ▶️</button>
           <button type="button" id="btn-dismiss-resume-card" class="tap-btn px-2.5 py-2 rounded-xl apple-subcard text-xs font-bold cursor-pointer" style="color: var(--text-muted);" title="إخفاء">✕</button>
+        </div>
+      </div>
+
+      <!-- Cross-Device Active Session Resume Banner (Hidden by default) -->
+      <div id="remote-session-resume-bar" class="hidden apple-card rounded-2xl p-3.5 sm:p-4 border border-[#0a84ff]/45 bg-[#0a84ff]/10 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+          <div class="w-9 h-9 rounded-xl bg-[#0a84ff]/20 text-[#38bdf8] flex items-center justify-center shrink-0">
+            <i data-lucide="laptop" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <div id="remote-session-resume-heading" class="text-xs font-extrabold text-[#38bdf8]">جلسة مفتوحة من جهاز آخر — متبقي 00:00</div>
+            <div id="remote-session-resume-title" class="text-xs sm:text-sm font-bold truncate mt-0.5">--</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" id="btn-remote-session-resume" class="tap-btn px-4 py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold cursor-pointer">▶ استكمال من حيث توقفت</button>
+          <button type="button" id="btn-remote-session-dismiss" class="tap-btn px-2.5 py-2 rounded-xl apple-subcard text-xs font-bold cursor-pointer" style="color: var(--text-muted);" title="إخفاء">✕</button>
         </div>
       </div>
 
@@ -2602,6 +2624,8 @@
       videoTimerSync: true,
       videoProgress: {},
       lastWatchedVideo: null,
+      activeSession: null,
+      updatedAt: 0,
       queueUpdatedAt: 0
     };
 
@@ -2681,6 +2705,132 @@
       ensureTodayReset();
     }
 
+    // =========================================================================
+    // Cross-Device Real-Time Cloud Sync Engine (Desktop / iPad / iPhone)
+    // =========================================================================
+    const DEVICE_ID_KEY = 'mnu_sem9_device_id';
+    const MY_DEVICE_ID = (() => {
+      try {
+        let id = localStorage.getItem(DEVICE_ID_KEY);
+        if (!id) {
+          id = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+          localStorage.setItem(DEVICE_ID_KEY, id);
+        }
+        return id;
+      } catch (e) {
+        return 'dev_' + Date.now().toString(36);
+      }
+    })();
+
+    let hasLoadedCloudOnce = false;
+    let studentCloudBooted = false;
+    let lastSyncErrorMsg = '';
+    let syncPillStatus = 'synced';
+    let remoteSessionDismissedKey = '';
+
+    function getCloudStudentId() {
+      const localId = state.studentProfile && state.studentProfile.studentId
+        ? String(state.studentProfile.studentId).trim()
+        : '';
+      if (localId) return localId;
+      const email = (shared.adminEmail || (typeof fbAuth !== 'undefined' && fbAuth && fbAuth.currentUser && fbAuth.currentUser.email) || '').trim();
+      if ((shared.isAdmin || email) && email.includes('@')) {
+        const extracted = email.split('@')[0].trim();
+        if (extracted) return extracted;
+      }
+      return '';
+    }
+
+    function cleanForFirestore(obj) {
+      if (obj === null || obj === undefined) return obj === null ? null : undefined;
+      if (typeof obj === 'function') return undefined;
+      if (typeof obj === 'number') return Number.isFinite(obj) ? obj : undefined;
+      if (typeof obj !== 'object') return obj;
+      if (Array.isArray(obj)) {
+        const arr = [];
+        for (let i = 0; i < obj.length; i++) {
+          const v = cleanForFirestore(obj[i]);
+          if (v !== undefined) arr.push(v);
+        }
+        return arr;
+      }
+      const out = {};
+      Object.keys(obj).forEach(k => {
+        const v = cleanForFirestore(obj[k]);
+        if (v !== undefined) out[k] = v;
+      });
+      return out;
+    }
+
+    function setCloudSyncPill(status, errMsg = '') {
+      syncPillStatus = status;
+      const dot = document.getElementById('cloud-sync-dot');
+      const txt = document.getElementById('cloud-sync-text');
+      if (!dot || !txt) return;
+      if (status === 'saving') {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0';
+        txt.className = 'text-amber-300';
+        txt.textContent = 'جاري الحفظ...';
+      } else if (status === 'error') {
+        lastSyncErrorMsg = errMsg || 'تعذر الاتصال بـ Firestore';
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500 shrink-0';
+        txt.className = 'text-rose-400';
+        txt.textContent = 'فشل الحفظ';
+      } else {
+        lastSyncErrorMsg = '';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 shrink-0';
+        txt.className = 'text-emerald-400';
+        txt.textContent = 'متزامن';
+      }
+    }
+
+    function buildActiveSessionSnapshot() {
+      const task = typeof getActiveTask === 'function' ? getActiveTask() : null;
+      if (!task) return null;
+      const totalSeconds = Math.max(60, Math.round((Number(task.durationMins) || 15) * 60));
+      const rawRem = task.remainingSec !== undefined ? task.remainingSec : (typeof pomoLeftSec === 'number' ? pomoLeftSec : totalSeconds);
+      const remainingSeconds = Math.max(0, Math.floor(Number(rawRem) || 0));
+      const elapsedSeconds = Math.max(0, totalSeconds - remainingSeconds);
+      let currentVideoSec = 0;
+      try {
+        if (typeof plannerYtPlayer !== 'undefined' && plannerYtPlayer && typeof plannerYtPlayer.getCurrentTime === 'function' && plannerBannerTaskId === task.id) {
+          currentVideoSec = Math.max(0, Math.floor(Number(plannerYtPlayer.getCurrentTime()) || 0));
+        }
+      } catch (e) {}
+      const currentVideoIndex = (typeof plannerBannerTaskId !== 'undefined' && plannerBannerTaskId === task.id && typeof plannerBannerVidIdx === 'number') ? plannerBannerVidIdx : 0;
+      return {
+        taskId: task.id,
+        topicId: task.topicId || '',
+        subject: task.subject || '',
+        title: task.title || '',
+        totalSeconds,
+        remainingSeconds,
+        elapsedSeconds,
+        isRunning: typeof pomoRunning !== 'undefined' ? !!pomoRunning : false,
+        lastTickAt: Date.now(),
+        currentVideoIndex,
+        currentVideoSec
+      };
+    }
+
+    function renderRemoteSessionResumeBar() {
+      const bar = document.getElementById('remote-session-resume-bar');
+      const headEl = document.getElementById('remote-session-resume-heading');
+      const titleEl = document.getElementById('remote-session-resume-title');
+      if (!bar || !headEl || !titleEl) return;
+      const sess = state.activeSession;
+      const taskExists = sess && sess.taskId && Array.isArray(state.todayQueue) && state.todayQueue.some(t => t.id === sess.taskId && !t.done);
+      const key = sess ? `${sess.taskId}_${sess.lastTickAt || 0}` : '';
+      if (!sess || !taskExists || !(Number(sess.remainingSeconds) > 0) || (typeof pomoRunning !== 'undefined' && pomoRunning) || (remoteSessionDismissedKey && remoteSessionDismissedKey === key)) {
+        bar.classList.add('hidden');
+        return;
+      }
+      headEl.textContent = `جلسة مفتوحة من جهاز آخر — متبقي ${formatMinSec(sess.remainingSeconds)}`;
+      titleEl.textContent = sess.subject ? `[${sess.subject}] ${sess.title || ''}` : (sess.title || 'جلسة مذاكرة');
+      bar.classList.remove('hidden');
+      refreshLucideIcons();
+    }
+
     function mergeVideoProgress(remoteProg) {
       if (!remoteProg || typeof remoteProg !== 'object') return;
       if (!state.videoProgress || typeof state.videoProgress !== 'object') state.videoProgress = {};
@@ -2718,70 +2868,124 @@
     }
 
     async function syncVideoResumeImmediateToFirestore() {
-      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      const sid = getCloudStudentId();
+      if (!hasLoadedCloudOnce || !fbDb || !sid) return;
+      const now = Date.now();
+      state.updatedAt = now;
+      setCloudSyncPill('saving');
       try {
-        await fbDb.collection('students').doc(state.studentProfile.studentId).set({
+        const payload = cleanForFirestore({
           videoProgress: state.videoProgress || {},
           lastWatchedVideo: state.lastWatchedVideo || null,
-          lastWatchedVideo: state.lastWatchedVideo || null,
-          lastActive: new Date().toISOString()
-        }, { merge: true });
-      } catch (e) {}
+          activeSession: buildActiveSessionSnapshot(),
+          updatedAt: now,
+          lastDeviceId: MY_DEVICE_ID,
+          lastActive: new Date(now).toISOString()
+        });
+        await fbDb.collection('students').doc(sid).set(payload, { merge: true });
+        setCloudSyncPill('synced');
+      } catch (e) {
+        console.error('[CloudSync] syncVideoResumeImmediateToFirestore failed:', e);
+        setCloudSyncPill('error', e && e.message ? e.message : String(e));
+      }
     }
 
-    function applyRemoteStudentResume(d) {
+    function applyCloudDocument(d, { isBoot = false } = {}) {
       if (!d || typeof d !== 'object') return false;
+      const remoteUpdatedAt = Number(d.updatedAt) || Number(d.queueUpdatedAt) || (d.lastActive ? (Date.parse(d.lastActive) || 0) : 0);
+      const localUpdatedAt = Number(state.updatedAt) || 0;
+      const fromSameDevice = d.lastDeviceId && d.lastDeviceId === MY_DEVICE_ID;
+      if (!isBoot && fromSameDevice && remoteUpdatedAt <= localUpdatedAt) {
+        return false;
+      }
+      if (!isBoot && !fromSameDevice && remoteUpdatedAt > 0 && localUpdatedAt > 0 && remoteUpdatedAt < localUpdatedAt) {
+        return false;
+      }
+
+      if (d.avatarType && state.studentProfile && !state.studentProfile.avatarType) state.studentProfile.avatarType = d.avatarType;
+      if (d.stages && typeof d.stages === 'object') state.stages = d.stages;
+      else if (isBoot && d.stages === undefined && !Object.keys(state.stages || {}).length) state.stages = {};
+      if (d.notes && typeof d.notes === 'object') state.notes = d.notes;
+      if (typeof d.hoursLogged === 'number') state.hoursLogged = d.hoursLogged;
+      if (typeof d.completedSessions === 'number') state.completedSessions = d.completedSessions;
+      if (typeof d.dailyGoalHours === 'number') state.dailyGoalHours = d.dailyGoalHours;
+      if (typeof d.todayHoursLogged === 'number' && (!d.todayDate || d.todayDate === getTodayDateStr())) state.todayHoursLogged = d.todayHoursLogged;
+
       mergeVideoProgress(d.videoProgress);
       if (d.lastWatchedVideo && typeof d.lastWatchedVideo === 'object' && d.lastWatchedVideo.videoId) {
         const rTs = Number(d.lastWatchedVideo.updatedAt) || 0;
         const lTs = state.lastWatchedVideo ? (Number(state.lastWatchedVideo.updatedAt) || 0) : 0;
-        if (!state.lastWatchedVideo || rTs >= lTs) {
+        if (isBoot || !state.lastWatchedVideo || rTs >= lTs) {
           state.lastWatchedVideo = Number(d.lastWatchedVideo.time) > 10 ? d.lastWatchedVideo : null;
         }
       } else if (d.lastWatchedVideo === null && state.lastWatchedVideo) {
         const vidProg = state.videoProgress && state.videoProgress[state.lastWatchedVideo.videoId];
         if (vidProg && Number(vidProg.time) <= 10) state.lastWatchedVideo = null;
       }
-      renderResumeLastVideoCard();
-      const remoteTs = Number(d.queueUpdatedAt) || (d.lastActive ? (Date.parse(d.lastActive) || 0) : 0);
-      const localTs = Number(state.queueUpdatedAt) || 0;
-      let queueChanged = false;
-      if (Array.isArray(d.todayQueue)) {
-        const remoteIsNewer = remoteTs > localTs;
-        const canApplyNewer = remoteIsNewer && (typeof pomoRunning === 'undefined' || !pomoRunning);
-        if (canApplyNewer || (!state.todayQueue.length && d.todayQueue.length)) {
-          state.todayQueue = d.todayQueue;
-          state.queueUpdatedAt = remoteTs;
-          if (state.activeTaskId && !state.todayQueue.some(t => t.id === state.activeTaskId)) {
-            state.activeTaskId = null;
-          }
-          queueChanged = true;
+
+      const timerCurrentlyRunning = typeof pomoRunning !== 'undefined' && pomoRunning;
+      if (Array.isArray(d.todayQueue) && (isBoot || !timerCurrentlyRunning)) {
+        state.todayQueue = d.todayQueue;
+        state.queueUpdatedAt = Number(d.queueUpdatedAt) || remoteUpdatedAt || Date.now();
+        if (state.activeTaskId && !state.todayQueue.some(t => t.id === state.activeTaskId && !t.done)) {
+          state.activeTaskId = null;
         }
       }
-      if (queueChanged) {
-        if (typeof renderTimeline === 'function') renderTimeline();
-        if (typeof syncTimerDisplay === 'function') syncTimerDisplay();
-        if (typeof updateKPIs === 'function') updateKPIs();
+
+      // Restore activeSession safely in paused state when coming from another device (or on boot)
+      if (d.activeSession && typeof d.activeSession === 'object' && d.activeSession.taskId && Number(d.activeSession.remainingSeconds) > 0) {
+        if (!timerCurrentlyRunning && (!fromSameDevice || isBoot)) {
+          const matchTask = Array.isArray(state.todayQueue) ? state.todayQueue.find(t => t.id === d.activeSession.taskId && !t.done) : null;
+          if (matchTask) {
+            matchTask.remainingSec = Math.max(10, Math.floor(Number(d.activeSession.remainingSeconds) || 0));
+            state.activeTaskId = matchTask.id;
+            state.activeSession = { ...d.activeSession, isRunning: false };
+          } else {
+            state.activeSession = null;
+          }
+        }
+      } else if (d.activeSession === null && !timerCurrentlyRunning) {
+        state.activeSession = null;
       }
-      return queueChanged;
+
+      if (remoteUpdatedAt > 0) state.updatedAt = remoteUpdatedAt;
+      saveLocalPrefsOnly();
+
+      const activeEl = document.activeElement;
+      const typingNote = activeEl && activeEl.classList && activeEl.classList.contains('topic-note-input');
+      if (!typingNote && typeof renderSubjects === 'function') renderSubjects(true);
+      if (typeof renderTimeline === 'function') renderTimeline();
+      if (typeof syncTimerDisplay === 'function') syncTimerDisplay();
+      if (typeof updateKPIs === 'function') updateKPIs();
+      renderResumeLastVideoCard();
+      renderRemoteSessionResumeBar();
+      return true;
     }
 
-    let studentCloudBooted = false;
+    function applyRemoteStudentResume(d) {
+      return applyCloudDocument(d, { isBoot: false });
+    }
+
     function saveLocalPrefsOnly() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
     }
 
     function saveLocalStudentState(immediateCloud = false, fromRemote = false) {
       ensureTodayReset();
-      if (!fromRemote) state.queueUpdatedAt = Date.now();
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-      if (!fromRemote && state.studentProfile && state.studentProfile.studentId && fbDb) {
+      if (!fromRemote) {
+        const now = Date.now();
+        state.updatedAt = now;
+        state.queueUpdatedAt = now;
+      }
+      saveLocalPrefsOnly();
+      const sid = getCloudStudentId();
+      if (!fromRemote && hasLoadedCloudOnce && sid && fbDb) {
         if (immediateCloud) {
           clearTimeout(studentSyncTimer);
           syncStudentToFirestore();
         } else {
           clearTimeout(studentSyncTimer);
-          studentSyncTimer = setTimeout(syncStudentToFirestore, 900);
+          studentSyncTimer = setTimeout(syncStudentToFirestore, 400);
         }
       }
     }
@@ -2799,87 +3003,158 @@
     }
 
     async function syncSingleStageToFirestore(topicId, key, val) {
-      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId || !topicId || !key) return;
-      const sid = state.studentProfile.studentId;
+      const sid = getCloudStudentId();
+      if (!hasLoadedCloudOnce || !fbDb || !sid || !topicId || !key) return;
       const ref = fbDb.collection('students').doc(sid);
-      const nowIso = new Date().toISOString();
+      const now = Date.now();
+      state.updatedAt = now;
+      setCloudSyncPill('saving');
       try {
-        await ref.update({
+        await ref.update(cleanForFirestore({
           [`stages.${topicId}.${key}`]: !!val,
-          stagesUpdatedAt: Date.now(),
-          lastActive: nowIso
-        });
+          stagesUpdatedAt: now,
+          updatedAt: now,
+          lastDeviceId: MY_DEVICE_ID,
+          lastActive: new Date(now).toISOString()
+        }));
+        setCloudSyncPill('synced');
       } catch (err) {
         try {
-          await ref.set({
+          await ref.set(cleanForFirestore({
+            studentId: sid,
             stages: { [topicId]: { [key]: !!val } },
-            stagesUpdatedAt: Date.now(),
-            lastActive: nowIso
-          }, { merge: true });
-        } catch (e) {}
+            stagesUpdatedAt: now,
+            updatedAt: now,
+            lastDeviceId: MY_DEVICE_ID,
+            lastActive: new Date(now).toISOString()
+          }), { merge: true });
+          setCloudSyncPill('synced');
+        } catch (e) {
+          console.error('[CloudSync] syncSingleStageToFirestore failed:', e);
+          setCloudSyncPill('error', e && e.message ? e.message : String(e));
+        }
       }
     }
 
     const noteSyncTimers = {};
     function syncSingleNoteToFirestore(topicId, noteText) {
-      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId || !topicId) return;
+      const sid = getCloudStudentId();
+      if (!hasLoadedCloudOnce || !fbDb || !sid || !topicId) return;
       clearTimeout(noteSyncTimers[topicId]);
       noteSyncTimers[topicId] = setTimeout(async () => {
-        const sid = state.studentProfile && state.studentProfile.studentId;
-        if (!sid || !fbDb) return;
-        const ref = fbDb.collection('students').doc(sid);
-        const nowIso = new Date().toISOString();
+        const curSid = getCloudStudentId();
+        if (!curSid || !fbDb || !hasLoadedCloudOnce) return;
+        const ref = fbDb.collection('students').doc(curSid);
+        const now = Date.now();
+        state.updatedAt = now;
+        setCloudSyncPill('saving');
         try {
-          await ref.update({ [`notes.${topicId}`]: noteText, lastActive: nowIso });
+          await ref.update(cleanForFirestore({
+            [`notes.${topicId}`]: noteText,
+            updatedAt: now,
+            lastDeviceId: MY_DEVICE_ID,
+            lastActive: new Date(now).toISOString()
+          }));
+          setCloudSyncPill('synced');
         } catch (err) {
           try {
-            await ref.set({ notes: { [topicId]: noteText }, lastActive: nowIso }, { merge: true });
-          } catch (e) {}
+            await ref.set(cleanForFirestore({
+              studentId: curSid,
+              notes: { [topicId]: noteText },
+              updatedAt: now,
+              lastDeviceId: MY_DEVICE_ID,
+              lastActive: new Date(now).toISOString()
+            }), { merge: true });
+            setCloudSyncPill('synced');
+          } catch (e) {
+            console.error('[CloudSync] syncSingleNoteToFirestore failed:', e);
+            setCloudSyncPill('error', e && e.message ? e.message : String(e));
+          }
         }
-      }, 450);
+      }, 400);
     }
 
     async function syncStudentToFirestore() {
-      if (!studentCloudBooted || !fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      const sid = getCloudStudentId();
+      if (!hasLoadedCloudOnce || !studentCloudBooted || !fbDb || !sid) return;
+      const now = Date.now();
+      state.updatedAt = now;
+      state.queueUpdatedAt = now;
+      const activeSnap = buildActiveSessionSnapshot();
+      state.activeSession = activeSnap;
+      saveLocalPrefsOnly();
+      setCloudSyncPill('saving');
       try {
-        await fbDb.collection('students').doc(state.studentProfile.studentId).set({
-          name: state.studentProfile.name,
-          studentId: state.studentProfile.studentId,
-          avatarType: state.studentProfile.avatarType || null,
+        const payload = cleanForFirestore({
+          name: (state.studentProfile && state.studentProfile.name) || (shared.isAdmin ? 'Admin' : sid),
+          studentId: sid,
+          avatarType: (state.studentProfile && state.studentProfile.avatarType) || null,
+          stages: state.stages || {},
+          notes: state.notes || {},
+          todayQueue: state.todayQueue || [],
           hoursLogged: Number((state.hoursLogged || 0).toFixed(3)),
           completedSessions: state.completedSessions || 0,
           dailyGoalHours: state.dailyGoalHours || 4,
           todayDate: state.todayDate || getTodayDateStr(),
           todayHoursLogged: Number((state.todayHoursLogged || 0).toFixed(3)),
-          todayQueue: state.todayQueue || [],
-          queueUpdatedAt: state.queueUpdatedAt || Date.now(),
           videoProgress: state.videoProgress || {},
           lastWatchedVideo: state.lastWatchedVideo || null,
-          lastActive: new Date().toISOString()
-        }, { merge: true });
-      } catch (e) {}
+          activeSession: activeSnap,
+          updatedAt: now,
+          queueUpdatedAt: now,
+          lastDeviceId: MY_DEVICE_ID,
+          lastActive: new Date(now).toISOString()
+        });
+        await fbDb.collection('students').doc(sid).set(payload, { merge: true });
+        setCloudSyncPill('synced');
+      } catch (e) {
+        console.error('[CloudSync] syncStudentToFirestore failed:', e);
+        setCloudSyncPill('error', e && e.message ? e.message : String(e));
+      }
     }
 
     async function loadStudentFromFirestoreOnBoot() {
-      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
+      const sid = getCloudStudentId();
+      if (!fbDb || !sid) return;
+      setCloudSyncPill('saving');
       try {
-        const doc = await fbDb.collection('students').doc(state.studentProfile.studentId).get();
+        const doc = await fbDb.collection('students').doc(sid).get();
         if (doc.exists) {
-          const d = doc.data();
-          if (d.avatarType && state.studentProfile && !state.studentProfile.avatarType) state.studentProfile.avatarType = d.avatarType;
-          if (typeof d.hoursLogged === 'number') state.hoursLogged = d.hoursLogged;
-          if (typeof d.completedSessions === 'number') state.completedSessions = d.completedSessions;
-          if (typeof d.dailyGoalHours === 'number') state.dailyGoalHours = d.dailyGoalHours;
-          if (typeof d.dailyGoalHours === 'number') state.dailyGoalHours = d.dailyGoalHours;
-          if (typeof d.todayHoursLogged === 'number' && (!d.todayDate || d.todayDate === getTodayDateStr())) state.todayHoursLogged = d.todayHoursLogged;
-          state.stages = d.stages || {};
-          state.notes = d.notes || {};
-          applyRemoteStudentResume(d);
-          saveLocalStudentState(false, true);
-          renderTimeline(); renderSubjects(true); syncTimerDisplay(); updateKPIs();
+          applyCloudDocument(doc.data(), { isBoot: true });
         }
-      } catch (e) {} finally {
+        setCloudSyncPill('synced');
+      } catch (e) {
+        console.error('[CloudSync] loadStudentFromFirestoreOnBoot failed:', e);
+        setCloudSyncPill('error', e && e.message ? e.message : String(e));
+      } finally {
+        hasLoadedCloudOnce = true;
         studentCloudBooted = true;
+      }
+    }
+
+    async function forceCloudSync() {
+      const sid = getCloudStudentId();
+      if (!fbDb || !sid) {
+        showToast('سجّل دخولك بحسابك الجامعي لتفعيل المزامنة السحابية');
+        return;
+      }
+      if (syncPillStatus === 'error' && lastSyncErrorMsg) {
+        showToast('سبب آخر خطأ: ' + lastSyncErrorMsg);
+      }
+      setCloudSyncPill('saving');
+      try {
+        const doc = await fbDb.collection('students').doc(sid).get();
+        if (doc.exists) {
+          applyCloudDocument(doc.data(), { isBoot: true });
+        }
+        hasLoadedCloudOnce = true;
+        studentCloudBooted = true;
+        setCloudSyncPill('synced');
+        showToast('تمت المزامنة مع السحابة');
+      } catch (e) {
+        console.error('[CloudSync] forceCloudSync failed:', e);
+        setCloudSyncPill('error', e && e.message ? e.message : String(e));
+        showToast('فشل الحفظ/المزامنة: ' + (e && e.message ? e.message : 'خطأ في الاتصال'));
       }
     }
 
@@ -4401,54 +4676,52 @@
     let myStudentDocUnsub = null;
     function initMyStudentDocListener() {
       if (myStudentDocUnsub) { myStudentDocUnsub(); myStudentDocUnsub = null; }
-      if (!fbDb || !state.studentProfile || !state.studentProfile.studentId) return;
-      myStudentDocUnsub = fbDb.collection('students').doc(state.studentProfile.studentId).onSnapshot(doc => {
-        if (!doc.exists || !state.studentProfile) return;
+      const sid = getCloudStudentId();
+      if (!fbDb || !sid) return;
+      myStudentDocUnsub = fbDb.collection('students').doc(sid).onSnapshot(doc => {
+        if (!doc.exists) return;
         const d = doc.data();
-        const prevGold = !!state.studentProfile.isGold;
-        state.studentProfile.isGold = !!d.isGold;
-        state.studentProfile.goldStatus = d.goldStatus || 'online';
-        state.studentProfile.goldBadgeTitle = d.goldBadgeTitle || '👑 VIP';
-        state.studentProfile.goldFrameStyle = d.goldFrameStyle || 'classic';
-        if (d.name) state.studentProfile.name = d.name;
-        if (d.avatarType) state.studentProfile.avatarType = d.avatarType;
+        if (state.studentProfile) {
+          const prevGold = !!state.studentProfile.isGold;
+          state.studentProfile.isGold = !!d.isGold;
+          state.studentProfile.goldStatus = d.goldStatus || 'online';
+          state.studentProfile.goldBadgeTitle = d.goldBadgeTitle || '👑 VIP';
+          state.studentProfile.goldFrameStyle = d.goldFrameStyle || 'classic';
+          if (d.name) state.studentProfile.name = d.name;
+          if (d.avatarType) state.studentProfile.avatarType = d.avatarType;
 
-        if (state.studentProfile.isGold) {
-          let vipSeen = false;
-          try { vipSeen = !!localStorage.getItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
-          if (!vipSeen) {
-            try { localStorage.setItem('mnu_sem9_vip_welcomed_v1', '1'); } catch (e) {}
-            const msgEl = document.getElementById('vip-welcome-admin-msg');
-            if (msgEl) msgEl.textContent = d.goldMessage || 'مبروك يا دكتور! تم تفعيل عضويتك الذهبية VIP تقديراً لاجتهادك، استمتع بكل المميزات الملكية 👑✨';
-            triggerConfetti();
-            gsapModalOpen('vip-welcome-modal');
-          } else if (!prevGold) {
-            triggerConfetti();
-            showToast('👑 مبروك! تم تفعيل العضوية الذهبية (VIP Gold) لحسابك!');
+          if (state.studentProfile.isGold) {
+            let vipSeen = false;
+            try { vipSeen = !!localStorage.getItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
+            if (!vipSeen) {
+              try { localStorage.setItem('mnu_sem9_vip_welcomed_v1', '1'); } catch (e) {}
+              const msgEl = document.getElementById('vip-welcome-admin-msg');
+              if (msgEl) msgEl.textContent = d.goldMessage || 'مبروك يا دكتور! تم تفعيل عضويتك الذهبية VIP تقديراً لاجتهادك، استمتع بكل المميزات الملكية 👑✨';
+              triggerConfetti();
+              gsapModalOpen('vip-welcome-modal');
+            } else if (!prevGold) {
+              triggerConfetti();
+              showToast('👑 مبروك! تم تفعيل العضوية الذهبية (VIP Gold) لحسابك!');
+            }
+            state.goldWelcomed = true;
+          } else {
+            state.goldWelcomed = false;
+            try { localStorage.removeItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
           }
-          state.goldWelcomed = true;
-        } else {
-          state.goldWelcomed = false;
-          try { localStorage.removeItem('mnu_sem9_vip_welcomed_v1'); } catch (e) {}
         }
         const isFromCloud = !(doc.metadata && doc.metadata.hasPendingWrites);
         if (isFromCloud) {
-          state.stages = d.stages || {};
-          state.notes = d.notes || {};
-          if (typeof d.hoursLogged === 'number') state.hoursLogged = d.hoursLogged;
-          if (typeof d.completedSessions === 'number') state.completedSessions = d.completedSessions;
-          if (typeof d.todayHoursLogged === 'number' && (!d.todayDate || d.todayDate === getTodayDateStr())) state.todayHoursLogged = d.todayHoursLogged;
+          applyCloudDocument(d, { isBoot: !hasLoadedCloudOnce });
+          hasLoadedCloudOnce = true;
+          hasLoadedCloudOnce = true;
+          studentCloudBooted = true;
+          setCloudSyncPill('synced');
         }
-        applyRemoteStudentResume(d);
-        saveLocalStudentState(false, true);
         updateStudentHeaderUI();
-        if (isFromCloud) {
-          const activeEl = document.activeElement;
-          const typingNote = activeEl && activeEl.classList && activeEl.classList.contains('topic-note-input');
-          if (!typingNote && typeof renderSubjects === 'function') renderSubjects(true);
-          if (typeof updateKPIs === 'function') updateKPIs();
-        }
-      }, () => {});
+      }, (err) => {
+        console.error('[CloudSync] onSnapshot error:', err);
+        setCloudSyncPill('error', err && err.message ? err.message : String(err));
+      });
     }
 
     function initGoldMembersLiveListener() {
@@ -4614,7 +4887,14 @@
           shared.adminEmail = user ? user.email : '';
           document.getElementById('admin-email-display').textContent = shared.adminEmail || '--';
           applyAdminUI();
-          if (shared.isAdmin) { subscribeAdminStudents(); subscribeAdminStudyRooms(); }
+          if (shared.isAdmin) {
+            subscribeAdminStudents();
+            subscribeAdminStudyRooms();
+            if (getCloudStudentId()) {
+              if (!hasLoadedCloudOnce) loadStudentFromFirestoreOnBoot();
+              initMyStudentDocListener();
+            }
+          }
           else { if (studentsUnsub) { studentsUnsub(); studentsUnsub = null; } if (adminRoomsUnsub) { adminRoomsUnsub(); adminRoomsUnsub = null; } }
         });
       } catch (e) {
@@ -5666,7 +5946,7 @@
       pomoAnchorRemaining = target.remainingSec;
       pomoAnchorStartMs = Date.now();
       pomoLeftSec = pomoAnchorRemaining;
-      pomoRunning = true; playSFX('click'); saveLocalStudentState(); syncTimerDisplay(); renderTimeline();
+      pomoRunning = true; playSFX('click'); saveLocalStudentState(true); syncTimerDisplay(); renderTimeline(); renderRemoteSessionResumeBar();
 
       const hasVids = Array.isArray(target.videos) && target.videos.length > 0;
       const bannerEl = document.getElementById('planner-video-banner');
@@ -5713,7 +5993,7 @@
           try { plannerYtPlayer.pauseVideo(); } catch (e) {}
         }
       }
-      saveLocalStudentState(); syncTimerDisplay();
+      saveLocalStudentState(true); syncTimerDisplay(); renderRemoteSessionResumeBar();
     }
 
     function finishActiveTask(elapsedOverride = null) {
@@ -5943,7 +6223,7 @@
       const vidSyncChk = document.getElementById('planner-vid-sync-chk'); if (vidSyncChk) vidSyncChk.checked = state.videoTimerSync !== false;
       initFirebaseSync();
       updateStudentHeaderUI();
-      renderNoticeBar(); applyAdminUI(); renderTimeline(); syncTimerDisplay(); renderResumeLastVideoCard();
+      renderNoticeBar(); applyAdminUI(); renderTimeline(); syncTimerDisplay(); renderResumeLastVideoCard(); renderRemoteSessionResumeBar();
       startLiveStudyingCounter();
       setInterval(updateCountdowns, 1000);
       switchTab(state.activeTab || 'home');
@@ -7255,9 +7535,30 @@
           if (state.activeTab === 'stream') sendWatchingStreamHeartbeat(Date.now());
         } else {
           saveAllActiveVideoProgress(true);
+          if (hasLoadedCloudOnce && getCloudStudentId()) syncStudentToFirestore();
           sendWatchingStreamHeartbeat(0);
         }
       });
+      window.addEventListener('pagehide', () => {
+        saveAllActiveVideoProgress(true);
+        if (hasLoadedCloudOnce && getCloudStudentId()) syncStudentToFirestore();
+      });
+      // 15-second active timer / video playback cloud heartbeat
+      setInterval(() => {
+        if (!hasLoadedCloudOnce || !getCloudStudentId()) return;
+        const vidPlaying = (() => {
+          try {
+            if (!window.YT || !window.YT.PlayerState) return false;
+            const pOn = plannerYtPlayer && plannerYtPlayer.getPlayerState && plannerYtPlayer.getPlayerState() === YT.PlayerState.PLAYING;
+            const mOn = modalYtPlayer && modalYtPlayer.getPlayerState && modalYtPlayer.getPlayerState() === YT.PlayerState.PLAYING;
+            return !!(pOn || mOn);
+          } catch (e) { return false; }
+        })();
+        if (pomoRunning || vidPlaying) {
+          saveAllActiveVideoProgress(false);
+          syncStudentToFirestore();
+        }
+      }, 15000);
 
       // Official Exam Schedule Image + Zoomable Lightbox
       renderExamScheduleImage();
@@ -7448,6 +7749,34 @@
         document.getElementById('wiz-lecture-custom').value = '';
         document.getElementById('study-wizard-modal').classList.add('hidden');
         saveLocalStudentState(true); renderTimeline(); playSFX('check'); showToast('تمت إضافة الجلسة لجدول اليوم');
+      };
+
+      // Sync Status Pill (Manual Force Cloud Sync) & Remote Active Session Resume Bar
+      document.getElementById('btn-cloud-sync-pill').onclick = forceCloudSync;
+      document.getElementById('btn-remote-session-resume').onclick = () => {
+        const sess = state.activeSession;
+        if (!sess || !sess.taskId) return;
+        const task = state.todayQueue.find(t => t.id === sess.taskId && !t.done);
+        if (!task) { state.activeSession = null; renderRemoteSessionResumeBar(); return; }
+        if (Number(sess.remainingSeconds) > 0) task.remainingSec = Math.max(10, Math.floor(Number(sess.remainingSeconds)));
+        if (Array.isArray(task.videos) && task.videos.length && sess.currentVideoSec > 10) {
+          const vIdx = Math.min(Math.max(0, Number(sess.currentVideoIndex) || 0), task.videos.length - 1);
+          const vid = task.videos[vIdx];
+          if (vid && vid.id) {
+            state.videoProgress = state.videoProgress || {};
+            state.videoProgress[vid.id] = { time: Math.floor(sess.currentVideoSec), updatedAt: Date.now() };
+          }
+        }
+        document.getElementById('remote-session-resume-bar').classList.add('hidden');
+        startTaskInTimer(task.id, { openBanner: true, fromUserGesture: true });
+        if (Array.isArray(task.videos) && task.videos.length && Number(sess.currentVideoIndex) > 0) {
+          openPlannerVideoForTask(task, Number(sess.currentVideoIndex), true);
+        }
+      };
+      document.getElementById('btn-remote-session-dismiss').onclick = () => {
+        const sess = state.activeSession;
+        if (sess) remoteSessionDismissedKey = `${sess.taskId}_${sess.lastTickAt || 0}`;
+        document.getElementById('remote-session-resume-bar').classList.add('hidden');
       };
 
       // Resume Last Watched Video Card & Low-Volume Safety Tip Controls
