@@ -980,14 +980,20 @@
             </div>
           </div>
 
-          <!-- Row 2 (Lectures Tab Only): Quick Search (Right) + Filter Pills (Left) -->
+          <!-- Row 2 (Lectures Tab Only): Quick Search (Right) + Filter Pills & Admin Add Toggle (Left) -->
           <div id="syl-lectures-toolbar" class="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t" style="border-color: var(--border-hairline);">
             <input id="topic-search-input" type="text" placeholder="بحث سريع في المحاضرات..." class="px-3.5 py-2 apple-subcard text-base sm:text-xs focus:outline-none w-full sm:w-64" />
-            <div class="seg-control inline-flex text-[11px] font-semibold">
-              <button data-topic-filter="ALL" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
-              <button data-topic-filter="Post-Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">فاينل</button>
-              <button data-topic-filter="Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">ميدتيرم</button>
-              <button data-topic-filter="Seminar" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">سيمينار (Seminar)</button>
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="seg-control inline-flex text-[11px] font-semibold">
+                <button data-topic-filter="ALL" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer">الكل</button>
+                <button data-topic-filter="Post-Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">فاينل</button>
+                <button data-topic-filter="Midterm" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">ميدتيرم</button>
+                <button data-topic-filter="Seminar" class="topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer" style="color: var(--text-muted);">سيمينار (Seminar)</button>
+              </div>
+              <button type="button" id="btn-toggle-add-topic" class="hidden tap-btn px-3 py-2 rounded-xl bg-[#0a84ff]/15 border border-[#0a84ff]/35 text-[#38bdf8] text-[11px] font-bold cursor-pointer inline-flex items-center gap-1 whitespace-nowrap">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>إضافة محاضرة</span>
+              </button>
             </div>
           </div>
         </div>
@@ -2369,26 +2375,7 @@
         { id: 'op-p12', title: 'L16: Lid', kind: 'Post-Midterm' },
         { id: 'op-p13', title: 'L17: Orbit', kind: 'Post-Midterm' },
         { id: 'op-p-ped', title: 'L18: Pediatric Ophthalmology', kind: 'Post-Midterm' },
-        { id: 'op-p-strab', title: 'L19: Strabismus', kind: 'Post-Midterm' },
-        // Seminars (18)
-        { id: 'op-sem1', title: 'Seminar 1: Spring Catarrh', kind: 'Seminar' },
-        { id: 'op-sem2', title: 'Seminar 2: MPC', kind: 'Seminar' },
-        { id: 'op-sem3', title: 'Seminar 3: Hypopyon Ulcer', kind: 'Seminar' },
-        { id: 'op-sem4', title: 'Seminar 4: Herpetic Keratitis', kind: 'Seminar' },
-        { id: 'op-sem5', title: 'Seminar 5: Uveitis', kind: 'Seminar' },
-        { id: 'op-sem6', title: 'Seminar 6: ACG', kind: 'Seminar' },
-        { id: 'op-sem7', title: 'Seminar 7: Dacryocystitis', kind: 'Seminar' },
-        { id: 'op-sem8', title: 'Seminar 8: Hypermature Cataract', kind: 'Seminar' },
-        { id: 'op-sem9', title: 'Seminar 9: POAG', kind: 'Seminar' },
-        { id: 'op-sem10', title: 'Seminar 10: Lens Subluxation', kind: 'Seminar' },
-        { id: 'op-sem11', title: 'Seminar 11: Diabetic Retinopathy – RP', kind: 'Seminar' },
-        { id: 'op-sem12', title: 'Seminar 12: CRAO – CRVO - RD', kind: 'Seminar' },
-        { id: 'op-sem13', title: 'Seminar 13: Papilledema', kind: 'Seminar' },
-        { id: 'op-sem14', title: 'Seminar 14: Hyphema - Penetrating Trauma - Chemical Injury', kind: 'Seminar' },
-        { id: 'op-sem15', title: 'Seminar 15: Chalazion', kind: 'Seminar' },
-        { id: 'op-sem16', title: 'Seminar 16: Thyroid Eye Disease', kind: 'Seminar' },
-        { id: 'op-sem17', title: 'Seminar 17: Acc. Esotropia', kind: 'Seminar' },
-        { id: 'op-sem18', title: 'Seminar 18: Congenital Esotropia', kind: 'Seminar' }
+        { id: 'op-p-strab', title: 'L19: Strabismus', kind: 'Post-Midterm' }
       ],
       FMIMC: [
         // Lectures
@@ -5125,7 +5112,9 @@
       document.getElementById('admin-active-badge').classList.toggle('hidden', !adm);
       document.getElementById('nav-admin-tab').classList.toggle('hidden', !adm);
       document.getElementById('mob-admin-btn').classList.toggle('hidden', !adm);
-      document.getElementById('add-topic-form').classList.toggle('hidden', !adm);
+      const addTopicToggleBtn = document.getElementById('btn-toggle-add-topic');
+      if (addTopicToggleBtn) addTopicToggleBtn.classList.toggle('hidden', !adm);
+      if (!adm) document.getElementById('add-topic-form').classList.add('hidden');
       const admLbl = document.getElementById('admin-lock-label');
       if (admLbl) { admLbl.textContent = adm ? 'Admin' : ''; admLbl.className = adm ? 'hidden sm:inline text-amber-400 font-bold' : 'hidden'; }
       renderExamsTimeline();
@@ -5166,11 +5155,46 @@
       });
     }
 
+    function formatExamDayGap(dateStrA, dateStrB) {
+      const parseUtc = (s) => {
+        const parts = String(s || '').split('-').map(Number);
+        if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+        return Date.UTC(parts[0], parts[1] - 1, parts[2]);
+      };
+      const a = parseUtc(dateStrA), b = parseUtc(dateStrB);
+      if (a === null || b === null) return '';
+      const diffDays = Math.round((b - a) / 86400000);
+      if (diffDays <= 0) return 'نفس اليوم';
+      if (diffDays === 1) return 'بعد يوم واحد';
+      if (diffDays === 2) return 'بعد يومين';
+      if (diffDays <= 10) return `بعد ${diffDays} أيام`;
+      return `بعد ${diffDays} يوم`;
+    }
+
     function renderExamsTimeline() {
       const sorted = getSortedExams().filter(e => state.examFilter === 'ALL' || e.type === state.examFilter);
       document.getElementById('exams-timeline-list').innerHTML = sorted.map((ex, i) => {
         const accentColor = (SUBJECTS_META[ex.code] && SUBJECTS_META[ex.code].color) || '#0a84ff';
         const typeBadge = ex.type === 'Final' ? 'bg-[#0a84ff]/15 text-[#0a84ff] border-[#0a84ff]/25' : 'bg-purple-500/15 text-purple-400 border-purple-500/25';
+        let connectorHtml = '';
+        if (i < sorted.length - 1) {
+          const gapText = formatExamDayGap(ex.dateStr, sorted[i + 1].dateStr);
+          if (gapText) {
+            const isTight = gapText === 'نفس اليوم' || gapText === 'بعد يوم واحد';
+            const pillCls = isTight
+              ? 'bg-amber-500/15 border-amber-400/35 text-amber-400'
+              : 'apple-card border-sky-400/25 text-[#38bdf8]';
+            connectorHtml = `
+              <div class="flex items-center justify-center gap-2.5 py-0.5 px-4 select-none">
+                <span class="h-px flex-1 max-w-[90px]" style="background: var(--border-hairline);"></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold ${pillCls}">
+                  <i data-lucide="arrow-down" class="w-3 h-3 shrink-0"></i>
+                  <span>${gapText}</span>
+                </span>
+                <span class="h-px flex-1 max-w-[90px]" style="background: var(--border-hairline);"></span>
+              </div>`;
+          }
+        }
         return `
           <div class="apple-subcard apple-card-hover stagger-item p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 relative overflow-hidden" style="--i:${i}">
             <span class="absolute right-0 top-0 bottom-0 w-1.5" style="background:${accentColor};"></span>
@@ -5195,7 +5219,7 @@
               <div id="timer-${ex.id}" class="px-3 py-1.5 rounded-xl apple-card text-[#0a84ff]"></div>
               ${shared.isAdmin ? `<button type="button" data-edit-ex="${ex.id}" class="edit-ex-btn tap-btn px-2.5 py-1.5 rounded-lg apple-card text-[11px] font-bold text-[#0a84ff] cursor-pointer">تعديل</button>` : ''}
             </div>
-          </div>`;
+          </div>${connectorHtml}`;
       }).join('');
       updateCountdowns();
       refreshLucideIcons();
@@ -6049,52 +6073,93 @@
       refreshLucideIcons();
     }
 
-    // 4-Stage Syllabus Checklist
+    // 4-Stage Syllabus Checklist (Modern 2-Col Glassmorphism Cards & Collapsible Sections)
+    const sylCollapsedSections = {};
+
     function renderTopicRow(t, idx) {
-      const st = (state.stages && state.stages[t.id]) || { videos: false, studied: false, reviewed: false, solved: false }, pct = getTopicPct(t.id);
+      const st = (state.stages && state.stages[t.id]) || { videos: false, studied: false, reviewed: false, solved: false };
+      const pct = getTopicPct(t.id);
       const rawNote = (state.notes[t.id] || '').trim();
       const noteVal = (state.notes[t.id] || '').replace(/"/g, '&quot;');
       const hasNote = rawNote.length > 0;
-      const badgeCls = t.kind === 'Seminar' ? 'bg-purple-500/15 text-purple-400' : t.kind === 'Midterm' ? 'bg-amber-500/15 text-amber-400' : 'bg-[#0a84ff]/15 text-[#0a84ff]';
+      const accentColor = (SUBJECTS_META[state.activeSubject] && SUBJECTS_META[state.activeSubject].color) || '#0a84ff';
+      const badgeCls = t.kind === 'Seminar'
+        ? 'bg-purple-500/15 text-purple-400 border-purple-500/25'
+        : t.kind === 'Midterm'
+          ? 'bg-amber-500/15 text-amber-400 border-amber-500/25'
+          : 'bg-[#0a84ff]/15 text-[#38bdf8] border-[#0a84ff]/25';
+
+      const vids = (Array.isArray(t.videos) && t.videos.length) ? t.videos : (ENT_LECTURE_VIDEOS[t.id] || []);
+      const locked = !canUserChat();
+      const shimiVids = vids.filter(v => v.doc !== 'mosaad');
+      const mosaadVids = vids.filter(v => v.doc === 'mosaad');
+      const renderVidBtn = (v, isMosaad) => {
+        const cls = isMosaad
+          ? (locked ? 'border-emerald-500/25 bg-emerald-500/5 opacity-80' : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:border-emerald-400/75')
+          : (locked ? 'border-[#0a84ff]/25 opacity-80' : 'border-[#0a84ff]/30 text-[#38bdf8] hover:border-[#0a84ff]/70');
+        return `<button type="button" data-vid-id="${escapeHtml(v.id)}" data-vid-title="${escapeHtml(v.title)}" class="topic-video-btn tap-btn px-2.5 py-1 rounded-lg apple-card border text-[11px] font-bold ${cls} cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>${escapeHtml(v.title)}</span></button>`;
+      };
+      const accHtml = vids.length ? `
+        <div id="vid-acc-${t.id}" class="hidden apple-card rounded-xl p-3 space-y-2.5 border border-[#0a84ff]/25">
+          ${shimiVids.length ? `<div class="space-y-1.5"><div class="text-[10px] font-extrabold text-[#38bdf8]">د. أحمد الشيمي</div><div class="flex flex-wrap gap-1.5">${shimiVids.map(v => renderVidBtn(v, false)).join('')}</div></div>` : ''}
+          ${mosaadVids.length ? `<div class="space-y-1.5"><div class="text-[10px] font-extrabold text-emerald-400">د. مسعد عبد العزيز</div><div class="flex flex-wrap gap-1.5">${mosaadVids.map(v => renderVidBtn(v, true)).join('')}</div></div>` : ''}
+        </div>` : '';
+
+      const pillConfigs = [
+        { key: 'videos', label: 'الفيديوهات', onCls: 'bg-[#0a84ff]/15 border-[#0a84ff]/45 text-[#38bdf8]' },
+        { key: 'studied', label: 'ذاكرتها', onCls: 'bg-sky-500/15 border-sky-400/45 text-sky-400' },
+        { key: 'reviewed', label: 'راجعتها', onCls: 'bg-amber-500/15 border-amber-400/45 text-amber-400' },
+        { key: 'solved', label: 'حليت', onCls: 'bg-emerald-500/15 border-emerald-400/45 text-emerald-400' }
+      ];
+      const pillsHtml = pillConfigs.map(p => {
+        const checked = !!st[p.key];
+        const cls = checked
+          ? `${p.onCls} shadow-sm`
+          : 'apple-card border-transparent opacity-75 hover:opacity-100';
+        const iconHtml = checked
+          ? '<i data-lucide="check" class="w-3 h-3 shrink-0"></i>'
+          : '<span class="w-2.5 h-2.5 rounded-full border border-current opacity-40 shrink-0"></span>';
+        return `<label class="tap-btn flex-1 min-w-[74px] flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border text-[11px] font-bold cursor-pointer select-none transition ${cls}"><input type="checkbox" data-st-id="${t.id}" data-st-key="${p.key}" class="stage-check sr-only" ${checked ? 'checked' : ''} />${iconHtml}<span>${p.label}</span></label>`;
+      }).join('');
+
+      const vidActionBtn = vids.length
+        ? `<button type="button" data-acc-vid="${t.id}" class="topic-vid-acc-btn tap-btn px-2.5 py-1.5 rounded-xl bg-[#0a84ff]/15 border border-[#0a84ff]/30 text-[#38bdf8] text-[11px] font-bold cursor-pointer inline-flex items-center gap-1.5"><i data-lucide="${locked ? 'lock' : 'play-circle'}" class="w-3.5 h-3.5 shrink-0"></i><span>فيديوهات الشرح (${vids.length})</span></button>`
+        : '';
+      const noteActionBtn = `<button type="button" data-toggle-note="${t.id}" class="topic-note-toggle-btn tap-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-bold cursor-pointer inline-flex items-center gap-1.5 ${hasNote ? 'bg-amber-500/15 border-amber-400/45 text-amber-400' : 'apple-card border-transparent opacity-80 hover:opacity-100'}"><i data-lucide="sticky-note" class="w-3.5 h-3.5 shrink-0"></i><span>${hasNote ? 'ملاحظة ✓' : 'ملاحظة'}</span></button>`;
+
       return `
-        <div class="apple-subcard p-3.5 space-y-2.5 ${pct === 100 ? 'border-emerald-500/40' : ''}">
-          ${(() => {
-            const vids = (Array.isArray(t.videos) && t.videos.length) ? t.videos : (ENT_LECTURE_VIDEOS[t.id] || []);
-            const locked = !canUserChat();
-            const vidBtn = vids.length
-              ? `<button type="button" data-acc-vid="${t.id}" class="topic-vid-acc-btn tap-btn px-2 py-0.5 rounded-lg bg-[#0a84ff]/15 border border-[#0a84ff]/30 text-[#38bdf8] text-[10px] font-bold cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>فيديوهات الشرح (${vids.length})</span></button>`
-              : '';
-            const noteBtn = `<button type="button" data-toggle-note="${t.id}" class="topic-note-toggle-btn tap-btn px-2 py-0.5 rounded-lg border text-[10px] font-bold cursor-pointer ${hasNote ? 'bg-amber-500/15 border-amber-400/45 text-amber-300' : 'apple-card border-transparent opacity-80 hover:opacity-100'}">${hasNote ? '📝 ملاحظة ✓' : '📝 ملاحظة'}</button>`;
-            const shimiVids = vids.filter(v => v.doc !== 'mosaad');
-            const mosaadVids = vids.filter(v => v.doc === 'mosaad');
-            const renderBtn = (v, isMosaad) => {
-              const cls = isMosaad
-                ? (locked ? 'border-emerald-500/25 bg-emerald-500/5 text-slate-300 opacity-85' : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:border-emerald-400/75')
-                : (locked ? 'border-[#0a84ff]/25 text-slate-300 opacity-85' : 'border-[#0a84ff]/25 text-[#38bdf8] hover:border-[#0a84ff]/60');
-              return `<button type="button" data-vid-id="${escapeHtml(v.id)}" data-vid-title="${escapeHtml(v.title)}" class="topic-video-btn tap-btn px-2.5 py-1 rounded-lg apple-card border text-[11px] font-bold ${cls} cursor-pointer inline-flex items-center gap-1">${locked ? '🔒' : '▶️'}<span>${escapeHtml(v.title)}</span></button>`;
-            };
-            const accHtml = vids.length ? `
-              <div id="vid-acc-${t.id}" class="hidden apple-card p-3 space-y-2.5 border border-[#0a84ff]/20">
-                ${shimiVids.length ? `<div class="space-y-1.5"><div class="text-[10px] font-extrabold text-[#38bdf8]">د. أحمد الشيمي</div><div class="flex flex-wrap gap-1.5">${shimiVids.map(v => renderBtn(v, false)).join('')}</div></div>` : ''}
-                ${mosaadVids.length ? `<div class="space-y-1.5"><div class="text-[10px] font-extrabold text-emerald-400">د. مسعد عبد العزيز</div><div class="flex flex-wrap gap-1.5">${mosaadVids.map(v => renderBtn(v, true)).join('')}</div></div>` : ''}
-              </div>` : '';
-            return `
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${(SUBJECTS_META[state.activeSubject] && SUBJECTS_META[state.activeSubject].color) || '#0a84ff'};"></span><span class="font-mono-num text-[11px]" style="color: var(--text-muted);">${pad2(idx + 1)}</span><span class="text-xs sm:text-sm font-bold ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</span></div>
-                <div class="flex items-center gap-1.5 flex-wrap shrink-0">${vidBtn}${noteBtn}<span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${t.kind}</span><span class="font-mono-num text-xs font-bold text-[#0a84ff]">${pct}%</span>${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn text-xs text-rose-400 px-1 cursor-pointer">✕</button>` : ''}</div>
-              </div>
-              ${hasNote ? `<div class="text-[11px] text-amber-300/85 truncate pr-4">📝 ${escapeHtml(rawNote)}</div>` : ''}
-              ${accHtml}`;
-          })()}
-          <div class="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden"><div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-[#0a84ff]'}" style="width:${pct}%"></div></div>
-          <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold">
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="videos" class="stage-check accent-[#0a84ff]" ${st.videos ? 'checked' : ''} /><span>شوفت الفيديوهات</span></label>
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="studied" class="stage-check accent-[#0a84ff]" ${st.studied ? 'checked' : ''} /><span>ذاكرتها</span></label>
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="reviewed" class="stage-check accent-amber-400" ${st.reviewed ? 'checked' : ''} /><span>راجعتها</span></label>
-            <label class="tap-btn flex items-center gap-1.5 px-2.5 py-1 rounded-full apple-card cursor-pointer"><input type="checkbox" data-st-id="${t.id}" data-st-key="solved" class="stage-check accent-emerald-400" ${st.solved ? 'checked' : ''} /><span>حليت عليها</span></label>
+        <div class="apple-subcard rounded-2xl p-4 pb-5 relative overflow-hidden flex flex-col justify-between gap-3 transition hover:border-[#0a84ff]/35 ${pct === 100 ? 'border-emerald-500/45' : ''}">
+          <!-- Top Row: Number Badge + Title + Kind + % + Subtle Admin Delete -->
+          <div class="flex items-start justify-between gap-2.5">
+            <div class="flex items-start gap-2.5 min-w-0 flex-1">
+              <span class="mt-0.5 px-2 py-0.5 rounded-lg font-mono-num text-[11px] font-extrabold shrink-0 border" style="background: ${accentColor}1a; color: ${accentColor}; border-color: ${accentColor}38;">${pad2(idx + 1)}</span>
+              <h5 class="text-xs sm:text-sm font-bold leading-snug break-words ${pct === 100 ? 'text-emerald-400' : ''}">${t.title}</h5>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="px-2 py-0.5 rounded-md border text-[10px] font-bold ${badgeCls}">${t.kind}</span>
+              <span class="font-mono-num text-xs font-extrabold ${pct === 100 ? 'text-emerald-400' : 'text-[#38bdf8]'}">${pct}%</span>
+              ${shared.isAdmin ? `<button type="button" data-del-topic="${t.id}" class="del-topic-btn tap-btn w-6 h-6 rounded-lg inline-flex items-center justify-center text-rose-400/75 hover:text-rose-400 hover:bg-rose-500/15 cursor-pointer transition" title="حذف المحاضرة">×</button>` : ''}
+            </div>
           </div>
-          <div id="note-box-${t.id}" class="hidden pt-1">
-            <input type="text" data-note-id="${t.id}" value="${noteVal}" placeholder="اكتب ملاحظتك السريعة هنا..." class="topic-note-input w-full px-3 py-1.5 rounded-xl apple-card text-base sm:text-[11px] focus:outline-none focus:border-[#0a84ff]/50" />
+
+          <!-- 4 Interactive Stage Pills -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">${pillsHtml}</div>
+
+          <!-- Compact Bottom Row: Videos & Note Actions -->
+          <div class="space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-1.5">${vidActionBtn}${noteActionBtn}</div>
+              ${hasNote ? `<div class="text-[11px] text-amber-400/90 truncate max-w-full sm:max-w-[55%]" title="${noteVal}">📝 ${escapeHtml(rawNote)}</div>` : ''}
+            </div>
+            ${accHtml}
+            <div id="note-box-${t.id}" class="hidden pt-0.5">
+              <input type="text" data-note-id="${t.id}" value="${noteVal}" placeholder="اكتب ملاحظتك السريعة هنا..." class="topic-note-input w-full px-3 py-2 rounded-xl apple-card text-base sm:text-xs focus:outline-none focus:border-[#0a84ff]/50" />
+            </div>
+          </div>
+
+          <!-- Thin Bottom-Edge Progress Bar -->
+          <div class="absolute bottom-0 inset-x-0 h-1 bg-slate-500/15">
+            <div class="h-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-gradient-to-l from-[#38bdf8] to-[#0a84ff]'}" style="width:${pct}%"></div>
           </div>
         </div>`;
     }
@@ -6114,24 +6179,59 @@
       }).join('');
 
       document.getElementById('active-subject-title').innerHTML = `<span class="inline-flex items-center gap-2">${getModuleLottie(state.activeSubject, 28)}<span>${SUBJECTS_META[state.activeSubject].name}</span></span>`;
+
+      const fullSubjList = shared.topics[state.activeSubject] || [];
+      const hasSeminars = fullSubjList.some(t => t.kind === 'Seminar');
+      const semFilterBtn = document.querySelector('.topic-filter-btn[data-topic-filter="Seminar"]');
+      if (semFilterBtn) semFilterBtn.classList.toggle('hidden', !hasSeminars);
+      if (!hasSeminars && state.topicFilter === 'Seminar') {
+        state.topicFilter = 'ALL';
+        document.querySelectorAll('.topic-filter-btn').forEach(x => {
+          const on = x.dataset.topicFilter === 'ALL';
+          x.className = on ? 'topic-filter-btn tap-btn px-3 py-1.5 rounded-lg bg-[#0a84ff] text-white cursor-pointer' : 'topic-filter-btn tap-btn px-3 py-1.5 rounded-lg cursor-pointer';
+          if (x.dataset.topicFilter === 'Seminar') x.classList.add('hidden');
+          x.style.color = on ? '#fff' : 'var(--text-muted)';
+        });
+      }
+
       const q = (document.getElementById('topic-search-input').value || '').trim().toLowerCase();
-      const all = (shared.topics[state.activeSubject] || []).filter(t => t.title.toLowerCase().includes(q));
+      const all = fullSubjList.filter(t => t.title.toLowerCase().includes(q));
       const postList = all.filter(t => t.kind === 'Post-Midterm'), midList = all.filter(t => t.kind === 'Midterm'), semList = all.filter(t => t.kind === 'Seminar');
+
+      const renderSection = (secKey, title, colorCls, badgeBgCls, list, emptyMsg) => {
+        const fullKey = `${state.activeSubject}_${secKey}`;
+        const collapsed = !!sylCollapsedSections[fullKey];
+        const doneCount = list.filter(t => getTopicPct(t.id) === 100).length;
+        return `
+          <div class="space-y-3">
+            <button type="button" data-sec-toggle="${fullKey}" class="syl-sec-toggle w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl apple-subcard hover:border-[#0a84ff]/35 cursor-pointer transition text-right">
+              <div class="flex items-center gap-2 min-w-0">
+                <i data-lucide="${collapsed ? 'chevron-left' : 'chevron-down'}" class="w-4 h-4 shrink-0 ${colorCls}"></i>
+                <h4 class="text-xs sm:text-sm font-extrabold truncate ${colorCls}">${title}</h4>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono-num font-bold shrink-0 ${badgeBgCls}">${doneCount} / ${list.length} مكتمل</span>
+            </button>
+            <div class="${collapsed ? 'hidden' : ''}">
+              ${list.length
+                ? `<div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5 items-stretch">${list.map((t, i) => renderTopicRow(t, i)).join('')}</div>`
+                : `<div class="apple-subcard rounded-xl p-4 text-center text-xs" style="color: var(--text-muted);">${emptyMsg}</div>`}
+            </div>
+          </div>`;
+      };
 
       let html = '';
       if (state.topicFilter === 'ALL' || state.topicFilter === 'Post-Midterm') {
-        html += `<div class="space-y-2.5"><h4 class="text-xs sm:text-sm font-extrabold text-[#0a84ff] px-1">Post-Midterm — الجديد للفاينل (${postList.length})</h4>${postList.length ? postList.map((t, i) => renderTopicRow(t, i)).join('') : '<div class="text-xs py-2">لا توجد محاضرات</div>'}</div>`;
+        html += renderSection('Post-Midterm', 'Post-Midterm — الجديد للفاينل', 'text-[#38bdf8]', 'bg-[#0a84ff]/15 text-[#38bdf8]', postList, 'لا توجد محاضرات');
       }
       if (state.topicFilter === 'ALL' || state.topicFilter === 'Midterm') {
-        html += `<div class="space-y-2.5 pt-2"><h4 class="text-xs sm:text-sm font-extrabold text-amber-400 px-1">Midterm — الميدتيرم (${midList.length})</h4>${midList.length ? midList.map((t, i) => renderTopicRow(t, i)).join('') : '<div class="text-xs py-2">لا توجد محاضرات</div>'}</div>`;
+        html += renderSection('Midterm', 'Midterm — الميدتيرم', 'text-amber-400', 'bg-amber-500/15 text-amber-400', midList, 'لا توجد محاضرات');
       }
-      if ((state.topicFilter === 'ALL' && semList.length) || state.topicFilter === 'Seminar') {
-        html += `<div class="space-y-2.5 pt-2"><h4 class="text-xs sm:text-sm font-extrabold text-purple-400 px-1">Seminars — السيمينارات الداخلة في الفاينل (${semList.length})</h4>${semList.length ? semList.map((t, i) => renderTopicRow(t, i)).join('') : '<div class="text-xs py-2">لا توجد سيمينارات لهذه المادة</div>'}</div>`;
+      if (hasSeminars && ((state.topicFilter === 'ALL' && semList.length) || state.topicFilter === 'Seminar')) {
+        html += renderSection('Seminar', 'Seminars — السيمينارات الداخلة في الفاينل', 'text-purple-400', 'bg-purple-500/15 text-purple-400', semList, 'لا توجد سيمينارات لهذه المادة');
       }
       document.getElementById('topics-sections-container').innerHTML = html;
       updateKPIs();
       refreshLucideIcons();
-      if (!skipStagger) gsapStagger('#topics-sections-container .stagger-item');
       renderSubjectResources();
       renderSubjectQuizzes();
     }
@@ -8276,7 +8376,20 @@
       document.getElementById('video-modal-close').onclick = closeVideoModal;
       document.getElementById('video-player-modal').onclick = (e) => { if (e.target.id === 'video-player-modal') closeVideoModal(); };
 
+      document.getElementById('btn-toggle-add-topic').onclick = () => {
+        if (!shared.isAdmin) return;
+        const form = document.getElementById('add-topic-form');
+        const isHidden = form.classList.toggle('hidden');
+        if (!isHidden) { const inp = document.getElementById('new-topic-input'); if (inp) inp.focus(); }
+      };
       document.getElementById('topics-sections-container').onclick = async (e) => {
+        const secBtn = e.target.closest('.syl-sec-toggle');
+        if (secBtn) {
+          const k = secBtn.dataset.secToggle;
+          sylCollapsedSections[k] = !sylCollapsedSections[k];
+          renderSubjects(true);
+          return;
+        }
         const noteBtn = e.target.closest('.topic-note-toggle-btn');
         if (noteBtn) {
           const box = document.getElementById(`note-box-${noteBtn.dataset.toggleNote}`);
@@ -8305,8 +8418,9 @@
           ensureYouTubeAPI(() => loadModalYouTubeVideo(vidBtn.dataset.vidId));
           return;
         }
-        if (e.target.classList.contains('del-topic-btn') && shared.isAdmin) {
-          shared.topics[state.activeSubject] = shared.topics[state.activeSubject].filter(t => t.id !== e.target.dataset.delTopic);
+        const delTopicBtn = e.target.closest('.del-topic-btn');
+        if (delTopicBtn && shared.isAdmin) {
+          shared.topics[state.activeSubject] = shared.topics[state.activeSubject].filter(t => t.id !== delTopicBtn.dataset.delTopic);
           await saveSharedToFirestore('topics', { data: shared.topics });
           renderSubjects(); showToast('تم حذف المحاضرة من Firestore');
         }
